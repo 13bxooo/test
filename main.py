@@ -3,209 +3,193 @@ import streamlit as st
 st.set_page_config(
     page_title="PROJECT : ECHO",
     page_icon="◈",
-    layout="wide",
-    initial_sidebar_state="collapsed"
+    layout="wide"
 )
 
 # -------------------------
-# 기본 설정
+# CSS
 # -------------------------
 st.markdown("""
 <style>
-    /* Streamlit 기본 여백 제거 */
-    .block-container {
-        padding: 0 !important;
-        max-width: 100% !important;
-    }
 
-    header {
-        visibility: hidden;
-    }
+html, body, [data-testid="stAppViewContainer"] {
+    background-color: #111820 !important;
+}
 
-    /* 전체 배경 */
-    .stApp {
-        background: #111820;
-    }
+[data-testid="stHeader"] {
+    display: none;
+}
 
-    /* 게임 화면 */
-    .game-screen {
-        position: relative;
-        width: 100%;
-        height: 100vh;
-        overflow: hidden;
-        background:
-            linear-gradient(
-                rgba(20, 35, 48, 0.92),
-                rgba(20, 35, 48, 0.92)
-            ),
-            repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 31px,
-                rgba(255,255,255,0.025) 32px
-            ),
-            repeating-linear-gradient(
-                90deg,
-                transparent,
-                transparent 31px,
-                rgba(255,255,255,0.025) 32px
-            );
-    }
+.block-container {
+    padding: 0 !important;
+    max-width: 100% !important;
+}
 
-    /* -------------------------
-       상단 좌측 타이틀
-       ------------------------- */
-    .game-title {
-        position: absolute;
-        top: 24px;
-        left: 28px;
+/* 전체 게임 화면 */
+.game-screen {
+    width: 100%;
+    height: 100vh;
 
-        padding: 10px 16px;
+    background:
+        repeating-linear-gradient(
+            0deg,
+            #182631 0px,
+            #182631 39px,
+            #1c2c38 40px
+        );
 
-        background: rgba(10, 18, 26, 0.9);
-        border: 2px solid #6d879d;
+    position: relative;
+    overflow: hidden;
+}
 
-        color: #ffffff;
-        font-family: monospace;
-        font-size: 18px;
-        font-weight: bold;
+/* 제목 */
+.game-title {
+    position: absolute;
+    top: 25px;
+    left: 30px;
 
-        letter-spacing: 2px;
-    }
+    padding: 10px 16px;
 
-    /* -------------------------
-       상단 우측 타이머
-       ------------------------- */
-    .timer {
-        position: absolute;
-        top: 24px;
-        right: 28px;
+    background: #101820;
+    border: 2px solid #71889a;
 
-        padding: 10px 16px;
+    color: white;
 
-        background: rgba(10, 18, 26, 0.9);
-        border: 2px solid #6d879d;
+    font-family: monospace;
+    font-size: 18px;
+    font-weight: bold;
 
-        color: #ffffff;
-        font-family: monospace;
-        font-size: 17px;
+    letter-spacing: 2px;
+}
 
-        letter-spacing: 1px;
-    }
+/* 타이머 */
+.timer {
+    position: absolute;
+    top: 25px;
+    right: 30px;
 
-    /* -------------------------
-       중앙 연구시설
-       ------------------------- */
-    .room {
-        position: absolute;
+    padding: 10px 16px;
 
-        left: 7%;
-        right: 7%;
-        top: 100px;
-        bottom: 155px;
+    background: #101820;
+    border: 2px solid #71889a;
 
-        border: 3px solid #526b7d;
+    color: white;
 
-        background:
-            repeating-linear-gradient(
-                0deg,
-                #1b2934 0px,
-                #1b2934 39px,
-                #1e2d38 40px
-            );
+    font-family: monospace;
+    font-size: 17px;
+}
 
-        box-shadow:
-            inset 0 0 0 2px #101820,
-            0 0 30px rgba(0,0,0,0.4);
-    }
+/* 연구실 */
+.room {
+    position: absolute;
 
-    /* 바닥 중앙 표시 */
-    .room-center {
-        position: absolute;
+    left: 7%;
+    right: 7%;
+    top: 100px;
+    bottom: 150px;
 
-        left: 50%;
-        top: 45%;
+    background:
+        repeating-linear-gradient(
+            0deg,
+            #1b2a35 0px,
+            #1b2a35 39px,
+            #20313d 40px
+        );
 
-        transform: translate(-50%, -50%);
+    border: 3px solid #536b7c;
 
-        width: 220px;
-        height: 120px;
+    box-shadow:
+        inset 0 0 0 2px #0d151c,
+        0 0 30px rgba(0,0,0,0.4);
+}
 
-        border: 2px solid #405766;
+/* ECHO */
+.echo {
+    position: absolute;
 
-        display: flex;
-        justify-content: center;
-        align-items: center;
+    top: 20%;
+    left: 50%;
 
-        color: #71899a;
-        font-family: monospace;
-        font-size: 14px;
+    transform: translateX(-50%);
 
-        text-align: center;
-    }
+    color: #9db3c4;
 
-    /* -------------------------
-       하단 시스템 메시지
-       ------------------------- */
-    .message-box {
-        position: absolute;
+    font-family: monospace;
+    font-size: 14px;
 
-        left: 7%;
-        right: 7%;
-        bottom: 28px;
+    letter-spacing: 6px;
+}
 
-        min-height: 92px;
+/* 중앙 표시 */
+.room-center {
+    position: absolute;
 
-        background: #f1f1f1;
+    top: 45%;
+    left: 50%;
 
-        border: 3px solid #526b7d;
+    transform: translate(-50%, -50%);
 
-        display: flex;
-        align-items: center;
+    width: 230px;
+    height: 120px;
 
-        padding: 14px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-        box-sizing: border-box;
-    }
+    text-align: center;
 
-    .message-label {
-        width: 130px;
+    border: 2px solid #405766;
 
-        color: #243746;
-        font-family: monospace;
-        font-size: 13px;
-        font-weight: bold;
+    color: #8097a8;
 
-        letter-spacing: 1px;
-    }
+    font-family: monospace;
+    font-size: 14px;
 
-    .message-text {
-        flex: 1;
+    line-height: 1.7;
+}
 
-        color: #111820;
-        font-family: monospace;
-        font-size: 15px;
+/* 하단 메시지 */
+.message-box {
+    position: absolute;
 
-        line-height: 1.6;
-    }
+    left: 7%;
+    right: 7%;
+    bottom: 25px;
 
-    /* -------------------------
-       중앙 ECHO 표시
-       ------------------------- */
-    .echo {
-        position: absolute;
+    min-height: 90px;
 
-        left: 50%;
-        top: 24%;
+    background: #f1f1f1;
 
-        transform: translateX(-50%);
+    border: 3px solid #536b7c;
 
-        color: #9bb2c4;
-        font-family: monospace;
+    display: flex;
+    align-items: center;
 
-        font-size: 13px;
-        letter-spacing: 5px;
-    }
+    padding: 15px 20px;
+
+    box-sizing: border-box;
+}
+
+.message-label {
+    width: 130px;
+
+    color: #243746;
+
+    font-family: monospace;
+    font-size: 13px;
+    font-weight: bold;
+
+    letter-spacing: 1px;
+}
+
+.message-text {
+    color: #111820;
+
+    font-family: monospace;
+    font-size: 15px;
+
+    line-height: 1.6;
+}
 
 </style>
 """, unsafe_allow_html=True)
@@ -218,17 +202,14 @@ st.markdown("""
 st.markdown("""
 <div class="game-screen">
 
-    <!-- 타이틀 -->
     <div class="game-title">
         ☰ PROJECT : ECHO
     </div>
 
-    <!-- 타이머 -->
     <div class="timer">
-        TIME  59:59
+        TIME&nbsp;&nbsp;59:59
     </div>
 
-    <!-- 방 -->
     <div class="room">
 
         <div class="echo">
@@ -242,7 +223,6 @@ st.markdown("""
 
     </div>
 
-    <!-- 시스템 메시지 -->
     <div class="message-box">
 
         <div class="message-label">
