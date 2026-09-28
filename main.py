@@ -41,14 +41,13 @@ else:
 
 
 # =========================================================
-# HIDE STREAMLIT DEFAULT UI
+# HIDE STREAMLIT UI
 # =========================================================
 
 st.markdown(
     """
     <style>
 
-    /* 기본 Streamlit 메뉴 */
     #MainMenu {
         visibility: hidden !important;
     }
@@ -61,22 +60,18 @@ st.markdown(
         visibility: hidden !important;
     }
 
-    /* 왼쪽 사이드바 */
     [data-testid="stSidebar"] {
         display: none !important;
     }
 
-    /* 사이드바 열기 버튼 */
     [data-testid="collapsedControl"] {
         display: none !important;
     }
 
-    /* 페이지 네비게이션 */
     [data-testid="stSidebarNav"] {
         display: none !important;
     }
 
-    /* Streamlit 여백 제거 */
     .block-container {
         padding: 0 !important;
         max-width: 100% !important;
@@ -86,41 +81,57 @@ st.markdown(
         background: #000000 !important;
     }
 
+
+    /* =====================================================
+       HOW TO PLAY - STREAMLIT NATIVE PAGE LINK
+       ===================================================== */
+
+    div[data-testid="stPageLink-NavLink"] {
+        position: fixed !important;
+
+        top: 65vh !important;
+        left: 50% !important;
+
+        transform: translateX(-50%) !important;
+
+        width: 220px !important;
+        height: 55px !important;
+
+        z-index: 9999 !important;
+    }
+
+    div[data-testid="stPageLink-NavLink"] a {
+        width: 100% !important;
+        height: 100% !important;
+
+        display: flex !important;
+
+        align-items: center !important;
+        justify-content: center !important;
+
+        background: transparent !important;
+
+        border: none !important;
+        border-radius: 0 !important;
+
+        color: white !important;
+
+        font-family: "NeoDungGeunMo", monospace !important;
+
+        font-size: 19px !important;
+
+        text-decoration: none !important;
+    }
+
+    div[data-testid="stPageLink-NavLink"] a:hover {
+        background: white !important;
+        color: black !important;
+    }
+
     </style>
     """,
     unsafe_allow_html=True,
 )
-
-
-# =========================================================
-# PAGE ROUTING
-# =========================================================
-
-action = st.query_params.get("action")
-
-
-if action == "how_to_play":
-    st.query_params.clear()
-    st.switch_page("pages/1_How_To_Play.py")
-
-
-elif action == "new_game":
-    st.query_params.clear()
-
-    # 게임 페이지가 만들어지면 이곳에서 연결
-    st.switch_page("pages/2_Game.py")
-
-
-elif action == "continue":
-    st.query_params.clear()
-
-    st.warning(
-        "이전 플레이 기록이 존재하지 않습니다. 새 게임을 시작해주세요."
-    )
-
-
-elif action == "title":
-    st.query_params.clear()
 
 
 # =========================================================
@@ -138,19 +149,10 @@ html = f"""
 
 <style>
 
-/* =====================================================
-   FONT
-   ===================================================== */
-
 @font-face {{
     font-family: "NeoDungGeunMo";
     src: url(data:font/ttf;base64,{font_data});
 }}
-
-
-/* =====================================================
-   RESET
-   ===================================================== */
 
 * {{
     box-sizing: border-box;
@@ -172,11 +174,6 @@ body {{
 body {{
     font-family: "NeoDungGeunMo", monospace;
 }}
-
-
-/* =====================================================
-   MAIN SCREEN
-   ===================================================== */
 
 .screen {{
 
@@ -213,8 +210,6 @@ body {{
 
     color: #ffffff;
 
-    font-family: "NeoDungGeunMo", monospace;
-
     font-size: clamp(28px, 4vw, 48px);
 
     letter-spacing: 2px;
@@ -240,8 +235,6 @@ body {{
     white-space: nowrap;
 
     color: #999999;
-
-    font-family: "NeoDungGeunMo", monospace;
 
     font-size: clamp(13px, 1.5vw, 18px);
 
@@ -283,8 +276,6 @@ body {{
 
     cursor: pointer;
 
-    user-select: none;
-
 }}
 
 
@@ -298,7 +289,7 @@ body {{
 
 
 /* =====================================================
-   START POPUP
+   POPUP
    ===================================================== */
 
 .popup {{
@@ -339,10 +330,6 @@ body {{
 }}
 
 
-/* =====================================================
-   POPUP BUTTON
-   ===================================================== */
-
 .popup-button {{
 
     width: 100%;
@@ -382,54 +369,7 @@ body {{
 
 
 /* =====================================================
-   HOW TO PLAY
-   ===================================================== */
-
-.how {{
-
-    position: absolute;
-
-    top: 65vh;
-    left: 50%;
-
-    transform: translateX(-50%);
-
-    width: 220px;
-    height: 55px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    background: transparent;
-
-    border: none;
-
-    color: #ffffff;
-
-    font-family: "NeoDungGeunMo", monospace;
-
-    font-size: 19px;
-
-    cursor: pointer;
-
-    user-select: none;
-
-}}
-
-
-.how:hover {{
-
-    background: #ffffff;
-
-    color: #000000;
-
-}}
-
-
-/* =====================================================
-   TITLE FLICKER
+   FLICKER
    ===================================================== */
 
 @keyframes title-flicker {{
@@ -473,26 +413,6 @@ body {{
         top: 51vh;
     }}
 
-    .popup {{
-
-        top: 59vh;
-
-        left: 50%;
-
-        transform: translateX(-50%);
-
-    }}
-
-    .popup.show {{
-
-        transform: translateX(-50%);
-
-    }}
-
-    .how {{
-        top: 73vh;
-    }}
-
 }}
 
 </style>
@@ -505,10 +425,6 @@ body {{
 <div class="screen">
 
 
-    <!-- =================================================
-         TITLE
-         ================================================= -->
-
     <div class="title">
         PROJECT : LOGIC
     </div>
@@ -519,9 +435,7 @@ body {{
     </div>
 
 
-    <!-- =================================================
-         START
-         ================================================= -->
+    <!-- START -->
 
     <button
         id="start"
@@ -531,9 +445,7 @@ body {{
     </button>
 
 
-    <!-- =================================================
-         START POPUP
-         ================================================= -->
+    <!-- START POPUP -->
 
     <div
         id="popup"
@@ -547,7 +459,6 @@ body {{
             CONTINUE
         </button>
 
-
         <button
             id="new-game"
             class="popup-button"
@@ -558,30 +469,12 @@ body {{
     </div>
 
 
-    <!-- =================================================
-         HOW TO PLAY
-         ================================================= -->
-
-    <button
-        id="how"
-        class="how"
-    >
-        HOW TO PLAY
-    </button>
-
-
 </div>
 
 
 <script>
 
-
-// =========================================================
-// START
-// =========================================================
-
 const start = document.getElementById("start");
-
 const popup = document.getElementById("popup");
 
 
@@ -592,9 +485,7 @@ start.addEventListener("click", function() {{
 }});
 
 
-// =========================================================
 // CONTINUE
-// =========================================================
 
 document
     .getElementById("continue")
@@ -605,9 +496,7 @@ document
     }});
 
 
-// =========================================================
 // NEW GAME
-// =========================================================
 
 document
     .getElementById("new-game")
@@ -617,20 +506,6 @@ document
 
     }});
 
-
-// =========================================================
-// HOW TO PLAY
-// =========================================================
-
-document
-    .getElementById("how")
-    .addEventListener("click", function() {{
-
-        window.parent.location.href = "?action=how_to_play";
-
-    }});
-
-
 </script>
 
 </body>
@@ -639,12 +514,22 @@ document
 """
 
 
-# =========================================================
-# RENDER
-# =========================================================
-
 components.html(
     html,
     height=900,
     scrolling=False,
+)
+
+
+# =========================================================
+# HOW TO PLAY
+# =========================================================
+#
+# components.html 밖에서 실제 Streamlit 페이지 링크를 생성한다.
+# 따라서 Streamlit이 페이지 이동을 직접 처리한다.
+#
+
+st.page_link(
+    "pages/1_How_To_Play.py",
+    label="HOW TO PLAY",
 )
