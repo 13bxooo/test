@@ -26,18 +26,13 @@ font_candidates = [
     Path("neodgm(2).ttf"),
 ]
 
-font_path = None
+font_data = ""
 
-for candidate in font_candidates:
-    if candidate.exists():
-        font_path = candidate
+for font_path in font_candidates:
+    if font_path.exists():
+        with open(font_path, "rb") as f:
+            font_data = base64.b64encode(f.read()).decode("utf-8")
         break
-
-if font_path:
-    with open(font_path, "rb") as f:
-        font_data = base64.b64encode(f.read()).decode("utf-8")
-else:
-    font_data = ""
 
 
 # =========================================================
@@ -47,26 +42,21 @@ else:
 action = st.query_params.get("action")
 
 
-# HOW TO PLAY
 if action == "how_to_play":
-
     st.query_params.clear()
-
     st.switch_page("pages/1_How_To_Play.py")
 
 
-# NEW GAME
 elif action == "new_game":
-
     st.query_params.clear()
 
-    # 게임 화면 제작 후 연결
-    st.switch_page("pages/2_Game.py")
+    # 나중에 게임 페이지가 만들어지면 연결
+    # st.switch_page("pages/2_Game.py")
+
+    st.info("GAME SYSTEM은 현재 준비 중입니다.")
 
 
-# CONTINUE
 elif action == "continue":
-
     st.query_params.clear()
 
     st.warning(
@@ -127,7 +117,6 @@ html = f"""
 <meta charset="UTF-8">
 
 <style>
-
 
 /* =====================================================
    FONT
@@ -333,6 +322,8 @@ body {{
     text-align: left;
 
     cursor: pointer;
+
+    text-decoration: none;
 }}
 
 
@@ -376,6 +367,8 @@ body {{
     cursor: pointer;
 
     user-select: none;
+
+    text-decoration: none;
 }}
 
 
@@ -419,13 +412,11 @@ body {{
 
     .title {{
         top: 12vh;
-
         font-size: 30px;
     }}
 
     .subtitle {{
         top: 22vh;
-
         font-size: 12px;
     }}
 
@@ -435,7 +426,6 @@ body {{
 
     .popup {{
         top: 59vh;
-
         left: 50%;
 
         transform: translateX(-50%);
@@ -488,7 +478,7 @@ body {{
 
 
     <!-- =================================================
-         START MENU
+         START POPUP
          ================================================= -->
 
     <div
@@ -496,20 +486,22 @@ body {{
         class="popup"
     >
 
-        <button
-            id="continue"
+        <a
             class="popup-button"
+            href="?action=continue"
+            target="_top"
         >
             CONTINUE
-        </button>
+        </a>
 
 
-        <button
-            id="new-game"
+        <a
             class="popup-button"
+            href="?action=new_game"
+            target="_top"
         >
             NEW GAME
-        </button>
+        </a>
 
     </div>
 
@@ -518,12 +510,13 @@ body {{
          HOW TO PLAY
          ================================================= -->
 
-    <button
-        id="how"
+    <a
         class="how"
+        href="?action=how_to_play"
+        target="_top"
     >
         HOW TO PLAY
-    </button>
+    </a>
 
 
 </div>
@@ -531,10 +524,9 @@ body {{
 
 <script>
 
-
-// =======================================================
-// START BUTTON
-// =======================================================
+/* =======================================================
+   START BUTTON
+   ======================================================= */
 
 const start =
     document.getElementById("start");
@@ -551,61 +543,6 @@ start.addEventListener(
 
     }}
 );
-
-
-// =======================================================
-// NEW GAME
-// =======================================================
-
-document
-    .getElementById("new-game")
-    .addEventListener(
-        "click",
-        function() {{
-
-            window.parent.location.href =
-                window.parent.location.pathname +
-                "?action=new_game";
-
-        }}
-    );
-
-
-// =======================================================
-// CONTINUE
-// =======================================================
-
-document
-    .getElementById("continue")
-    .addEventListener(
-        "click",
-        function() {{
-
-            window.parent.location.href =
-                window.parent.location.pathname +
-                "?action=continue";
-
-        }}
-    );
-
-
-// =======================================================
-// HOW TO PLAY
-// =======================================================
-
-document
-    .getElementById("how")
-    .addEventListener(
-        "click",
-        function() {{
-
-            window.parent.location.href =
-                window.parent.location.pathname +
-                "?action=how_to_play";
-
-        }}
-    );
-
 
 </script>
 
