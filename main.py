@@ -35,17 +35,34 @@ for font_path in font_candidates:
 
 
 # =========================================================
-# STREAMLIT UI HIDDEN
+# SESSION STATE
+# =========================================================
+
+if "start_open" not in st.session_state:
+    st.session_state.start_open = False
+
+
+# =========================================================
+# HIDE STREAMLIT UI
 # =========================================================
 
 st.markdown(
     f"""
     <style>
 
+    /* =====================================================
+       FONT
+       ===================================================== */
+
     @font-face {{
         font-family: "NeoDungGeunMo";
         src: url(data:font/ttf;base64,{font_data});
     }}
+
+
+    /* =====================================================
+       STREAMLIT UI
+       ===================================================== */
 
     #MainMenu {{
         visibility: hidden;
@@ -64,7 +81,7 @@ st.markdown(
     }}
 
     .stApp {{
-        background: #000000;
+        background: #000000 !important;
     }}
 
     .block-container {{
@@ -74,29 +91,11 @@ st.markdown(
 
 
     /* =====================================================
-       START SCREEN
-       ===================================================== */
-
-    .screen {{
-        position: fixed;
-        inset: 0;
-
-        width: 100vw;
-        height: 100vh;
-
-        background: #000000;
-        color: #ffffff;
-
-        overflow: hidden;
-    }}
-
-
-    /* =====================================================
        TITLE
        ===================================================== */
 
     .project-title {{
-        position: absolute;
+        position: fixed;
 
         top: 12vh;
         left: 50%;
@@ -105,18 +104,26 @@ st.markdown(
 
         white-space: nowrap;
 
+        color: #ffffff;
+
         font-family: "NeoDungGeunMo", monospace;
 
         font-size: clamp(28px, 4vw, 48px);
 
         letter-spacing: 2px;
 
+        z-index: 10;
+
         animation: title-flicker 4s infinite;
     }}
 
 
+    /* =====================================================
+       SUBTITLE
+       ===================================================== */
+
     .project-subtitle {{
-        position: absolute;
+        position: fixed;
 
         top: 22vh;
         left: 50%;
@@ -132,60 +139,30 @@ st.markdown(
         font-size: clamp(13px, 1.5vw, 18px);
 
         letter-spacing: 1px;
+
+        z-index: 10;
     }}
 
 
     /* =====================================================
-       STREAMLIT BUTTON COMMON
+       START CONTAINER
        ===================================================== */
 
-    div.stButton {{
-        position: absolute;
-        z-index: 100;
-    }}
+    .st-key-start_button {{
+        position: fixed !important;
 
-    div.stButton > button {{
-        border-radius: 0 !important;
+        top: 51vh !important;
+        left: 50% !important;
 
-        background: transparent !important;
+        transform: translateX(-50%) !important;
 
-        border: none !important;
+        width: 170px !important;
+        height: 55px !important;
 
-        color: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
 
-        font-family: "NeoDungGeunMo", monospace !important;
-
-        cursor: pointer !important;
-
-        box-shadow: none !important;
-
-        transition:
-            background 0.15s ease,
-            color 0.15s ease !important;
-    }}
-
-    div.stButton > button:hover {{
-        background: #ffffff !important;
-
-        color: #000000 !important;
-
-        border: none !important;
-    }}
-
-    div.stButton > button:focus {{
-        background: transparent !important;
-
-        color: #ffffff !important;
-
-        border: none !important;
-
-        box-shadow: none !important;
-    }}
-
-    div.stButton > button:focus:hover {{
-        background: #ffffff !important;
-
-        color: #000000 !important;
+        z-index: 1000 !important;
     }}
 
 
@@ -193,127 +170,195 @@ st.markdown(
        START BUTTON
        ===================================================== */
 
-    .start-button {{
-        top: 51vh;
-        left: 50%;
-
-        transform: translateX(-50%);
-
-        width: 170px;
-        height: 55px;
-    }}
-
-    .start-button button {{
+    .st-key-start_button button {{
         width: 170px !important;
         height: 55px !important;
 
+        margin: 0 !important;
         padding: 0 !important;
 
+        border: none !important;
+        border-radius: 0 !important;
+
+        background: transparent !important;
+
+        color: #ffffff !important;
+
+        font-family: "NeoDungGeunMo", monospace !important;
+
         font-size: 19px !important;
+
+        box-shadow: none !important;
+
+        cursor: pointer !important;
+    }}
+
+
+    .st-key-start_button button:hover {{
+        background: #ffffff !important;
+        color: #000000 !important;
+        border: none !important;
+    }}
+
+
+    .st-key-start_button button:focus {{
+        background: transparent !important;
+        color: #ffffff !important;
+        border: none !important;
+        box-shadow: none !important;
+    }}
+
+
+    .st-key-start_button button:focus:hover {{
+        background: #ffffff !important;
+        color: #000000 !important;
     }}
 
 
     /* =====================================================
-       HOW TO PLAY
+       HOW TO PLAY CONTAINER
        ===================================================== */
 
-    .how-button {{
-        top: 65vh;
-        left: 50%;
+    .st-key-how_to_play_button {{
+        position: fixed !important;
 
-        transform: translateX(-50%);
+        top: 65vh !important;
+        left: 50% !important;
 
-        width: 220px;
-        height: 55px;
-    }}
+        transform: translateX(-50%) !important;
 
-    .how-button button {{
         width: 220px !important;
         height: 55px !important;
 
         padding: 0 !important;
+        margin: 0 !important;
+
+        z-index: 1000 !important;
+    }}
+
+
+    /* =====================================================
+       HOW TO PLAY BUTTON
+       ===================================================== */
+
+    .st-key-how_to_play_button button {{
+        width: 220px !important;
+        height: 55px !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+
+        border: none !important;
+        border-radius: 0 !important;
+
+        background: transparent !important;
+
+        color: #ffffff !important;
+
+        font-family: "NeoDungGeunMo", monospace !important;
 
         font-size: 19px !important;
+
+        box-shadow: none !important;
+
+        cursor: pointer !important;
+    }}
+
+
+    .st-key-how_to_play_button button:hover {{
+        background: #ffffff !important;
+        color: #000000 !important;
+        border: none !important;
+    }}
+
+
+    .st-key-how_to_play_button button:focus {{
+        background: transparent !important;
+        color: #ffffff !important;
+        border: none !important;
+        box-shadow: none !important;
+    }}
+
+
+    .st-key-how_to_play_button button:focus:hover {{
+        background: #ffffff !important;
+        color: #000000 !important;
     }}
 
 
     /* =====================================================
-       START POPUP
+       POPUP
        ===================================================== */
 
-    .popup {{
-        position: absolute;
+    .st-key-popup {{
+        position: fixed !important;
 
-        top: calc(51vh - 3px);
-        left: calc(50% + 105px);
+        top: calc(51vh - 3px) !important;
+        left: calc(50% + 105px) !important;
 
-        width: 190px;
-
-        background: #050505;
-
-        border: 1px solid #ffffff;
-
-        z-index: 200;
-    }}
-
-
-    .popup-title {{
-        display: none;
-    }}
-
-
-    /* =====================================================
-       POPUP BUTTONS
-       ===================================================== */
-
-    .popup-area {{
-        position: absolute;
-
-        top: calc(51vh - 3px);
-        left: calc(50% + 105px);
-
-        width: 190px;
-
-        z-index: 300;
-    }}
-
-    .popup-area div.stButton {{
-        position: relative !important;
-
-        width: 190px;
-
-        height: 42px;
-
-        left: 0;
-        top: 0;
-
-        transform: none;
-    }}
-
-    .popup-area div.stButton > button {{
         width: 190px !important;
+
+        padding: 0 !important;
+        margin: 0 !important;
+
+        border: 1px solid #ffffff !important;
+
+        background: #050505 !important;
+
+        z-index: 2000 !important;
+    }}
+
+
+    /* =====================================================
+       POPUP BUTTON
+       ===================================================== */
+
+    .st-key-popup button {{
+        width: 188px !important;
         height: 42px !important;
 
+        margin: 0 !important;
         padding: 0 18px !important;
 
         display: flex !important;
         align-items: center !important;
         justify-content: flex-start !important;
 
+        border: none !important;
+        border-radius: 0 !important;
+
         background: #050505 !important;
 
-        border: none !important;
-
         color: #ffffff !important;
+
+        font-family: "NeoDungGeunMo", monospace !important;
 
         font-size: 14px !important;
 
         text-align: left !important;
+
+        box-shadow: none !important;
+
+        cursor: pointer !important;
     }}
 
-    .popup-area div.stButton > button:hover {{
-        background: #ffffff !important;
 
+    .st-key-popup button:hover {{
+        background: #ffffff !important;
+        color: #000000 !important;
+    }}
+
+
+    .st-key-popup button:focus {{
+        background: #050505 !important;
+        color: #ffffff !important;
+        border: none !important;
+        box-shadow: none !important;
+    }}
+
+
+    .st-key-popup button:focus:hover {{
+        background: #ffffff !important;
         color: #000000 !important;
     }}
 
@@ -349,35 +394,31 @@ st.markdown(
 
     @media (max-width: 600px) {{
 
-        .start-button {{
-            top: 51vh;
+        .st-key-start_button {{
+            top: 51vh !important;
         }}
 
-        .how-button {{
-            top: 73vh;
+        .st-key-how_to_play_button {{
+            top: 73vh !important;
         }}
 
-        .popup-area {{
-            top: 59vh;
-            left: 50%;
+        .st-key-popup {{
+            top: 59vh !important;
+            left: 50% !important;
 
-            transform: translateX(-50%);
+            transform: translateX(-50%) !important;
         }}
 
     }}
 
     </style>
 
-    <div class="screen">
+    <div class="project-title">
+        PROJECT : LOGIC
+    </div>
 
-        <div class="project-title">
-            PROJECT : LOGIC
-        </div>
-
-        <div class="project-subtitle">
-            INFORMATION IS NOT ALWAYS TRUE
-        </div>
-
+    <div class="project-subtitle">
+        INFORMATION IS NOT ALWAYS TRUE
     </div>
     """,
     unsafe_allow_html=True,
@@ -388,61 +429,49 @@ st.markdown(
 # START BUTTON
 # =========================================================
 
-st.markdown(
-    '<div class="start-button">',
-    unsafe_allow_html=True,
-)
+with st.container(key="start_button"):
 
-start_clicked = st.button(
-    "START",
-    key="start_button",
-)
+    start_clicked = st.button(
+        "START",
+        key="start",
+        use_container_width=True,
+    )
 
-st.markdown(
-    "</div>",
-    unsafe_allow_html=True,
-)
+
+if start_clicked:
+    st.session_state.start_open = (
+        not st.session_state.start_open
+    )
 
 
 # =========================================================
 # START POPUP
 # =========================================================
 
-if start_clicked:
-    st.session_state.start_open = not st.session_state.get(
-        "start_open",
-        False,
-    )
+if st.session_state.start_open:
 
+    with st.container(key="popup"):
 
-if st.session_state.get("start_open", False):
+        continue_clicked = st.button(
+            "CONTINUE",
+            key="continue",
+            use_container_width=True,
+        )
 
-    st.markdown(
-        '<div class="popup-area">',
-        unsafe_allow_html=True,
-    )
-
-    continue_clicked = st.button(
-        "CONTINUE",
-        key="continue_button",
-    )
-
-    new_game_clicked = st.button(
-        "NEW GAME",
-        key="new_game_button",
-    )
-
-    st.markdown(
-        "</div>",
-        unsafe_allow_html=True,
-    )
+        new_game_clicked = st.button(
+            "NEW GAME",
+            key="new_game",
+            use_container_width=True,
+        )
 
     if continue_clicked:
+
         st.warning(
             "이전 플레이 기록이 존재하지 않습니다. 새 게임을 시작해주세요."
         )
 
     if new_game_clicked:
+
         st.info(
             "GAME SYSTEM은 현재 준비 중입니다."
         )
@@ -452,20 +481,13 @@ if st.session_state.get("start_open", False):
 # HOW TO PLAY
 # =========================================================
 
-st.markdown(
-    '<div class="how-button">',
-    unsafe_allow_html=True,
-)
+with st.container(key="how_to_play_button"):
 
-how_to_play_clicked = st.button(
-    "HOW TO PLAY",
-    key="how_to_play_button",
-)
-
-st.markdown(
-    "</div>",
-    unsafe_allow_html=True,
-)
+    how_to_play_clicked = st.button(
+        "HOW TO PLAY",
+        key="how_to_play",
+        use_container_width=True,
+    )
 
 
 # =========================================================
@@ -473,4 +495,7 @@ st.markdown(
 # =========================================================
 
 if how_to_play_clicked:
-    st.switch_page("pages/1_How_To_Play.py")
+
+    st.switch_page(
+        "pages/1_How_To_Play.py"
+    )
