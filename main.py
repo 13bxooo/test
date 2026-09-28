@@ -1,573 +1,96 @@
-import base64
-from pathlib import Path
+/* =====================================================
+   START
+   ===================================================== */
 
-import streamlit as st
-import streamlit.components.v1 as components
+div[data-testid="stButton"] {
+    position: fixed !important;
 
+    top: 51vh !important;
+    left: 50% !important;
 
-# =========================================================
-# PAGE CONFIG
-# =========================================================
+    width: 170px !important;
+    height: 55px !important;
 
-st.set_page_config(
-    page_title="PROJECT : LOGIC",
-    page_icon="◈",
-    layout="wide",
-    initial_sidebar_state="collapsed",
-)
+    transform: translateX(-50%) !important;
 
+    z-index: 1000000 !important;
+}
 
-# =========================================================
-# FONT
-# =========================================================
+div[data-testid="stButton"] button {
+    width: 170px !important;
+    height: 55px !important;
 
-font_candidates = [
-    Path("neodgm.ttf"),
-    Path("neodgm(2).ttf"),
-]
+    padding: 0 !important;
 
-font_data = ""
+    background: transparent !important;
 
-for font_path in font_candidates:
-    if font_path.exists():
-        with open(font_path, "rb") as f:
-            font_data = base64.b64encode(f.read()).decode("utf-8")
-        break
+    border: none !important;
+    border-radius: 0 !important;
 
+    color: transparent !important;
 
-# =========================================================
-# SESSION STATE
-# =========================================================
+    font-size: 0 !important;
 
-if "start_open" not in st.session_state:
-    st.session_state.start_open = False
+    cursor: pointer !important;
+}
 
-
-# =========================================================
-# GLOBAL CSS
-# =========================================================
-
-st.markdown(
-    f"""
-    <style>
-
-    /* =====================================================
-       FONT
-       ===================================================== */
-
-    @font-face {{
-        font-family: "NeoDungGeunMo";
-        src: url(data:font/ttf;base64,{font_data});
-    }}
-
-
-    /* =====================================================
-       STREAMLIT UI HIDE
-       ===================================================== */
-
-    #MainMenu {{
-        visibility: hidden;
-    }}
-
-    header {{
-        visibility: hidden;
-    }}
-
-    footer {{
-        visibility: hidden;
-    }}
-
-    [data-testid="stSidebar"] {{
-        display: none;
-    }}
-
-    .stApp {{
-        background: #000000;
-    }}
-
-    .block-container {{
-        padding: 0 !important;
-        max-width: 100% !important;
-    }}
-
-
-    /* =====================================================
-       ALL NATIVE CONTROLS
-       ===================================================== */
-
-    div[data-testid="stButton"],
-    div[data-testid="stPageLink"] {{
-        position: fixed !important;
-        z-index: 1000000 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }}
-
-
-    /* =====================================================
-       START
-       ===================================================== */
-
-    div[data-testid="stButton"] {{
-        top: 51vh !important;
-        left: 50% !important;
-
-        width: 170px !important;
-        height: 55px !important;
-
-        transform: translateX(-50%) !important;
-    }}
-
-    div[data-testid="stButton"] button {{
-        width: 170px !important;
-        height: 55px !important;
-
-        padding: 0 !important;
-
-        background: transparent !important;
-
-        border: none !important;
-        border-radius: 0 !important;
-
-        color: #ffffff !important;
-
-        font-family: "NeoDungGeunMo", monospace !important;
-        font-size: 19px !important;
-
-        cursor: pointer !important;
-    }}
-
-    div[data-testid="stButton"] button:hover {{
-        background: #ffffff !important;
-        color: #000000 !important;
-    }}
-
-
-    /* =====================================================
-       HOW TO PLAY
-       ===================================================== */
-
-    div[data-testid="stPageLink"]:nth-of-type(1) {{
-        top: 65vh !important;
-        left: 50% !important;
-
-        width: 220px !important;
-        height: 55px !important;
-
-        transform: translateX(-50%) !important;
-    }}
-
-    div[data-testid="stPageLink"]:nth-of-type(1) a {{
-        width: 220px !important;
-        height: 55px !important;
-
-        display: flex !important;
-
-        align-items: center !important;
-        justify-content: center !important;
-
-        padding: 0 !important;
-
-        background: transparent !important;
-
-        border: none !important;
-
-        color: #ffffff !important;
-
-        font-family: "NeoDungGeunMo", monospace !important;
-        font-size: 19px !important;
-
-        text-decoration: none !important;
-
-        cursor: pointer !important;
-    }}
-
-    div[data-testid="stPageLink"]:nth-of-type(1) a:hover {{
-        background: #ffffff !important;
-        color: #000000 !important;
-    }}
-
-
-    /* =====================================================
-       CONTINUE / NEW GAME
-       ===================================================== */
-
-    .popup-links {{
-        position: fixed;
-
-        top: calc(51vh - 3px);
-        left: calc(50% + 105px);
-
-        width: 190px;
-        height: 84px;
-
-        z-index: 1000001;
-
-        border: 1px solid #ffffff;
-
-        background: #050505;
-    }}
-
-
-    /* =====================================================
-       POPUP PAGE LINKS
-       ===================================================== */
-
-    .popup-links div[data-testid="stPageLink"] {{
-        position: absolute !important;
-
-        left: 0 !important;
-
-        width: 190px !important;
-        height: 42px !important;
-
-        transform: none !important;
-    }}
-
-    .popup-links div[data-testid="stPageLink"]:first-child {{
-        top: 0 !important;
-    }}
-
-    .popup-links div[data-testid="stPageLink"]:last-child {{
-        top: 42px !important;
-    }}
-
-    .popup-links div[data-testid="stPageLink"] a {{
-        width: 190px !important;
-        height: 42px !important;
-
-        display: flex !important;
-
-        align-items: center !important;
-
-        padding: 0 0 0 18px !important;
-
-        background: #050505 !important;
-
-        border: none !important;
-
-        color: #ffffff !important;
-
-        font-family: "NeoDungGeunMo", monospace !important;
-        font-size: 14px !important;
-
-        text-decoration: none !important;
-    }}
-
-    .popup-links div[data-testid="stPageLink"] a:hover {{
-        background: #ffffff !important;
-        color: #000000 !important;
-    }}
-
-
-    /* =====================================================
-       MOBILE
-       ===================================================== */
-
-    @media (max-width: 600px) {{
-
-        div[data-testid="stPageLink"]:nth-of-type(1) {{
-            top: 73vh !important;
-        }}
-
-        .popup-links {{
-            top: 59vh;
-            left: 50%;
-
-            transform: translateX(-50%);
-        }}
-
-    }}
-
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-
-# =========================================================
-# START SCREEN HTML
-# =========================================================
-
-popup_class = "show" if st.session_state.start_open else ""
-
-html = f"""
-<!DOCTYPE html>
-
-<html>
-
-<head>
-
-<meta charset="UTF-8">
-
-<style>
-
-@font-face {{
-    font-family: "NeoDungGeunMo";
-    src: url(data:font/ttf;base64,{font_data});
-}}
-
-
-* {{
-    box-sizing: border-box;
-}}
-
-
-html,
-body {{
-    margin: 0;
-    padding: 0;
-
-    width: 100%;
-    height: 100%;
-
-    overflow: hidden;
-
-    background: #000000;
-}}
-
-
-body {{
-    font-family: "NeoDungGeunMo", monospace;
-}}
+div[data-testid="stButton"] button:hover {
+    background: #ffffff !important;
+}
 
 
 /* =====================================================
-   SCREEN
+   HOW TO PLAY
    ===================================================== */
 
-.screen {{
-    position: fixed;
+div[data-testid="stPageLink"] {
+    position: fixed !important;
 
-    inset: 0;
+    z-index: 1000000 !important;
 
-    width: 100vw;
-    height: 100vh;
+    margin: 0 !important;
+    padding: 0 !important;
+}
 
-    background: #000000;
+div[data-testid="stPageLink"] a {
+    font-family: "NeoDungGeunMo", monospace !important;
 
-    color: #ffffff;
-}}
+    text-decoration: none !important;
+}
 
 
-/* =====================================================
-   TITLE
-   ===================================================== */
+.how-link {
+    position: fixed !important;
 
-.title {{
-    position: absolute;
+    top: 65vh !important;
+    left: 50% !important;
 
-    top: 12vh;
-    left: 50%;
+    width: 220px !important;
+    height: 55px !important;
 
-    transform: translateX(-50%);
+    transform: translateX(-50%) !important;
 
-    white-space: nowrap;
+    z-index: 1000000 !important;
+}
 
-    font-family: "NeoDungGeunMo", monospace;
+.how-link a {
+    width: 220px !important;
+    height: 55px !important;
 
-    font-size: clamp(28px, 4vw, 48px);
+    display: flex !important;
 
-    letter-spacing: 2px;
+    align-items: center !important;
+    justify-content: center !important;
 
-    animation: title-flicker 4s infinite;
-}}
+    background: transparent !important;
 
+    color: transparent !important;
 
-.subtitle {{
-    position: absolute;
+    font-size: 0 !important;
 
-    top: 22vh;
-    left: 50%;
+    border: none !important;
+}
 
-    transform: translateX(-50%);
-
-    white-space: nowrap;
-
-    color: #9c9c9c;
-
-    font-family: "NeoDungGeunMo", monospace;
-
-    font-size: clamp(13px, 1.5vw, 18px);
-
-    letter-spacing: 1px;
-}}
-
-
-/* =====================================================
-   POPUP BACKGROUND VISUAL
-   ===================================================== */
-
-.popup-visual {{
-    position: absolute;
-
-    top: calc(51vh - 3px);
-    left: calc(50% + 105px);
-
-    width: 190px;
-    height: 84px;
-
-    background: #050505;
-
-    border: 1px solid #ffffff;
-
-    opacity: 0;
-
-    visibility: hidden;
-
-    transition:
-        opacity 0.15s ease,
-        visibility 0.15s;
-}}
-
-
-.popup-visual.show {{
-    opacity: 1;
-    visibility: visible;
-}}
-
-
-.popup-visual::after {{
-    content: "";
-
-    position: absolute;
-
-    left: 0;
-    top: 42px;
-
-    width: 100%;
-    height: 1px;
-
-    background: #222222;
-}}
-
-
-/* =====================================================
-   TITLE FLICKER
-   ===================================================== */
-
-@keyframes title-flicker {{
-
-    0%, 18%, 20%, 22%, 63%, 65%, 100% {{
-        opacity: 1;
-    }}
-
-    19% {{
-        opacity: 0.35;
-    }}
-
-    21% {{
-        opacity: 0.65;
-    }}
-
-    64% {{
-        opacity: 0.15;
-    }}
-
-}}
-
-
-/* =====================================================
-   MOBILE
-   ===================================================== */
-
-@media (max-width: 600px) {{
-
-    .popup-visual {{
-        top: 59vh;
-        left: 50%;
-
-        transform: translateX(-50%);
-    }}
-
-}}
-
-</style>
-
-</head>
-
-
-<body>
-
-<div class="screen">
-
-    <div class="title">
-        PROJECT : LOGIC
-    </div>
-
-    <div class="subtitle">
-        INFORMATION IS NOT ALWAYS TRUE
-    </div>
-
-    <div class="popup-visual {popup_class}">
-    </div>
-
-</div>
-
-</body>
-
-</html>
-"""
-
-
-# =========================================================
-# RENDER BACKGROUND
-# =========================================================
-
-components.html(
-    html,
-    height=900,
-    scrolling=False,
-)
-
-
-# =========================================================
-# START BUTTON
-# =========================================================
-
-start_clicked = st.button(
-    "START",
-    key="start_button",
-)
-
-
-if start_clicked:
-    st.session_state.start_open = not st.session_state.start_open
-    st.rerun()
-
-
-# =========================================================
-# HOW TO PLAY
-# =========================================================
-
-st.page_link(
-    "pages/1_How_To_Play.py",
-    label="HOW TO PLAY",
-)
-
-
-# =========================================================
-# POPUP
-# =========================================================
-
-if st.session_state.start_open:
-
-    st.markdown(
-        '<div class="popup-links">',
-        unsafe_allow_html=True,
-    )
-
-    st.page_link(
-        "pages/1_How_To_Play.py",
-        label="CONTINUE",
-    )
-
-    st.page_link(
-        "pages/2_Game.py",
-        label="NEW GAME",
-    )
-
-    st.markdown(
-        "</div>",
-        unsafe_allow_html=True,
-    )
+.how-link a:hover {
+    background: #ffffff !important;
+}
