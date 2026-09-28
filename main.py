@@ -242,7 +242,7 @@ body {{
 
     font-family: "NeoDungGeunMo", monospace;
 
-    font-size: 19px;
+    font-size: 14px;
 
     cursor: pointer;
 
@@ -362,7 +362,7 @@ body {{
 
     font-family: "NeoDungGeunMo", monospace;
 
-    font-size: 19px;
+    font-size: 14px;
 
     cursor: pointer;
 
