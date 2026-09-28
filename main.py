@@ -2,6 +2,7 @@ import base64
 from pathlib import Path
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 
 # =========================================================
@@ -40,343 +41,71 @@ else:
 
 
 # =========================================================
-# SESSION STATE
+# PAGE ROUTING
 # =========================================================
 
-if "start_menu" not in st.session_state:
-    st.session_state.start_menu = False
+action = st.query_params.get("action")
+
+
+# HOW TO PLAY
+if action == "how_to_play":
+
+    st.query_params.clear()
+
+    st.switch_page("pages/1_How_To_Play.py")
+
+
+# NEW GAME
+elif action == "new_game":
+
+    st.query_params.clear()
+
+    # 게임 화면 제작 후 연결
+    st.switch_page("pages/2_Game.py")
+
+
+# CONTINUE
+elif action == "continue":
+
+    st.query_params.clear()
+
+    st.warning(
+        "이전 플레이 기록이 존재하지 않습니다. 새 게임을 시작해주세요."
+    )
 
 
 # =========================================================
-# CSS
+# HIDE STREAMLIT UI
 # =========================================================
 
 st.markdown(
-    f"""
+    """
     <style>
 
-    /* =====================================================
-       FONT
-       ===================================================== */
+    #MainMenu {
+        visibility: hidden;
+    }
 
-    @font-face {{
-        font-family: "NeoDungGeunMo";
-        src: url(data:font/ttf;base64,{font_data});
-    }}
+    header {
+        visibility: hidden;
+    }
 
+    footer {
+        visibility: hidden;
+    }
 
-    /* =====================================================
-       STREAMLIT RESET
-       ===================================================== */
+    [data-testid="stSidebar"] {
+        display: none;
+    }
 
-    html,
-    body,
-    [data-testid="stAppViewContainer"],
-    [data-testid="stApp"] {{
-        background: #000000 !important;
-    }}
+    .stApp {
+        background: #000000;
+    }
 
-    .block-container {{
+    .block-container {
         padding: 0 !important;
-        margin: 0 !important;
         max-width: 100% !important;
-    }}
-
-    header {{
-        visibility: hidden !important;
-    }}
-
-    footer {{
-        visibility: hidden !important;
-    }}
-
-    #MainMenu {{
-        visibility: hidden !important;
-    }}
-
-    [data-testid="stSidebar"] {{
-        display: none !important;
-    }}
-
-    [data-testid="collapsedControl"] {{
-        display: none !important;
-    }}
-
-    [data-testid="stSidebarNav"] {{
-        display: none !important;
-    }}
-
-
-    /* =====================================================
-       ALL BUTTONS
-       ===================================================== */
-
-    div[data-testid="stButton"] {{
-        font-family: "NeoDungGeunMo", monospace !important;
-    }}
-
-    div[data-testid="stButton"] button {{
-        font-family: "NeoDungGeunMo", monospace !important;
-        border-radius: 0 !important;
-        box-shadow: none !important;
-    }}
-
-
-    /* =====================================================
-       TITLE
-       ===================================================== */
-
-    .title {{
-        position: fixed;
-
-        top: 12vh;
-        left: 50%;
-
-        transform: translateX(-50%);
-
-        color: white;
-
-        font-family: "NeoDungGeunMo", monospace;
-
-        font-size: clamp(28px, 4vw, 48px);
-
-        letter-spacing: 2px;
-
-        white-space: nowrap;
-
-        z-index: 10;
-
-        animation: title-flicker 4s infinite;
-    }}
-
-
-    /* =====================================================
-       SUBTITLE
-       ===================================================== */
-
-    .subtitle {{
-        position: fixed;
-
-        top: 22vh;
-        left: 50%;
-
-        transform: translateX(-50%);
-
-        color: #999999;
-
-        font-family: "NeoDungGeunMo", monospace;
-
-        font-size: clamp(13px, 1.5vw, 18px);
-
-        letter-spacing: 1px;
-
-        white-space: nowrap;
-
-        z-index: 10;
-    }}
-
-
-    /* =====================================================
-       START BUTTON
-       ===================================================== */
-
-    div[data-testid="stButton"]:has(button[kind="secondary"]) {{
-        font-family: "NeoDungGeunMo", monospace;
-    }}
-
-
-    .start-area {{
-        position: fixed;
-
-        top: 51vh;
-        left: 50%;
-
-        transform: translateX(-50%);
-
-        width: 170px;
-        height: 55px;
-
-        z-index: 100;
-    }}
-
-
-    .start-area button {{
-        width: 170px !important;
-        height: 55px !important;
-
-        padding: 0 !important;
-
-        background: transparent !important;
-
-        border: none !important;
-
-        color: white !important;
-
-        font-family: "NeoDungGeunMo", monospace !important;
-
-        font-size: 19px !important;
-
-        border-radius: 0 !important;
-    }}
-
-
-    .start-area button:hover {{
-        background: white !important;
-
-        color: black !important;
-    }}
-
-
-    /* =====================================================
-       HOW TO PLAY
-       ===================================================== */
-
-    .how-area {{
-        position: fixed;
-
-        top: 65vh;
-        left: 50%;
-
-        transform: translateX(-50%);
-
-        width: 220px;
-        height: 55px;
-
-        z-index: 100;
-    }}
-
-
-    .how-area button {{
-        width: 220px !important;
-        height: 55px !important;
-
-        padding: 0 !important;
-
-        background: transparent !important;
-
-        border: none !important;
-
-        color: white !important;
-
-        font-family: "NeoDungGeunMo", monospace !important;
-
-        font-size: 19px !important;
-
-        border-radius: 0 !important;
-    }}
-
-
-    .how-area button:hover {{
-        background: white !important;
-
-        color: black !important;
-    }}
-
-
-    /* =====================================================
-       POPUP
-       ===================================================== */
-
-    .popup-area {{
-        position: fixed;
-
-        top: calc(51vh - 3px);
-
-        left: calc(50% + 105px);
-
-        width: 190px;
-
-        z-index: 101;
-    }}
-
-
-    .popup-area button {{
-        width: 190px !important;
-
-        height: 42px !important;
-
-        padding: 0 0 0 18px !important;
-
-        background: #050505 !important;
-
-        border: none !important;
-
-        border-left: 1px solid white !important;
-        border-right: 1px solid white !important;
-
-        color: white !important;
-
-        font-family: "NeoDungGeunMo", monospace !important;
-
-        font-size: 14px !important;
-
-        text-align: left !important;
-
-        border-radius: 0 !important;
-    }}
-
-
-    .popup-area button:hover {{
-        background: white !important;
-
-        color: black !important;
-    }}
-
-
-    /* =====================================================
-       TITLE FLICKER
-       ===================================================== */
-
-    @keyframes title-flicker {{
-
-        0%,
-        18%,
-        20%,
-        22%,
-        63%,
-        65%,
-        100% {{
-            opacity: 1;
-        }}
-
-        19% {{
-            opacity: 0.35;
-        }}
-
-        21% {{
-            opacity: 0.65;
-        }}
-
-        64% {{
-            opacity: 0.15;
-        }}
-
-    }}
-
-
-    /* =====================================================
-       MOBILE
-       ===================================================== */
-
-    @media (max-width: 600px) {{
-
-        .start-area {{
-            top: 51vh;
-        }}
-
-        .popup-area {{
-            top: 59vh;
-
-            left: 50%;
-
-            transform: translateX(-50%);
-        }}
-
-        .how-area {{
-            top: 73vh;
-        }}
-
-    }}
+    }
 
     </style>
     """,
@@ -385,87 +114,514 @@ st.markdown(
 
 
 # =========================================================
-# TITLE
+# START SCREEN
 # =========================================================
 
-st.markdown(
-    '<div class="title">PROJECT : LOGIC</div>',
-    unsafe_allow_html=True,
+html = f"""
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<style>
+
+
+/* =====================================================
+   FONT
+   ===================================================== */
+
+@font-face {{
+    font-family: "NeoDungGeunMo";
+    src: url(data:font/ttf;base64,{font_data});
+}}
+
+
+* {{
+    box-sizing: border-box;
+}}
+
+
+html,
+body {{
+    margin: 0;
+    padding: 0;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+
+    background: #000000;
+}}
+
+
+body {{
+    font-family: "NeoDungGeunMo", monospace;
+}}
+
+
+/* =====================================================
+   SCREEN
+   ===================================================== */
+
+.screen {{
+    position: fixed;
+
+    inset: 0;
+
+    width: 100vw;
+    height: 100vh;
+
+    background: #000000;
+
+    color: #ffffff;
+}}
+
+
+/* =====================================================
+   TITLE
+   ===================================================== */
+
+.title {{
+    position: absolute;
+
+    top: 12vh;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    white-space: nowrap;
+
+    font-family: "NeoDungGeunMo", monospace;
+
+    font-size: clamp(28px, 4vw, 48px);
+
+    letter-spacing: 2px;
+
+    animation: title-flicker 4s infinite;
+}}
+
+
+.subtitle {{
+    position: absolute;
+
+    top: 22vh;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    white-space: nowrap;
+
+    color: #9c9c9c;
+
+    font-family: "NeoDungGeunMo", monospace;
+
+    font-size: clamp(13px, 1.5vw, 18px);
+
+    letter-spacing: 1px;
+}}
+
+
+/* =====================================================
+   START
+   ===================================================== */
+
+.start {{
+    position: absolute;
+
+    top: 51vh;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    width: 170px;
+    height: 55px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: transparent;
+
+    border: none;
+
+    color: #ffffff;
+
+    font-family: "NeoDungGeunMo", monospace;
+
+    font-size: 19px;
+
+    cursor: pointer;
+
+    user-select: none;
+}}
+
+
+.start:hover {{
+    background: #ffffff;
+
+    color: #000000;
+}}
+
+
+/* =====================================================
+   START POPUP
+   ===================================================== */
+
+.popup {{
+    position: absolute;
+
+    top: calc(51vh - 3px);
+    left: calc(50% + 105px);
+
+    width: 190px;
+
+    background: #050505;
+
+    border: 1px solid #ffffff;
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transform: translateX(-10px);
+
+    transition:
+        opacity 0.15s ease,
+        transform 0.15s ease,
+        visibility 0.15s;
+}}
+
+
+.popup.show {{
+    opacity: 1;
+
+    visibility: visible;
+
+    transform: translateX(0);
+}}
+
+
+/* =====================================================
+   POPUP BUTTON
+   ===================================================== */
+
+.popup-button {{
+    width: 100%;
+    height: 42px;
+
+    display: flex;
+
+    align-items: center;
+
+    padding-left: 18px;
+
+    background: #050505;
+
+    border: none;
+
+    color: #ffffff;
+
+    font-family: "NeoDungGeunMo", monospace;
+
+    font-size: 14px;
+
+    text-align: left;
+
+    cursor: pointer;
+}}
+
+
+.popup-button:hover {{
+    background: #ffffff;
+
+    color: #000000;
+}}
+
+
+/* =====================================================
+   HOW TO PLAY
+   ===================================================== */
+
+.how {{
+    position: absolute;
+
+    top: 65vh;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    width: 220px;
+    height: 55px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: transparent;
+
+    border: none;
+
+    color: #ffffff;
+
+    font-family: "NeoDungGeunMo", monospace;
+
+    font-size: 19px;
+
+    cursor: pointer;
+
+    user-select: none;
+}}
+
+
+.how:hover {{
+    background: #ffffff;
+
+    color: #000000;
+}}
+
+
+/* =====================================================
+   TITLE FLICKER
+   ===================================================== */
+
+@keyframes title-flicker {{
+
+    0%, 18%, 20%, 22%, 63%, 65%, 100% {{
+        opacity: 1;
+    }}
+
+    19% {{
+        opacity: 0.35;
+    }}
+
+    21% {{
+        opacity: 0.65;
+    }}
+
+    64% {{
+        opacity: 0.15;
+    }}
+
+}}
+
+
+/* =====================================================
+   MOBILE
+   ===================================================== */
+
+@media (max-width: 600px) {{
+
+    .title {{
+        top: 12vh;
+
+        font-size: 30px;
+    }}
+
+    .subtitle {{
+        top: 22vh;
+
+        font-size: 12px;
+    }}
+
+    .start {{
+        top: 51vh;
+    }}
+
+    .popup {{
+        top: 59vh;
+
+        left: 50%;
+
+        transform: translateX(-50%);
+    }}
+
+    .popup.show {{
+        transform: translateX(-50%);
+    }}
+
+    .how {{
+        top: 73vh;
+    }}
+
+}}
+
+</style>
+
+</head>
+
+
+<body>
+
+<div class="screen">
+
+
+    <!-- =================================================
+         TITLE
+         ================================================= -->
+
+    <div class="title">
+        PROJECT : LOGIC
+    </div>
+
+
+    <div class="subtitle">
+        INFORMATION IS NOT ALWAYS TRUE
+    </div>
+
+
+    <!-- =================================================
+         START
+         ================================================= -->
+
+    <button
+        id="start"
+        class="start"
+    >
+        START
+    </button>
+
+
+    <!-- =================================================
+         START MENU
+         ================================================= -->
+
+    <div
+        id="popup"
+        class="popup"
+    >
+
+        <button
+            id="continue"
+            class="popup-button"
+        >
+            CONTINUE
+        </button>
+
+
+        <button
+            id="new-game"
+            class="popup-button"
+        >
+            NEW GAME
+        </button>
+
+    </div>
+
+
+    <!-- =================================================
+         HOW TO PLAY
+         ================================================= -->
+
+    <button
+        id="how"
+        class="how"
+    >
+        HOW TO PLAY
+    </button>
+
+
+</div>
+
+
+<script>
+
+
+// =======================================================
+// START BUTTON
+// =======================================================
+
+const start =
+    document.getElementById("start");
+
+const popup =
+    document.getElementById("popup");
+
+
+start.addEventListener(
+    "click",
+    function() {{
+
+        popup.classList.toggle("show");
+
+    }}
+);
+
+
+// =======================================================
+// NEW GAME
+// =======================================================
+
+document
+    .getElementById("new-game")
+    .addEventListener(
+        "click",
+        function() {{
+
+            window.parent.location.href =
+                window.parent.location.pathname +
+                "?action=new_game";
+
+        }}
+    );
+
+
+// =======================================================
+// CONTINUE
+// =======================================================
+
+document
+    .getElementById("continue")
+    .addEventListener(
+        "click",
+        function() {{
+
+            window.parent.location.href =
+                window.parent.location.pathname +
+                "?action=continue";
+
+        }}
+    );
+
+
+// =======================================================
+// HOW TO PLAY
+// =======================================================
+
+document
+    .getElementById("how")
+    .addEventListener(
+        "click",
+        function() {{
+
+            window.parent.location.href =
+                window.parent.location.pathname +
+                "?action=how_to_play";
+
+        }}
+    );
+
+
+</script>
+
+
+</body>
+
+</html>
+"""
+
+
+# =========================================================
+# RENDER
+# =========================================================
+
+components.html(
+    html,
+    height=900,
+    scrolling=False,
 )
-
-st.markdown(
-    '<div class="subtitle">INFORMATION IS NOT ALWAYS TRUE</div>',
-    unsafe_allow_html=True,
-)
-
-
-# =========================================================
-# START
-# =========================================================
-
-st.markdown('<div class="start-area">', unsafe_allow_html=True)
-
-if st.button(
-    "START",
-    key="start_button",
-    use_container_width=True,
-):
-    st.session_state.start_menu = not st.session_state.start_menu
-
-st.markdown("</div>", unsafe_allow_html=True)
-
-
-# =========================================================
-# START POPUP
-# =========================================================
-
-if st.session_state.start_menu:
-
-    st.markdown(
-        '<div class="popup-area">',
-        unsafe_allow_html=True,
-    )
-
-    if st.button(
-        "CONTINUE",
-        key="continue_button",
-        use_container_width=True,
-    ):
-        st.session_state.start_menu = False
-
-        st.warning(
-            "이전 플레이 기록이 존재하지 않습니다. 새 게임을 시작해주세요."
-        )
-
-    if st.button(
-        "NEW GAME",
-        key="new_game_button",
-        use_container_width=True,
-    ):
-        st.session_state.start_menu = False
-
-        # 게임 페이지가 만들어지면 연결
-        # st.switch_page("pages/2_Game.py")
-
-        st.info("NEW GAME은 게임 화면 구현 후 연결됩니다.")
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-
-# =========================================================
-# HOW TO PLAY
-# =========================================================
-
-st.markdown(
-    '<div class="how-area">',
-    unsafe_allow_html=True,
-)
-
-if st.button(
-    "HOW TO PLAY",
-    key="how_to_play_button",
-    use_container_width=True,
-):
-    st.switch_page("pages/1_How_To_Play.py")
-
-st.markdown("</div>", unsafe_allow_html=True)
