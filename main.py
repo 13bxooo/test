@@ -476,7 +476,7 @@ body {{
 
         <a
             class="popup-button"
-            href="?action=continue"
+            href="/?action=continue"
             target="_top"
         >
             CONTINUE
@@ -485,7 +485,7 @@ body {{
 
         <a
             class="popup-button"
-            href="?action=new_game"
+            href="/?action=new_game"
             target="_top"
         >
             NEW GAME
@@ -500,7 +500,7 @@ body {{
 
     <a
         class="how"
-        href="?action=how_to_play"
+        href="/?action=how_to_play"
         target="_top"
     >
         HOW TO PLAY
