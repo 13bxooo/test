@@ -35,23 +35,20 @@ for font_path in font_candidates:
         break
 
 
-# =========================================================
+
+ =========================================================
 # PAGE ROUTING
 # =========================================================
 
 action = st.query_params.get("action")
 
 if action == "how_to_play":
-    st.query_params.clear()
     st.switch_page("pages/1_How_To_Play.py")
 
 elif action == "new_game":
-    st.query_params.clear()
-    # st.switch_page("pages/2_Game.py")
-    st.info("GAME SYSTEM은 현재 준비 중입니다.")
+    st.warning("GAME SYSTEM은 현재 준비 중입니다.")
 
 elif action == "continue":
-    st.query_params.clear()
     st.warning("이전 플레이 기록이 존재하지 않습니다. 새 게임을 시작해주세요.")
 
 
