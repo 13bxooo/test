@@ -98,7 +98,9 @@ st.markdown(
     div[data-testid="stButton"],
     div[data-testid="stPageLink"] {{
         position: fixed !important;
+
         z-index: 1000000 !important;
+
         margin: 0 !important;
         padding: 0 !important;
     }}
@@ -132,7 +134,8 @@ st.markdown(
         color: #ffffff !important;
 
         font-family: "NeoDungGeunMo", monospace !important;
-        font-size: 19px !important;
+        font-size: 14px !important;
+        font-weight: normal !important;
 
         cursor: pointer !important;
     }}
@@ -146,6 +149,18 @@ st.markdown(
     /* =====================================================
        HOW TO PLAY
        ===================================================== */
+
+    div[data-testid="stPageLink"] a {{
+        text-decoration: none !important;
+
+        font-family: "NeoDungGeunMo", monospace !important;
+        font-weight: normal !important;
+    }}
+
+
+    /*
+       첫 번째 PageLink = HOW TO PLAY
+    */
 
     div[data-testid="stPageLink"]:nth-of-type(1) {{
         top: 65vh !important;
@@ -175,7 +190,7 @@ st.markdown(
         color: #ffffff !important;
 
         font-family: "NeoDungGeunMo", monospace !important;
-        font-size: 19px !important;
+        font-size: 14px !important;
 
         text-decoration: none !important;
 
@@ -192,53 +207,47 @@ st.markdown(
        CONTINUE / NEW GAME
        ===================================================== */
 
-    .popup-links {{
-        position: fixed;
+    /*
+       두 번째 PageLink = CONTINUE
+       세 번째 PageLink = NEW GAME
+    */
 
-        top: calc(51vh - 3px);
-        left: calc(50% + 105px);
-
-        width: 190px;
-        height: 84px;
-
-        z-index: 1000001;
-
-        border: 1px solid #ffffff;
-
-        background: #050505;
-    }}
-
-
-    /* =====================================================
-       POPUP PAGE LINKS
-       ===================================================== */
-
-    .popup-links div[data-testid="stPageLink"] {{
-        position: absolute !important;
-
-        left: 0 !important;
+    div[data-testid="stPageLink"]:nth-of-type(2),
+    div[data-testid="stPageLink"]:nth-of-type(3) {{
+        left: calc(50% + 105px) !important;
 
         width: 190px !important;
         height: 42px !important;
 
         transform: none !important;
+
+        z-index: 1000001 !important;
     }}
 
-    .popup-links div[data-testid="stPageLink"]:first-child {{
-        top: 0 !important;
+
+    /* CONTINUE */
+
+    div[data-testid="stPageLink"]:nth-of-type(2) {{
+        top: calc(51vh - 3px) !important;
     }}
 
-    .popup-links div[data-testid="stPageLink"]:last-child {{
-        top: 42px !important;
+
+    /* NEW GAME */
+
+    div[data-testid="stPageLink"]:nth-of-type(3) {{
+        top: calc(51vh + 39px) !important;
     }}
 
-    .popup-links div[data-testid="stPageLink"] a {{
+
+    div[data-testid="stPageLink"]:nth-of-type(2) a,
+    div[data-testid="stPageLink"]:nth-of-type(3) a {{
         width: 190px !important;
         height: 42px !important;
 
         display: flex !important;
 
         align-items: center !important;
+        justify-content: flex-start !important;
 
         padding: 0 0 0 18px !important;
 
@@ -252,9 +261,13 @@ st.markdown(
         font-size: 14px !important;
 
         text-decoration: none !important;
+
+        cursor: pointer !important;
     }}
 
-    .popup-links div[data-testid="stPageLink"] a:hover {{
+
+    div[data-testid="stPageLink"]:nth-of-type(2) a:hover,
+    div[data-testid="stPageLink"]:nth-of-type(3) a:hover {{
         background: #ffffff !important;
         color: #000000 !important;
     }}
@@ -270,11 +283,14 @@ st.markdown(
             top: 73vh !important;
         }}
 
-        .popup-links {{
-            top: 59vh;
-            left: 50%;
+        div[data-testid="stPageLink"]:nth-of-type(2) {{
+            top: calc(59vh - 3px) !important;
+            left: calc(50% - 95px) !important;
+        }}
 
-            transform: translateX(-50%);
+        div[data-testid="stPageLink"]:nth-of-type(3) {{
+            top: calc(59vh + 39px) !important;
+            left: calc(50% - 95px) !important;
         }}
 
     }}
@@ -552,11 +568,6 @@ st.page_link(
 
 if st.session_state.start_open:
 
-    st.markdown(
-        '<div class="popup-links">',
-        unsafe_allow_html=True,
-    )
-
     st.page_link(
         "pages/1_How_To_Play.py",
         label="CONTINUE",
@@ -565,9 +576,4 @@ if st.session_state.start_open:
     st.page_link(
         "pages/2_Game.py",
         label="NEW GAME",
-    )
-
-    st.markdown(
-        "</div>",
-        unsafe_allow_html=True,
     )
