@@ -529,7 +529,59 @@ components.html(
 # 따라서 Streamlit이 페이지 이동을 직접 처리한다.
 #
 
-st.page_link(
-    "pages/1_How_To_Play.py",
-    label="HOW TO PLAY",
+# =========================================================
+# HOW TO PLAY BUTTON
+# =========================================================
+
+st.markdown(
+    """
+    <style>
+
+    div.stButton {
+        position: fixed !important;
+
+        top: 65vh !important;
+        left: 50% !important;
+
+        transform: translateX(-50%) !important;
+
+        width: 220px !important;
+        height: 55px !important;
+
+        z-index: 99999 !important;
+    }
+
+    div.stButton > button {
+        width: 220px !important;
+        height: 55px !important;
+
+        background: transparent !important;
+
+        border: none !important;
+        border-radius: 0 !important;
+
+        color: white !important;
+
+        font-family: "NeoDungGeunMo", monospace !important;
+
+        font-size: 19px !important;
+
+        box-shadow: none !important;
+    }
+
+    div.stButton > button:hover {
+        background: white !important;
+
+        color: black !important;
+
+        border: none !important;
+    }
+
+    </style>
+    """,
+    unsafe_allow_html=True,
 )
+
+
+if st.button("HOW TO PLAY", key="how_to_play_button"):
+    st.switch_page("pages/1_How_To_Play.py")
