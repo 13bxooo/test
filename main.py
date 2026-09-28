@@ -41,27 +41,18 @@ for font_path in font_candidates:
 
 action = st.query_params.get("action")
 
-
 if action == "how_to_play":
     st.query_params.clear()
     st.switch_page("pages/1_How_To_Play.py")
 
-
 elif action == "new_game":
     st.query_params.clear()
-
-    # 나중에 게임 페이지가 만들어지면 연결
     # st.switch_page("pages/2_Game.py")
-
     st.info("GAME SYSTEM은 현재 준비 중입니다.")
-
 
 elif action == "continue":
     st.query_params.clear()
-
-    st.warning(
-        "이전 플레이 기록이 존재하지 않습니다. 새 게임을 시작해주세요."
-    )
+    st.warning("이전 플레이 기록이 존재하지 않습니다. 새 게임을 시작해주세요.")
 
 
 # =========================================================
@@ -242,7 +233,7 @@ body {{
 
     font-family: "NeoDungGeunMo", monospace;
 
-    font-size: 14px;
+    font-size: 19px;
 
     cursor: pointer;
 
@@ -362,7 +353,7 @@ body {{
 
     font-family: "NeoDungGeunMo", monospace;
 
-    font-size: 14px;
+    font-size: 19px;
 
     cursor: pointer;
 
