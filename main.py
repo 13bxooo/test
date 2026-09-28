@@ -736,3 +736,50 @@ components.html(
     height=900,
     scrolling=False,
 )
+st.markdown(
+    """
+    <style>
+
+    div[data-testid="stButton"] {
+        position: fixed !important;
+
+        bottom: 30px !important;
+        left: 50% !important;
+
+        transform: translateX(-50%) !important;
+
+        width: 210px !important;
+        height: 48px !important;
+
+        z-index: 9999 !important;
+    }
+
+    div[data-testid="stButton"] > button {
+        width: 210px !important;
+        height: 48px !important;
+
+        background: #000000 !important;
+
+        border: 1px solid #ffffff !important;
+        border-radius: 0 !important;
+
+        color: #ffffff !important;
+
+        font-family: "NeoDungGeunMo", monospace !important;
+
+        font-size: 15px !important;
+    }
+
+    div[data-testid="stButton"] > button:hover {
+        background: #ffffff !important;
+        color: #000000 !important;
+    }
+
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
+
+if st.button("BACK TO TITLE", key="back_to_title"):
+    st.switch_page("main.py")
