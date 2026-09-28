@@ -10,7 +10,7 @@ import streamlit.components.v1 as components
 # =========================================================
 
 st.set_page_config(
-    page_title="PROJECT : LOGIC // HOW TO PLAY",
+    page_title="PROJECT : LOGIC",
     page_icon="◈",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -36,7 +36,36 @@ for font_path in font_candidates:
 
 
 # =========================================================
-# STREAMLIT UI HIDDEN
+# PAGE ROUTING
+# =========================================================
+
+action = st.query_params.get("action")
+
+
+if action == "how_to_play":
+    st.query_params.clear()
+    st.switch_page("pages/1_How_To_Play.py")
+
+
+elif action == "new_game":
+    st.query_params.clear()
+
+    # 나중에 게임 페이지가 만들어지면 연결
+    # st.switch_page("pages/2_Game.py")
+
+    st.info("GAME SYSTEM은 현재 준비 중입니다.")
+
+
+elif action == "continue":
+    st.query_params.clear()
+
+    st.warning(
+        "이전 플레이 기록이 존재하지 않습니다. 새 게임을 시작해주세요."
+    )
+
+
+# =========================================================
+# HIDE STREAMLIT UI
 # =========================================================
 
 st.markdown(
@@ -75,7 +104,7 @@ st.markdown(
 
 
 # =========================================================
-# HOW TO PLAY
+# START SCREEN
 # =========================================================
 
 html = f"""
@@ -110,61 +139,34 @@ body {{
     padding: 0;
 
     width: 100%;
-    min-height: 100%;
+    height: 100%;
+
+    overflow: hidden;
 
     background: #000000;
+}}
 
+
+body {{
     font-family: "NeoDungGeunMo", monospace;
 }}
 
 
 /* =====================================================
-   PAGE
+   SCREEN
    ===================================================== */
 
-body {{
-    color: #ffffff;
-
-    overflow-x: hidden;
-    overflow-y: auto;
-}}
-
-
 .screen {{
-    width: 100%;
+    position: fixed;
 
-    min-height: 100vh;
+    inset: 0;
+
+    width: 100vw;
+    height: 100vh;
 
     background: #000000;
 
-    padding-bottom: 150px;
-}}
-
-
-/* =====================================================
-   HEADER
-   ===================================================== */
-
-.header {{
-    width: calc(100% - 100px);
-
-    margin: 0 auto;
-
-    padding-top: 32px;
-
-    display: flex;
-
-    justify-content: space-between;
-    align-items: center;
-
-    font-size: 15px;
-
-    letter-spacing: 1px;
-}}
-
-
-.header-right {{
-    color: #666666;
+    color: #ffffff;
 }}
 
 
@@ -172,257 +174,233 @@ body {{
    TITLE
    ===================================================== */
 
-.title-area {{
-    width: calc(100% - 100px);
+.title {{
+    position: absolute;
 
-    margin: 65px auto 0;
+    top: 12vh;
+    left: 50%;
 
-    max-width: 1000px;
-}}
+    transform: translateX(-50%);
 
+    white-space: nowrap;
 
-.main-title {{
-    font-size: clamp(32px, 4vw, 48px);
+    font-family: "NeoDungGeunMo", monospace;
+
+    font-size: clamp(28px, 4vw, 48px);
 
     letter-spacing: 2px;
 
-    margin-bottom: 14px;
+    animation: title-flicker 4s infinite;
 }}
 
 
 .subtitle {{
-    color: #777777;
+    position: absolute;
 
-    font-size: 15px;
+    top: 22vh;
+    left: 50%;
 
-    letter-spacing: 1px;
-}}
+    transform: translateX(-50%);
 
+    white-space: nowrap;
 
-/* =====================================================
-   CONTENT
-   ===================================================== */
+    color: #9c9c9c;
 
-.content {{
-    width: calc(100% - 100px);
+    font-family: "NeoDungGeunMo", monospace;
 
-    max-width: 1000px;
-
-    margin: 70px auto 0;
-
-    display: grid;
-
-    grid-template-columns: repeat(2, minmax(280px, 1fr));
-
-    gap: 18px;
-}}
-
-
-/* =====================================================
-   CARD
-   ===================================================== */
-
-.card {{
-    min-height: 145px;
-
-    border: 1px solid #333333;
-
-    background: #050505;
-
-    padding: 20px;
-
-    transition:
-        border-color 0.15s ease,
-        background 0.15s ease;
-}}
-
-
-.card:hover {{
-    border-color: #ffffff;
-
-    background: #0b0b0b;
-}}
-
-
-.card-header {{
-    display: flex;
-
-    align-items: center;
-
-    gap: 12px;
-
-    margin-bottom: 17px;
-}}
-
-
-.number {{
-    color: #666666;
-
-    font-size: 13px;
-}}
-
-
-.card-title {{
-    color: #ffffff;
-
-    font-size: 19px;
+    font-size: clamp(13px, 1.5vw, 18px);
 
     letter-spacing: 1px;
 }}
 
 
 /* =====================================================
-   KEY
+   START
    ===================================================== */
 
-.key {{
-    display: inline-flex;
+.start {{
+    position: absolute;
 
-    align-items: center;
-    justify-content: center;
+    top: 51vh;
+    left: 50%;
 
-    min-width: 58px;
-    height: 32px;
+    transform: translateX(-50%);
 
-    padding: 0 10px;
-
-    margin-right: 7px;
-
-    border: 1px solid #777777;
-
-    background: #111111;
-
-    color: #ffffff;
-
-    font-size: 14px;
-
-    vertical-align: middle;
-}}
-
-
-/* =====================================================
-   DESCRIPTION
-   ===================================================== */
-
-.description {{
-    color: #999999;
-
-    font-size: 14px;
-
-    line-height: 1.9;
-}}
-
-
-/* =====================================================
-   IMPORTANT
-   ===================================================== */
-
-.important {{
-    grid-column: 1 / -1;
-
-    border: 1px solid #555555;
-
-    background: #030303;
-
-    padding: 24px;
-
-    margin-top: 5px;
-
-    min-height: 150px;
-}}
-
-
-.important-title {{
-    color: #ffffff;
-
-    font-size: 17px;
-
-    margin-bottom: 14px;
-
-    letter-spacing: 1px;
-}}
-
-
-.important-text {{
-    color: #888888;
-
-    font-size: 14px;
-
-    line-height: 2;
-}}
-
-
-.warning {{
-    color: #ffffff;
-}}
-
-
-/* =====================================================
-   FOOTER
-   ===================================================== */
-
-.footer {{
-    width: calc(100% - 100px);
-
-    max-width: 1000px;
-
-    margin: 55px auto 0;
-
-    color: #444444;
-
-    font-size: 11px;
-
-    letter-spacing: 1px;
-}}
-
-
-/* =====================================================
-   BACK TO TITLE OVERLAY
-   ===================================================== */
-
-.back {{
-    position: fixed;
-
-    right: 32px;
-    bottom: 28px;
-
-    width: 190px;
-    height: 50px;
+    width: 170px;
+    height: 55px;
 
     display: flex;
 
     align-items: center;
     justify-content: center;
 
-    border: 1px solid #777777;
+    background: transparent;
 
-    background: rgba(5, 5, 5, 0.96);
+    border: none;
 
     color: #ffffff;
 
     font-family: "NeoDungGeunMo", monospace;
 
-    font-size: 16px;
-
-    text-decoration: none;
+    font-size: 19px;
 
     cursor: pointer;
 
-    z-index: 999999;
-
-    transition:
-        background 0.15s ease,
-        color 0.15s ease,
-        border-color 0.15s ease;
+    user-select: none;
 }}
 
 
-.back:hover {{
+.start:hover {{
     background: #ffffff;
 
     color: #000000;
+}}
 
-    border-color: #ffffff;
+
+/* =====================================================
+   START POPUP
+   ===================================================== */
+
+.popup {{
+    position: absolute;
+
+    top: calc(51vh - 3px);
+    left: calc(50% + 105px);
+
+    width: 190px;
+
+    background: #050505;
+
+    border: 1px solid #ffffff;
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transform: translateX(-10px);
+
+    transition:
+        opacity 0.15s ease,
+        transform 0.15s ease,
+        visibility 0.15s;
+}}
+
+
+.popup.show {{
+    opacity: 1;
+
+    visibility: visible;
+
+    transform: translateX(0);
+}}
+
+
+/* =====================================================
+   POPUP BUTTON
+   ===================================================== */
+
+.popup-button {{
+    width: 100%;
+    height: 42px;
+
+    display: flex;
+
+    align-items: center;
+
+    padding-left: 18px;
+
+    background: #050505;
+
+    border: none;
+
+    color: #ffffff;
+
+    font-family: "NeoDungGeunMo", monospace;
+
+    font-size: 14px;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    text-decoration: none;
+}}
+
+
+.popup-button:hover {{
+    background: #ffffff;
+
+    color: #000000;
+}}
+
+
+/* =====================================================
+   HOW TO PLAY
+   ===================================================== */
+
+.how {{
+    position: absolute;
+
+    top: 65vh;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    width: 220px;
+    height: 55px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background: transparent;
+
+    border: none;
+
+    color: #ffffff;
+
+    font-family: "NeoDungGeunMo", monospace;
+
+    font-size: 19px;
+
+    cursor: pointer;
+
+    user-select: none;
+
+    text-decoration: none;
+}}
+
+
+.how:hover {{
+    background: #ffffff;
+
+    color: #000000;
+}}
+
+
+/* =====================================================
+   TITLE FLICKER
+   ===================================================== */
+
+@keyframes title-flicker {{
+
+    0%, 18%, 20%, 22%, 63%, 65%, 100% {{
+        opacity: 1;
+    }}
+
+    19% {{
+        opacity: 0.35;
+    }}
+
+    21% {{
+        opacity: 0.65;
+    }}
+
+    64% {{
+        opacity: 0.15;
+    }}
+
 }}
 
 
@@ -430,44 +408,35 @@ body {{
    MOBILE
    ===================================================== */
 
-@media (max-width: 700px) {{
+@media (max-width: 600px) {{
 
-    .header {{
-        width: calc(100% - 50px);
+    .title {{
+        top: 12vh;
+        font-size: 30px;
+    }}
 
+    .subtitle {{
+        top: 22vh;
         font-size: 12px;
     }}
 
-    .title-area {{
-        width: calc(100% - 50px);
-
-        margin-top: 60px;
+    .start {{
+        top: 51vh;
     }}
 
-    .content {{
-        width: calc(100% - 50px);
+    .popup {{
+        top: 59vh;
+        left: 50%;
 
-        margin-top: 55px;
-
-        grid-template-columns: 1fr;
+        transform: translateX(-50%);
     }}
 
-    .important {{
-        grid-column: auto;
+    .popup.show {{
+        transform: translateX(-50%);
     }}
 
-    .footer {{
-        width: calc(100% - 50px);
-    }}
-
-    .back {{
-        right: 20px;
-        bottom: 20px;
-
-        width: 170px;
-        height: 46px;
-
-        font-size: 14px;
+    .how {{
+        top: 73vh;
     }}
 
 }}
@@ -479,240 +448,103 @@ body {{
 
 <body>
 
-
 <div class="screen">
-
-
-    <!-- =================================================
-         HEADER
-         ================================================= -->
-
-    <div class="header">
-
-        <div>
-            PROJECT : LOGIC
-        </div>
-
-        <div class="header-right">
-            SYSTEM MANUAL // 01
-        </div>
-
-    </div>
 
 
     <!-- =================================================
          TITLE
          ================================================= -->
 
-    <div class="title-area">
+    <div class="title">
+        PROJECT : LOGIC
+    </div>
 
-        <div class="main-title">
-            HOW TO PLAY
-        </div>
 
-        <div class="subtitle">
-            BASIC OPERATING INSTRUCTIONS
-        </div>
+    <div class="subtitle">
+        INFORMATION IS NOT ALWAYS TRUE
+    </div>
+
+
+    <!-- =================================================
+         START
+         ================================================= -->
+
+    <button
+        id="start"
+        class="start"
+    >
+        START
+    </button>
+
+
+    <!-- =================================================
+         START POPUP
+         ================================================= -->
+
+    <div
+        id="popup"
+        class="popup"
+    >
+
+        <a
+            class="popup-button"
+            href="?action=continue"
+            target="_top"
+        >
+            CONTINUE
+        </a>
+
+
+        <a
+            class="popup-button"
+            href="?action=new_game"
+            target="_top"
+        >
+            NEW GAME
+        </a>
 
     </div>
 
 
     <!-- =================================================
-         CONTENT
+         HOW TO PLAY
          ================================================= -->
 
-    <div class="content">
-
-
-        <!-- 01 MOVEMENT -->
-
-        <div class="card">
-
-            <div class="card-header">
-
-                <span class="number">
-                    01
-                </span>
-
-                <span class="card-title">
-                    MOVEMENT
-                </span>
-
-            </div>
-
-            <div class="description">
-
-                <span class="key">W</span>
-                <span class="key">A</span>
-                <span class="key">S</span>
-                <span class="key">D</span>
-
-                <br>
-
-                연구시설 내부를 이동합니다.
-
-            </div>
-
-        </div>
-
-
-        <!-- 02 INTERACTION -->
-
-        <div class="card">
-
-            <div class="card-header">
-
-                <span class="number">
-                    02
-                </span>
-
-                <span class="card-title">
-                    INTERACTION
-                </span>
-
-            </div>
-
-            <div class="description">
-
-                <span class="key">E</span>
-
-                주변의 물체를 조사하거나
-
-                <br>
-
-                아이템을 획득합니다.
-
-            </div>
-
-        </div>
-
-
-        <!-- 03 INVENTORY -->
-
-        <div class="card">
-
-            <div class="card-header">
-
-                <span class="number">
-                    03
-                </span>
-
-                <span class="card-title">
-                    INVENTORY
-                </span>
-
-            </div>
-
-            <div class="description">
-
-                <span class="key">I</span>
-
-                보유한 아이템과 단서를 확인합니다.
-
-                <br>
-
-                <span class="key">ESC</span>
-
-                인벤토리 또는 메뉴를 닫습니다.
-
-            </div>
-
-        </div>
-
-
-        <!-- 04 SYSTEM MESSAGE -->
-
-        <div class="card">
-
-            <div class="card-header">
-
-                <span class="number">
-                    04
-                </span>
-
-                <span class="card-title">
-                    SYSTEM MESSAGE
-                </span>
-
-            </div>
-
-            <div class="description">
-
-                <span class="key">SPACE</span>
-
-                대화와 시스템 메시지를 진행합니다.
-
-                <br>
-
-                중요한 정보가 표시될 수 있습니다.
-
-            </div>
-
-        </div>
-
-
-        <!-- =================================================
-             IMPORTANT
-             ================================================= -->
-
-        <div class="important">
-
-            <div class="important-title">
-                IMPORTANT
-            </div>
-
-            <div class="important-text">
-
-                주변의 물체와 기록을 자세히 조사하십시오.
-
-                <br>
-
-                <span class="warning">
-                    ECHO가 제공하는 모든 정보가 사실이라고 가정하지 마십시오.
-                </span>
-
-                <br>
-
-                서로 모순되는 단서가 발견될 수 있습니다.
-
-                <br>
-
-                무엇을 믿을 것인지는 당신의 판단에 달려 있습니다.
-
-            </div>
-
-        </div>
-
-
-    </div>
-
-
-    <!-- =================================================
-         FOOTER
-         ================================================= -->
-
-    <div class="footer">
-
-        ECHO SYSTEM // INFORMATION IS NOT ALWAYS TRUE
-
-    </div>
+    <a
+        class="how"
+        href="?action=how_to_play"
+        target="_top"
+    >
+        HOW TO PLAY
+    </a>
 
 
 </div>
 
 
-<!-- =====================================================
-     BACK TO TITLE
-     화면에 고정되는 오버레이
-     ===================================================== -->
+<script>
 
-<a
-    class="back"
-    href="/"
-    target="_top"
->
-    BACK TO TITLE
-</a>
+/* =======================================================
+   START BUTTON
+   ======================================================= */
+
+const start =
+    document.getElementById("start");
+
+const popup =
+    document.getElementById("popup");
+
+
+start.addEventListener(
+    "click",
+    function() {{
+
+        popup.classList.toggle("show");
+
+    }}
+);
+
+</script>
 
 
 </body>
@@ -727,6 +559,6 @@ body {{
 
 components.html(
     html,
-    height=1000,
-    scrolling=True,
+    height=900,
+    scrolling=False,
 )
