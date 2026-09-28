@@ -40,33 +40,141 @@ for font_path in font_candidates:
 # =========================================================
 
 st.markdown(
-    """
+    f"""
     <style>
 
-    #MainMenu {
-        visibility: hidden;
-    }
+    @font-face {{
+        font-family: "NeoDungGeunMo";
+        src: url(data:font/ttf;base64,{font_data});
+    }}
 
-    header {
-        visibility: hidden;
-    }
 
-    footer {
+    #MainMenu {{
         visibility: hidden;
-    }
+    }}
 
-    [data-testid="stSidebar"] {
+    header {{
+        visibility: hidden;
+    }}
+
+    footer {{
+        visibility: hidden;
+    }}
+
+    [data-testid="stSidebar"] {{
         display: none;
-    }
+    }}
 
-    .stApp {
+    .stApp {{
         background: #000000;
-    }
+    }}
 
-    .block-container {
+    .block-container {{
         padding: 0 !important;
         max-width: 100% !important;
-    }
+    }}
+
+
+    /* =====================================================
+       BACK TO TITLE
+       ===================================================== */
+
+    .st-key-back_to_title {{
+        position: fixed !important;
+
+        right: 32px !important;
+        bottom: 28px !important;
+
+        width: 190px !important;
+        height: 50px !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+
+        z-index: 999999 !important;
+    }}
+
+
+    .st-key-back_to_title button {{
+        width: 190px !important;
+        height: 50px !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+
+        border: 1px solid #777777 !important;
+        border-radius: 0 !important;
+
+        background: rgba(5, 5, 5, 0.96) !important;
+
+        color: #ffffff !important;
+
+        font-family: "NeoDungGeunMo", monospace !important;
+
+        font-size: 16px !important;
+
+        box-shadow: none !important;
+
+        cursor: pointer !important;
+
+        transition:
+            background 0.15s ease,
+            color 0.15s ease,
+            border-color 0.15s ease !important;
+    }}
+
+
+    .st-key-back_to_title button:hover {{
+        background: #ffffff !important;
+
+        color: #000000 !important;
+
+        border-color: #ffffff !important;
+    }}
+
+
+    .st-key-back_to_title button:focus {{
+        background: rgba(5, 5, 5, 0.96) !important;
+
+        color: #ffffff !important;
+
+        border-color: #777777 !important;
+
+        box-shadow: none !important;
+    }}
+
+
+    .st-key-back_to_title button:focus:hover {{
+        background: #ffffff !important;
+
+        color: #000000 !important;
+
+        border-color: #ffffff !important;
+    }}
+
+
+    /* =====================================================
+       MOBILE
+       ===================================================== */
+
+    @media (max-width: 700px) {{
+
+        .st-key-back_to_title {{
+            right: 20px !important;
+            bottom: 20px !important;
+
+            width: 170px !important;
+            height: 46px !important;
+        }}
+
+        .st-key-back_to_title button {{
+            width: 170px !important;
+            height: 46px !important;
+
+            font-size: 14px !important;
+        }}
+
+    }}
 
     </style>
     """,
@@ -377,56 +485,6 @@ body {{
 
 
 /* =====================================================
-   BACK TO TITLE OVERLAY
-   ===================================================== */
-
-.back {{
-    position: fixed;
-
-    right: 32px;
-    bottom: 28px;
-
-    width: 190px;
-    height: 50px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    border: 1px solid #777777;
-
-    background: rgba(5, 5, 5, 0.96);
-
-    color: #ffffff;
-
-    font-family: "NeoDungGeunMo", monospace;
-
-    font-size: 16px;
-
-    text-decoration: none;
-
-    cursor: pointer;
-
-    z-index: 999999;
-
-    transition:
-        background 0.15s ease,
-        color 0.15s ease,
-        border-color 0.15s ease;
-}}
-
-
-.back:hover {{
-    background: #ffffff;
-
-    color: #000000;
-
-    border-color: #ffffff;
-}}
-
-
-/* =====================================================
    MOBILE
    ===================================================== */
 
@@ -458,16 +516,6 @@ body {{
 
     .footer {{
         width: calc(100% - 50px);
-    }}
-
-    .back {{
-        right: 20px;
-        bottom: 20px;
-
-        width: 170px;
-        height: 46px;
-
-        font-size: 14px;
     }}
 
 }}
@@ -701,20 +749,6 @@ body {{
 </div>
 
 
-<!-- =====================================================
-     BACK TO TITLE
-     화면에 고정되는 오버레이
-     ===================================================== -->
-
-<a
-    class="back"
-    href="/"
-    target="_top"
->
-    BACK TO TITLE
-</a>
-
-
 </body>
 
 </html>
@@ -730,3 +764,24 @@ components.html(
     height=1000,
     scrolling=True,
 )
+
+
+# =========================================================
+# BACK TO TITLE
+# =========================================================
+
+with st.container(key="back_to_title"):
+
+    back_clicked = st.button(
+        "BACK TO TITLE",
+        key="back_title_button",
+    )
+
+
+# =========================================================
+# PAGE NAVIGATION
+# =========================================================
+
+if back_clicked:
+
+    st.switch_page("main.py")
