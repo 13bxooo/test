@@ -36,7 +36,7 @@ for font_path in font_candidates:
 
 
 # =========================================================
-# HIDE STREAMLIT UI
+# STREAMLIT UI HIDDEN
 # =========================================================
 
 st.markdown(
@@ -75,7 +75,7 @@ st.markdown(
 
 
 # =========================================================
-# HOW TO PLAY SCREEN
+# HOW TO PLAY
 # =========================================================
 
 html = f"""
@@ -88,7 +88,6 @@ html = f"""
 <meta charset="UTF-8">
 
 <style>
-
 
 /* =====================================================
    FONT
@@ -111,36 +110,34 @@ body {{
     padding: 0;
 
     width: 100%;
-    height: 100%;
-
-    overflow: hidden;
+    min-height: 100%;
 
     background: #000000;
-}}
 
-
-body {{
     font-family: "NeoDungGeunMo", monospace;
 }}
 
 
 /* =====================================================
-   SCREEN
+   PAGE
    ===================================================== */
 
+body {{
+    color: #ffffff;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+}}
+
+
 .screen {{
-    position: fixed;
+    width: 100%;
 
-    inset: 0;
-
-    width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
 
     background: #000000;
 
-    color: #ffffff;
-
-    overflow-y: auto;
+    padding-bottom: 150px;
 }}
 
 
@@ -149,11 +146,11 @@ body {{
    ===================================================== */
 
 .header {{
-    position: absolute;
+    width: calc(100% - 100px);
 
-    top: 32px;
-    left: 50px;
-    right: 50px;
+    margin: 0 auto;
+
+    padding-top: 32px;
 
     display: flex;
 
@@ -163,8 +160,6 @@ body {{
     font-size: 15px;
 
     letter-spacing: 1px;
-
-    color: #ffffff;
 }}
 
 
@@ -178,11 +173,11 @@ body {{
    ===================================================== */
 
 .title-area {{
-    position: absolute;
+    width: calc(100% - 100px);
 
-    top: 100px;
+    margin: 65px auto 0;
 
-    left: 50px;
+    max-width: 1000px;
 }}
 
 
@@ -209,34 +204,26 @@ body {{
    ===================================================== */
 
 .content {{
-    position: absolute;
-
-    top: 230px;
-
-    left: 50%;
-
-    transform: translateX(-50%);
-
     width: calc(100% - 100px);
 
     max-width: 1000px;
+
+    margin: 70px auto 0;
 
     display: grid;
 
     grid-template-columns: repeat(2, minmax(280px, 1fr));
 
     gap: 18px;
-
-    padding-bottom: 120px;
 }}
 
 
 /* =====================================================
-   INSTRUCTION CARD
+   CARD
    ===================================================== */
 
 .card {{
-    min-height: 125px;
+    min-height: 145px;
 
     border: 1px solid #333333;
 
@@ -264,7 +251,7 @@ body {{
 
     gap: 12px;
 
-    margin-bottom: 15px;
+    margin-bottom: 17px;
 }}
 
 
@@ -299,6 +286,8 @@ body {{
 
     padding: 0 10px;
 
+    margin-right: 7px;
+
     border: 1px solid #777777;
 
     background: #111111;
@@ -306,8 +295,6 @@ body {{
     color: #ffffff;
 
     font-size: 14px;
-
-    margin-right: 8px;
 
     vertical-align: middle;
 }}
@@ -322,7 +309,7 @@ body {{
 
     font-size: 14px;
 
-    line-height: 1.8;
+    line-height: 1.9;
 }}
 
 
@@ -335,20 +322,22 @@ body {{
 
     border: 1px solid #555555;
 
-    padding: 20px;
-
-    margin-top: 4px;
-
     background: #030303;
+
+    padding: 24px;
+
+    margin-top: 5px;
+
+    min-height: 150px;
 }}
 
 
 .important-title {{
     color: #ffffff;
 
-    font-size: 16px;
+    font-size: 17px;
 
-    margin-bottom: 12px;
+    margin-bottom: 14px;
 
     letter-spacing: 1px;
 }}
@@ -359,7 +348,7 @@ body {{
 
     font-size: 14px;
 
-    line-height: 1.9;
+    line-height: 2;
 }}
 
 
@@ -369,29 +358,45 @@ body {{
 
 
 /* =====================================================
-   BACK BUTTON
+   FOOTER
+   ===================================================== */
+
+.footer {{
+    width: calc(100% - 100px);
+
+    max-width: 1000px;
+
+    margin: 55px auto 0;
+
+    color: #444444;
+
+    font-size: 11px;
+
+    letter-spacing: 1px;
+}}
+
+
+/* =====================================================
+   BACK TO TITLE OVERLAY
    ===================================================== */
 
 .back {{
     position: fixed;
 
-    bottom: 35px;
-
-    left: 50%;
-
-    transform: translateX(-50%);
+    right: 32px;
+    bottom: 28px;
 
     width: 190px;
-    height: 48px;
+    height: 50px;
 
     display: flex;
 
     align-items: center;
     justify-content: center;
 
-    border: 1px solid #555555;
+    border: 1px solid #777777;
 
-    background: #050505;
+    background: rgba(5, 5, 5, 0.96);
 
     color: #ffffff;
 
@@ -399,11 +404,16 @@ body {{
 
     font-size: 16px;
 
-    cursor: pointer;
-
     text-decoration: none;
 
-    z-index: 100;
+    cursor: pointer;
+
+    z-index: 999999;
+
+    transition:
+        background 0.15s ease,
+        color 0.15s ease,
+        border-color 0.15s ease;
 }}
 
 
@@ -417,51 +427,29 @@ body {{
 
 
 /* =====================================================
-   FOOTER
-   ===================================================== */
-
-.footer {{
-    position: fixed;
-
-    bottom: 18px;
-
-    left: 50px;
-
-    color: #444444;
-
-    font-size: 11px;
-
-    letter-spacing: 1px;
-}}
-
-
-/* =====================================================
    MOBILE
    ===================================================== */
 
 @media (max-width: 700px) {{
 
     .header {{
-        left: 25px;
-        right: 25px;
+        width: calc(100% - 50px);
 
         font-size: 12px;
     }}
 
     .title-area {{
-        left: 25px;
+        width: calc(100% - 50px);
 
-        top: 90px;
+        margin-top: 60px;
     }}
 
     .content {{
-        top: 210px;
-
         width: calc(100% - 50px);
 
-        grid-template-columns: 1fr;
+        margin-top: 55px;
 
-        padding-bottom: 120px;
+        grid-template-columns: 1fr;
     }}
 
     .important {{
@@ -469,11 +457,17 @@ body {{
     }}
 
     .footer {{
-        left: 25px;
+        width: calc(100% - 50px);
     }}
 
     .back {{
-        bottom: 25px;
+        right: 20px;
+        bottom: 20px;
+
+        width: 170px;
+        height: 46px;
+
+        font-size: 14px;
     }}
 
 }}
@@ -484,6 +478,7 @@ body {{
 
 
 <body>
+
 
 <div class="screen">
 
@@ -523,13 +518,13 @@ body {{
 
 
     <!-- =================================================
-         INSTRUCTIONS
+         CONTENT
          ================================================= -->
 
     <div class="content">
 
 
-        <!-- MOVEMENT -->
+        <!-- 01 MOVEMENT -->
 
         <div class="card">
 
@@ -561,7 +556,7 @@ body {{
         </div>
 
 
-        <!-- INTERACTION -->
+        <!-- 02 INTERACTION -->
 
         <div class="card">
 
@@ -592,7 +587,7 @@ body {{
         </div>
 
 
-        <!-- INVENTORY -->
+        <!-- 03 INVENTORY -->
 
         <div class="card">
 
@@ -625,7 +620,7 @@ body {{
         </div>
 
 
-        <!-- SYSTEM MESSAGE -->
+        <!-- 04 SYSTEM MESSAGE -->
 
         <div class="card">
 
@@ -656,7 +651,9 @@ body {{
         </div>
 
 
-        <!-- IMPORTANT -->
+        <!-- =================================================
+             IMPORTANT
+             ================================================= -->
 
         <div class="important">
 
@@ -678,6 +675,8 @@ body {{
 
                 서로 모순되는 단서가 발견될 수 있습니다.
 
+                <br>
+
                 무엇을 믿을 것인지는 당신의 판단에 달려 있습니다.
 
             </div>
@@ -689,28 +688,32 @@ body {{
 
 
     <!-- =================================================
-         BACK TO TITLE
-         ================================================= -->
-
-    <a
-        class="back"
-        href="/"
-        target="_top"
-    >
-        BACK TO TITLE
-    </a>
-
-
-    <!-- =================================================
          FOOTER
          ================================================= -->
 
     <div class="footer">
+
         ECHO SYSTEM // INFORMATION IS NOT ALWAYS TRUE
+
     </div>
 
 
 </div>
+
+
+<!-- =====================================================
+     BACK TO TITLE
+     화면에 고정되는 오버레이
+     ===================================================== -->
+
+<a
+    class="back"
+    href="/"
+    target="_top"
+>
+    BACK TO TITLE
+</a>
+
 
 </body>
 
@@ -724,6 +727,6 @@ body {{
 
 components.html(
     html,
-    height=900,
-    scrolling=False,
+    height=1000,
+    scrolling=True,
 )
