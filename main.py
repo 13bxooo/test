@@ -13,15 +13,14 @@ st.set_page_config(
     page_title="PROJECT : LOGIC",
     page_icon="◈",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="collapsed",
 )
 
 
 # =========================================================
-# FONT LOAD
+# FONT
 # =========================================================
 
-# GitHub에는 neodgm.ttf로 올리는 것을 권장
 font_candidates = [
     Path("neodgm.ttf"),
     Path("neodgm(2).ttf"),
@@ -34,121 +33,81 @@ for candidate in font_candidates:
         font_path = candidate
         break
 
-
-if font_path is not None:
-
+if font_path:
     with open(font_path, "rb") as f:
         font_data = base64.b64encode(f.read()).decode("utf-8")
-
 else:
-
     font_data = ""
 
 
 # =========================================================
-# QUERY ACTION
+# PAGE ROUTING
 # =========================================================
 
 action = st.query_params.get("action")
 
 
-if action == "new_game":
+if action == "how_to_play":
+    st.query_params.clear()
+    st.switch_page("pages/1_How_to_Play.py")
 
+
+elif action == "new_game":
     st.query_params.clear()
 
-    st.switch_page("pages/1_Game.py")
+    # 게임 페이지가 만들어지면 이 부분을 연결
+    st.switch_page("pages/2_Game.py")
 
 
 elif action == "continue":
-
     st.query_params.clear()
 
     st.warning(
-        "이전 플레이 기록이 존재하지 않습니다. "
-        "새 게임을 시작해주세요."
+        "이전 플레이 기록이 존재하지 않습니다. 새 게임을 시작해주세요."
     )
 
 
-elif action == "how_to_play":
-
-    st.query_params.clear()
-
-    st.switch_page("pages/2_How_to_Play.py")
-
-
 # =========================================================
-# STREAMLIT UI HIDE
+# STREAMLIT UI HIDDEN
 # =========================================================
 
 st.markdown(
     """
     <style>
 
-    html,
-    body {
-
-        margin: 0 !important;
-        padding: 0 !important;
-
-        background: #000000 !important;
-    }
-
-
-    .stApp {
-
-        background: #000000 !important;
-
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-
-
-    [data-testid="stAppViewContainer"] {
-
-        background: #000000 !important;
-    }
-
-
-    [data-testid="stHeader"] {
-
-        display: none !important;
-    }
-
-
-    [data-testid="stSidebar"] {
-
-        display: none !important;
-    }
-
-
     #MainMenu {
-
-        visibility: hidden !important;
+        visibility: hidden;
     }
 
+    header {
+        visibility: hidden;
+    }
 
     footer {
-
-        visibility: hidden !important;
+        visibility: hidden;
     }
 
+    [data-testid="stSidebar"] {
+        display: none;
+    }
+
+    .stApp {
+        background: black;
+    }
 
     .block-container {
-
         padding: 0 !important;
-        margin: 0 !important;
-
-        max-width: none !important;
+        max-width: 100% !important;
     }
 
     </style>
     """,
-    unsafe_allow_html=True
+    unsafe_allow_html=True,
 )
 
 
 # =========================================================
-# GAME START SCREEN
+# START SCREEN
 # =========================================================
 
 html = f"""
@@ -160,62 +119,33 @@ html = f"""
 
 <meta charset="UTF-8">
 
-
 <style>
 
-/* =====================================================
-   FONT
-   ===================================================== */
-
 @font-face {{
-
     font-family: "NeoDungGeunMo";
-
-    src: url(
-        "data:font/ttf;base64,{font_data}"
-    ) format("truetype");
-
-    font-weight: normal;
-
-    font-style: normal;
+    src: url(data:font/ttf;base64,{font_data});
 }}
-
-
-/* =====================================================
-   RESET
-   ===================================================== */
 
 * {{
-
     box-sizing: border-box;
-
 }}
-
 
 html,
 body {{
-
-    width: 100%;
-    height: 100%;
-
     margin: 0;
     padding: 0;
-
+    width: 100%;
+    height: 100%;
     overflow: hidden;
-
     background: #000000;
-
 }}
 
-
-/* =====================================================
-   전체 화면
-   ===================================================== */
+body {{
+    font-family: "NeoDungGeunMo", monospace;
+}}
 
 .screen {{
-
     position: fixed;
-
     inset: 0;
 
     width: 100vw;
@@ -224,90 +154,48 @@ body {{
     background: #000000;
 
     color: #ffffff;
-
-    font-family:
-        "NeoDungGeunMo",
-        monospace;
-
-    overflow: hidden;
-
 }}
 
 
 /* =====================================================
-   PROJECT : LOGIC
+   TITLE
    ===================================================== */
 
 .title {{
-
-    position: fixed;
+    position: absolute;
 
     top: 12vh;
-
     left: 50%;
 
     transform: translateX(-50%);
 
-    color: #ffffff;
-
-    font-family:
-        "NeoDungGeunMo",
-        monospace;
-
-    font-size: clamp(32px, 4vw, 58px);
-
-    font-weight: normal;
-
-    letter-spacing: 0.12em;
-
     white-space: nowrap;
 
-    text-align: center;
+    font-family: "NeoDungGeunMo", monospace;
+    font-size: clamp(28px, 4vw, 48px);
 
-    z-index: 10;
+    letter-spacing: 2px;
 
-    text-shadow:
-        0 0 4px rgba(255,255,255,0.85),
-        0 0 12px rgba(255,255,255,0.25);
-
-    animation:
-        title-flicker
-        4.2s
-        infinite;
-
+    animation: title-flicker 4s infinite;
 }}
 
 
-/* =====================================================
-   SUBTITLE
-   ===================================================== */
-
 .subtitle {{
-
-    position: fixed;
+    position: absolute;
 
     top: 22vh;
-
     left: 50%;
 
     transform: translateX(-50%);
 
-    color: #9a9a9a;
-
-    font-family:
-        "NeoDungGeunMo",
-        monospace;
-
-    font-size: clamp(10px, 1.1vw, 15px);
-
-    letter-spacing: 0.25em;
-
     white-space: nowrap;
 
-    text-align: center;
+    color: #9c9c9c;
 
-    z-index: 10;
+    font-family: "NeoDungGeunMo", monospace;
+    font-size: clamp(13px, 1.5vw, 18px);
 
+    letter-spacing: 1px;
 }}
 
 
@@ -316,49 +204,37 @@ body {{
    ===================================================== */
 
 .start {{
-
-    position: fixed;
+    position: absolute;
 
     top: 51vh;
-
     left: 50%;
 
     transform: translateX(-50%);
 
     width: 170px;
-
     height: 55px;
 
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
-    color: #ffffff;
+    background: transparent;
 
-    font-family:
-        "NeoDungGeunMo",
-        monospace;
+    border: none;
 
-    font-size: 22px;
+    color: white;
 
-    letter-spacing: 0.12em;
+    font-family: "NeoDungGeunMo", monospace;
+    font-size: 19px;
 
     cursor: pointer;
 
     user-select: none;
-
-    z-index: 20;
-
 }}
 
-
 .start:hover {{
-
-    text-shadow:
-        0 0 5px rgba(255,255,255,0.5);
-
+    background: #ffffff;
+    color: #000000;
 }}
 
 
@@ -367,100 +243,62 @@ body {{
    ===================================================== */
 
 .popup {{
-
-    position: fixed;
+    position: absolute;
 
     top: calc(51vh - 3px);
-
     left: calc(50% + 105px);
 
     width: 190px;
 
-    padding: 7px 0;
+    background: #050505;
 
-    background: #080808;
+    border: 1px solid #ffffff;
 
-    border: 1px solid #555555;
+    opacity: 0;
+    visibility: hidden;
 
-    box-shadow:
-        0 0 0 1px #111111,
-        0 0 12px rgba(255,255,255,0.08);
+    transform: translateX(-10px);
 
-    display: none;
-
-    z-index: 30;
-
-    animation:
-        popup-appear
-        0.12s
-        steps(2, end);
-
+    transition:
+        opacity 0.15s ease,
+        transform 0.15s ease,
+        visibility 0.15s;
 }}
-
 
 .popup.show {{
+    opacity: 1;
+    visibility: visible;
 
-    display: block;
-
+    transform: translateX(0);
 }}
 
 
-/* =====================================================
-   POPUP BUTTON
-   ===================================================== */
-
 .popup-button {{
-
     width: 100%;
-
     height: 42px;
 
     display: flex;
-
     align-items: center;
 
     padding-left: 18px;
 
+    background: #050505;
+
+    border: none;
+
     color: #ffffff;
 
-    font-family:
-        "NeoDungGeunMo",
-        monospace;
-
+    font-family: "NeoDungGeunMo", monospace;
     font-size: 14px;
 
-    letter-spacing: 0.1em;
+    text-align: left;
 
     cursor: pointer;
-
-    user-select: none;
-
 }}
-
-
-.popup-button + .popup-button {{
-
-    border-top: 1px solid #222222;
-
-}}
-
-
-/* =====================================================
-   POPUP HOVER FLICKER
-   ===================================================== */
 
 .popup-button:hover {{
-
     background: #ffffff;
-
     color: #000000;
-
-    animation:
-        menu-flicker
-        0.55s
-        steps(1, end)
-        infinite;
-
 }}
 
 
@@ -469,249 +307,98 @@ body {{
    ===================================================== */
 
 .how {{
-
-    position: fixed;
+    position: absolute;
 
     top: 65vh;
-
     left: 50%;
 
     transform: translateX(-50%);
 
     width: 220px;
-
     height: 55px;
 
     display: flex;
-
     align-items: center;
-
     justify-content: center;
 
-    color: #ffffff;
+    background: transparent;
 
-    font-family:
-        "NeoDungGeunMo",
-        monospace;
+    border: none;
 
-    font-size: 17px;
+    color: white;
 
-    letter-spacing: 0.12em;
+    font-family: "NeoDungGeunMo", monospace;
+    font-size: 19px;
 
     cursor: pointer;
 
     user-select: none;
-
-    z-index: 20;
-
 }}
 
-
 .how:hover {{
-
-    text-shadow:
-        0 0 5px rgba(255,255,255,0.5);
-
+    background: #ffffff;
+    color: #000000;
 }}
 
 
 /* =====================================================
-   PROJECT : LOGIC FLICKER
+   TITLE FLICKER
    ===================================================== */
 
 @keyframes title-flicker {{
 
-    0%,
-    4% {{
+    0%, 18%, 20%, 22%, 63%, 65%, 100% {{
         opacity: 1;
-    }}
-
-    5% {{
-        opacity: 0.45;
-    }}
-
-    6% {{
-        opacity: 1;
-    }}
-
-    13% {{
-        opacity: 1;
-    }}
-
-    14% {{
-        opacity: 0.2;
-    }}
-
-    15% {{
-        opacity: 0.85;
-    }}
-
-    16% {{
-        opacity: 1;
-    }}
-
-    38% {{
-        opacity: 1;
-    }}
-
-    39% {{
-        opacity: 0.4;
-    }}
-
-    40% {{
-        opacity: 0.1;
-    }}
-
-    41% {{
-        opacity: 0.9;
-    }}
-
-    42% {{
-        opacity: 1;
-    }}
-
-    70% {{
-        opacity: 1;
-    }}
-
-    71% {{
-        opacity: 0.3;
-    }}
-
-    72% {{
-        opacity: 1;
-    }}
-
-    100% {{
-        opacity: 1;
-    }}
-
-}}
-
-
-/* =====================================================
-   MENU FLICKER
-   ===================================================== */
-
-@keyframes menu-flicker {{
-
-    0% {{
-        opacity: 1;
-    }}
-
-    18% {{
-        opacity: 0.15;
     }}
 
     19% {{
-        opacity: 1;
-    }}
-
-    38% {{
         opacity: 0.35;
     }}
 
-    39% {{
-        opacity: 1;
+    21% {{
+        opacity: 0.65;
     }}
 
-    60% {{
-        opacity: 0.1;
-    }}
-
-    61% {{
-        opacity: 1;
-    }}
-
-    80% {{
-        opacity: 0.45;
-    }}
-
-    81% {{
-        opacity: 1;
-    }}
-
-    100% {{
-        opacity: 1;
+    64% {{
+        opacity: 0.15;
     }}
 
 }}
 
 
 /* =====================================================
-   POPUP APPEAR
+   MOBILE
    ===================================================== */
 
-@keyframes popup-appear {{
-
-    0% {{
-
-        opacity: 0;
-
-        transform:
-            translateX(-8px);
-
-    }}
-
-    100% {{
-
-        opacity: 1;
-
-        transform:
-            translateX(0);
-
-    }}
-
-}}
-
-
-/* =====================================================
-   SMALL SCREEN
-   ===================================================== */
-
-@media (max-width: 700px) {{
+@media (max-width: 600px) {{
 
     .title {{
-
         top: 12vh;
-
         font-size: 30px;
-
     }}
-
 
     .subtitle {{
-
-        top: 21vh;
-
-        font-size: 9px;
-
+        top: 22vh;
+        font-size: 12px;
     }}
-
 
     .start {{
-
         top: 51vh;
-
     }}
-
 
     .popup {{
-
         top: 59vh;
-
         left: 50%;
 
-        transform:
-            translateX(-50%);
-
+        transform: translateX(-50%);
     }}
 
+    .popup.show {{
+        transform: translateX(-50%);
+    }}
 
     .how {{
-
         top: 73vh;
-
     }}
 
 }}
@@ -723,165 +410,111 @@ body {{
 
 <body>
 
-
 <div class="screen">
 
-
-    <!-- =================================================
-         TITLE
-         ================================================= -->
-
     <div class="title">
-
         PROJECT : LOGIC
-
     </div>
-
 
     <div class="subtitle">
-
         INFORMATION IS NOT ALWAYS TRUE
-
     </div>
 
 
-    <!-- =================================================
-         START
-         ================================================= -->
+    <!-- START -->
 
-    <div
-        class="start"
+    <button
         id="start"
+        class="start"
     >
-
         START
+    </button>
 
-    </div>
 
-
-    <!-- =================================================
-         START POPUP
-         ================================================= -->
+    <!-- START MENU -->
 
     <div
-        class="popup"
         id="popup"
+        class="popup"
     >
 
-        <div
-            class="popup-button"
+        <button
             id="continue"
-        >
-
-            CONTINUE
-
-        </div>
-
-
-        <div
             class="popup-button"
-            id="new-game"
         >
+            CONTINUE
+        </button>
 
+        <button
+            id="new-game"
+            class="popup-button"
+        >
             NEW GAME
-
-        </div>
+        </button>
 
     </div>
 
 
-    <!-- =================================================
-         HOW TO PLAY
-         ================================================= -->
+    <!-- HOW TO PLAY -->
 
-    <div
-        class="how"
+    <button
         id="how"
+        class="how"
     >
-
         HOW TO PLAY
-
-    </div>
-
+    </button>
 
 </div>
 
 
 <script>
 
-/* =====================================================
-   START → POPUP
-   ===================================================== */
-
-const start =
-    document.getElementById("start");
-
-const popup =
-    document.getElementById("popup");
+const start = document.getElementById("start");
+const popup = document.getElementById("popup");
 
 
-start.addEventListener(
-    "click",
-    function() {{
+// START 버튼
 
-        popup.classList.toggle("show");
+start.addEventListener("click", function() {{
 
-    }}
-);
+    popup.classList.toggle("show");
+
+}});
 
 
-/* =====================================================
-   NEW GAME
-   ===================================================== */
+// NEW GAME
 
 document
     .getElementById("new-game")
-    .addEventListener(
-        "click",
-        function() {{
+    .addEventListener("click", function() {{
 
-            window.parent.location.href =
-                "?action=new_game";
+        window.parent.location.href = "?action=new_game";
 
-        }}
-    );
+    }});
 
 
-/* =====================================================
-   CONTINUE
-   ===================================================== */
+// CONTINUE
 
 document
     .getElementById("continue")
-    .addEventListener(
-        "click",
-        function() {{
+    .addEventListener("click", function() {{
 
-            window.parent.location.href =
-                "?action=continue";
+        window.parent.location.href = "?action=continue";
 
-        }}
-    );
+    }});
 
 
-/* =====================================================
-   HOW TO PLAY
-   ===================================================== */
+// HOW TO PLAY
 
 document
     .getElementById("how")
-    .addEventListener(
-        "click",
-        function() {{
+    .addEventListener("click", function() {{
 
-            window.parent.location.href =
-                "?action=how_to_play";
+        window.parent.location.href = "?action=how_to_play";
 
-        }}
-    );
+    }});
 
 </script>
-
 
 </body>
 
@@ -889,12 +522,8 @@ document
 """
 
 
-# =========================================================
-# RENDER
-# =========================================================
-
 components.html(
     html,
     height=900,
-    scrolling=False
+    scrolling=False,
 )
