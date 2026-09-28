@@ -26,18 +26,13 @@ font_candidates = [
     Path("neodgm(2).ttf"),
 ]
 
-font_path = None
+font_data = ""
 
-for candidate in font_candidates:
-    if candidate.exists():
-        font_path = candidate
+for font_path in font_candidates:
+    if font_path.exists():
+        with open(font_path, "rb") as f:
+            font_data = base64.b64encode(f.read()).decode("utf-8")
         break
-
-if font_path:
-    with open(font_path, "rb") as f:
-        font_data = base64.b64encode(f.read()).decode("utf-8")
-else:
-    font_data = ""
 
 
 # =========================================================
@@ -94,6 +89,11 @@ html = f"""
 
 <style>
 
+
+/* =====================================================
+   FONT
+   ===================================================== */
+
 @font-face {{
     font-family: "NeoDungGeunMo";
     src: url(data:font/ttf;base64,{font_data});
@@ -124,6 +124,10 @@ body {{
 }}
 
 
+/* =====================================================
+   SCREEN
+   ===================================================== */
+
 .screen {{
     position: fixed;
 
@@ -141,7 +145,7 @@ body {{
 
 
 /* =====================================================
-   TOP HEADER
+   HEADER
    ===================================================== */
 
 .header {{
@@ -209,8 +213,13 @@ body {{
 
     top: 230px;
 
-    left: 50px;
-    right: 50px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    width: calc(100% - 100px);
+
+    max-width: 1000px;
 
     display: grid;
 
@@ -218,9 +227,7 @@ body {{
 
     gap: 18px;
 
-    max-width: 1000px;
-
-    margin: 0 auto;
+    padding-bottom: 120px;
 }}
 
 
@@ -277,6 +284,10 @@ body {{
 }}
 
 
+/* =====================================================
+   KEY
+   ===================================================== */
+
 .key {{
     display: inline-flex;
 
@@ -297,8 +308,14 @@ body {{
     font-size: 14px;
 
     margin-right: 8px;
+
+    vertical-align: middle;
 }}
 
+
+/* =====================================================
+   DESCRIPTION
+   ===================================================== */
 
 .description {{
     color: #999999;
@@ -356,7 +373,7 @@ body {{
    ===================================================== */
 
 .back {{
-    position: absolute;
+    position: fixed;
 
     bottom: 35px;
 
@@ -366,6 +383,11 @@ body {{
 
     width: 190px;
     height: 48px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
 
     border: 1px solid #555555;
 
@@ -378,6 +400,10 @@ body {{
     font-size: 16px;
 
     cursor: pointer;
+
+    text-decoration: none;
+
+    z-index: 100;
 }}
 
 
@@ -395,7 +421,7 @@ body {{
    ===================================================== */
 
 .footer {{
-    position: absolute;
+    position: fixed;
 
     bottom: 18px;
 
@@ -418,21 +444,24 @@ body {{
     .header {{
         left: 25px;
         right: 25px;
+
+        font-size: 12px;
     }}
 
     .title-area {{
         left: 25px;
+
+        top: 90px;
     }}
 
     .content {{
-        left: 25px;
-        right: 25px;
+        top: 210px;
+
+        width: calc(100% - 50px);
 
         grid-template-columns: 1fr;
 
-        top: 220px;
-
-        padding-bottom: 100px;
+        padding-bottom: 120px;
     }}
 
     .important {{
@@ -459,7 +488,9 @@ body {{
 <div class="screen">
 
 
-    <!-- HEADER -->
+    <!-- =================================================
+         HEADER
+         ================================================= -->
 
     <div class="header">
 
@@ -474,7 +505,9 @@ body {{
     </div>
 
 
-    <!-- TITLE -->
+    <!-- =================================================
+         TITLE
+         ================================================= -->
 
     <div class="title-area">
 
@@ -489,7 +522,9 @@ body {{
     </div>
 
 
-    <!-- INSTRUCTIONS -->
+    <!-- =================================================
+         INSTRUCTIONS
+         ================================================= -->
 
     <div class="content">
 
@@ -653,17 +688,22 @@ body {{
     </div>
 
 
-    <!-- BACK -->
+    <!-- =================================================
+         BACK TO TITLE
+         ================================================= -->
 
-    <button
-        id="back"
+    <a
         class="back"
+        href="/"
+        target="_top"
     >
         BACK TO TITLE
-    </button>
+    </a>
 
 
-    <!-- FOOTER -->
+    <!-- =================================================
+         FOOTER
+         ================================================= -->
 
     <div class="footer">
         ECHO SYSTEM // INFORMATION IS NOT ALWAYS TRUE
@@ -672,26 +712,15 @@ body {{
 
 </div>
 
-
-<script>
-
-document
-    .getElementById("back")
-    .addEventListener("click", function(){{
-
-        window.parent.location.href =
-            window.parent.location.pathname;
-
-    }});
-
-</script>
-
-
 </body>
 
 </html>
 """
 
+
+# =========================================================
+# RENDER
+# =========================================================
 
 components.html(
     html,
