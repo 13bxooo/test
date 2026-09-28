@@ -10,7 +10,7 @@ import streamlit.components.v1 as components
 # =========================================================
 
 st.set_page_config(
-    page_title="HOW TO PLAY | PROJECT : LOGIC",
+    page_title="PROJECT : LOGIC // HOW TO PLAY",
     page_icon="◈",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -33,7 +33,7 @@ for candidate in font_candidates:
         font_path = candidate
         break
 
-if font_path is not None:
+if font_path:
     with open(font_path, "rb") as f:
         font_data = base64.b64encode(f.read()).decode("utf-8")
 else:
@@ -49,36 +49,28 @@ st.markdown(
     <style>
 
     #MainMenu {
-        visibility: hidden !important;
+        visibility: hidden;
     }
 
     header {
-        visibility: hidden !important;
+        visibility: hidden;
     }
 
     footer {
-        visibility: hidden !important;
+        visibility: hidden;
     }
 
     [data-testid="stSidebar"] {
-        display: none !important;
+        display: none;
     }
 
-    [data-testid="collapsedControl"] {
-        display: none !important;
-    }
-
-    [data-testid="stSidebarNav"] {
-        display: none !important;
+    .stApp {
+        background: #000000;
     }
 
     .block-container {
         padding: 0 !important;
         max-width: 100% !important;
-    }
-
-    .stApp {
-        background: #000000 !important;
     }
 
     </style>
@@ -88,7 +80,7 @@ st.markdown(
 
 
 # =========================================================
-# HOW TO PLAY
+# HOW TO PLAY SCREEN
 # =========================================================
 
 html = f"""
@@ -100,24 +92,13 @@ html = f"""
 
 <meta charset="UTF-8">
 
-
 <style>
-
-
-/* =====================================================
-   FONT
-   ===================================================== */
 
 @font-face {{
     font-family: "NeoDungGeunMo";
-
     src: url(data:font/ttf;base64,{font_data});
 }}
 
-
-/* =====================================================
-   RESET
-   ===================================================== */
 
 * {{
     box-sizing: border-box;
@@ -126,31 +107,24 @@ html = f"""
 
 html,
 body {{
-
     margin: 0;
     padding: 0;
 
     width: 100%;
     height: 100%;
 
-    background: #000000;
+    overflow: hidden;
 
+    background: #000000;
 }}
 
 
 body {{
-
     font-family: "NeoDungGeunMo", monospace;
-
 }}
 
 
-/* =====================================================
-   SCREEN
-   ===================================================== */
-
 .screen {{
-
     position: fixed;
 
     inset: 0;
@@ -163,40 +137,35 @@ body {{
     color: #ffffff;
 
     overflow-y: auto;
-
 }}
 
 
 /* =====================================================
-   TOP BAR
+   TOP HEADER
    ===================================================== */
 
-.top-bar {{
-
+.header {{
     position: absolute;
 
-    top: 24px;
-
-    left: 35px;
-    right: 35px;
+    top: 32px;
+    left: 50px;
+    right: 50px;
 
     display: flex;
 
     justify-content: space-between;
-
     align-items: center;
 
-    color: #777777;
+    font-size: 15px;
 
-    font-size: 14px;
+    letter-spacing: 1px;
 
+    color: #ffffff;
 }}
 
 
-.system-status {{
-
-    color: #ffffff;
-
+.header-right {{
+    color: #666666;
 }}
 
 
@@ -204,45 +173,30 @@ body {{
    TITLE
    ===================================================== */
 
-.page-title {{
-
+.title-area {{
     position: absolute;
 
-    top: 70px;
+    top: 100px;
 
-    left: 50%;
-
-    transform: translateX(-50%);
-
-    white-space: nowrap;
-
-    color: #ffffff;
-
-    font-size: 32px;
-
-    letter-spacing: 2px;
-
+    left: 50px;
 }}
 
 
-.page-subtitle {{
+.main-title {{
+    font-size: clamp(32px, 4vw, 48px);
 
-    position: absolute;
+    letter-spacing: 2px;
 
-    top: 112px;
+    margin-bottom: 14px;
+}}
 
-    left: 50%;
 
-    transform: translateX(-50%);
-
-    white-space: nowrap;
-
+.subtitle {{
     color: #777777;
 
-    font-size: 13px;
+    font-size: 15px;
 
     letter-spacing: 1px;
-
 }}
 
 
@@ -251,139 +205,149 @@ body {{
    ===================================================== */
 
 .content {{
-
     position: absolute;
 
-    top: 165px;
+    top: 230px;
 
-    left: 50%;
+    left: 50px;
+    right: 50px;
 
-    transform: translateX(-50%);
+    display: grid;
 
-    width: min(850px, 88vw);
+    grid-template-columns: repeat(2, minmax(280px, 1fr));
 
-    padding-bottom: 130px;
+    gap: 18px;
 
+    max-width: 1000px;
+
+    margin: 0 auto;
 }}
 
 
 /* =====================================================
-   SECTION
+   INSTRUCTION CARD
    ===================================================== */
 
-.section {{
+.card {{
+    min-height: 125px;
 
-    margin-bottom: 22px;
+    border: 1px solid #333333;
 
-    border: 1px solid #3d4650;
+    background: #050505;
 
-    background: #080b0f;
+    padding: 20px;
 
+    transition:
+        border-color 0.15s ease,
+        background 0.15s ease;
 }}
 
 
-.section-title {{
+.card:hover {{
+    border-color: #ffffff;
 
-    padding: 11px 16px;
-
-    background: #111820;
-
-    border-bottom: 1px solid #3d4650;
-
-    color: #ffffff;
-
-    font-size: 15px;
-
+    background: #0b0b0b;
 }}
 
 
-.section-body {{
-
-    padding: 15px 17px;
-
-    color: #bdbdbd;
-
-    font-size: 14px;
-
-    line-height: 1.8;
-
-}}
-
-
-/* =====================================================
-   CONTROL
-   ===================================================== */
-
-.control-row {{
-
+.card-header {{
     display: flex;
 
     align-items: center;
 
-    gap: 18px;
+    gap: 12px;
 
-    min-height: 48px;
-
-    border-bottom: 1px solid #20262d;
-
+    margin-bottom: 15px;
 }}
 
 
-.control-row:last-child {{
+.number {{
+    color: #666666;
 
-    border-bottom: none;
+    font-size: 13px;
+}}
 
+
+.card-title {{
+    color: #ffffff;
+
+    font-size: 19px;
+
+    letter-spacing: 1px;
 }}
 
 
 .key {{
-
-    width: 105px;
-
-    min-width: 105px;
-
-    height: 32px;
-
-    display: flex;
+    display: inline-flex;
 
     align-items: center;
-
     justify-content: center;
 
-    background: #eeeeee;
+    min-width: 58px;
+    height: 32px;
 
-    color: #000000;
+    padding: 0 10px;
 
-    border: 2px solid #ffffff;
+    border: 1px solid #777777;
 
-    font-size: 13px;
+    background: #111111;
 
+    color: #ffffff;
+
+    font-size: 14px;
+
+    margin-right: 8px;
 }}
 
 
 .description {{
+    color: #999999;
 
-    color: #bdbdbd;
+    font-size: 14px;
 
-    font-size: 13px;
-
+    line-height: 1.8;
 }}
 
 
 /* =====================================================
-   WARNING
+   IMPORTANT
    ===================================================== */
 
+.important {{
+    grid-column: 1 / -1;
+
+    border: 1px solid #555555;
+
+    padding: 20px;
+
+    margin-top: 4px;
+
+    background: #030303;
+}}
+
+
+.important-title {{
+    color: #ffffff;
+
+    font-size: 16px;
+
+    margin-bottom: 12px;
+
+    letter-spacing: 1px;
+}}
+
+
+.important-text {{
+    color: #888888;
+
+    font-size: 14px;
+
+    line-height: 1.9;
+}}
+
+
 .warning {{
-
-    color: #d4d4d4;
-
-    border-left: 3px solid #ffffff;
-
-    padding-left: 13px;
-
-    margin-top: 5px;
-
+    color: #ffffff;
 }}
 
 
@@ -391,47 +355,38 @@ body {{
    BACK BUTTON
    ===================================================== */
 
-.back-button {{
+.back {{
+    position: absolute;
 
-    position: fixed;
-
-    bottom: 30px;
+    bottom: 35px;
 
     left: 50%;
 
     transform: translateX(-50%);
 
-    width: 210px;
-
+    width: 190px;
     height: 48px;
 
-    display: flex;
+    border: 1px solid #555555;
 
-    align-items: center;
-
-    justify-content: center;
-
-    background: #000000;
-
-    border: 1px solid #ffffff;
+    background: #050505;
 
     color: #ffffff;
 
     font-family: "NeoDungGeunMo", monospace;
 
-    font-size: 15px;
+    font-size: 16px;
 
     cursor: pointer;
-
 }}
 
 
-.back-button:hover {{
-
+.back:hover {{
     background: #ffffff;
 
     color: #000000;
 
+    border-color: #ffffff;
 }}
 
 
@@ -440,15 +395,17 @@ body {{
    ===================================================== */
 
 .footer {{
+    position: absolute;
 
-    margin-top: 30px;
+    bottom: 18px;
 
-    text-align: center;
+    left: 50px;
 
-    color: #4f555c;
+    color: #444444;
 
     font-size: 11px;
 
+    letter-spacing: 1px;
 }}
 
 
@@ -456,55 +413,41 @@ body {{
    MOBILE
    ===================================================== */
 
-@media (max-width: 600px) {{
+@media (max-width: 700px) {{
 
-    .top-bar {{
-
-        left: 18px;
-        right: 18px;
-
+    .header {{
+        left: 25px;
+        right: 25px;
     }}
 
-    .page-title {{
-
-        top: 70px;
-
-        font-size: 25px;
-
-    }}
-
-    .page-subtitle {{
-
-        top: 108px;
-
-        font-size: 11px;
-
+    .title-area {{
+        left: 25px;
     }}
 
     .content {{
+        left: 25px;
+        right: 25px;
 
-        top: 150px;
+        grid-template-columns: 1fr;
 
-        width: 90vw;
+        top: 220px;
 
+        padding-bottom: 100px;
     }}
 
-    .control-row {{
-
-        gap: 12px;
-
+    .important {{
+        grid-column: auto;
     }}
 
-    .key {{
+    .footer {{
+        left: 25px;
+    }}
 
-        width: 80px;
-
-        min-width: 80px;
-
+    .back {{
+        bottom: 25px;
     }}
 
 }}
-
 
 </style>
 
@@ -513,69 +456,70 @@ body {{
 
 <body>
 
-
 <div class="screen">
 
 
-    <!-- =================================================
-         TOP BAR
-         ================================================= -->
+    <!-- HEADER -->
 
-    <div class="top-bar">
+    <div class="header">
 
         <div>
             PROJECT : LOGIC
         </div>
 
-        <div class="system-status">
+        <div class="header-right">
             SYSTEM MANUAL // 01
         </div>
 
     </div>
 
 
-    <!-- =================================================
-         TITLE
-         ================================================= -->
+    <!-- TITLE -->
 
-    <div class="page-title">
-        HOW TO PLAY
+    <div class="title-area">
+
+        <div class="main-title">
+            HOW TO PLAY
+        </div>
+
+        <div class="subtitle">
+            BASIC OPERATING INSTRUCTIONS
+        </div>
+
     </div>
 
 
-    <div class="page-subtitle">
-        BASIC OPERATING INSTRUCTIONS
-    </div>
-
-
-    <!-- =================================================
-         CONTENT
-         ================================================= -->
+    <!-- INSTRUCTIONS -->
 
     <div class="content">
 
 
         <!-- MOVEMENT -->
 
-        <div class="section">
+        <div class="card">
 
-            <div class="section-title">
-                [ 01 ] MOVEMENT
+            <div class="card-header">
+
+                <span class="number">
+                    01
+                </span>
+
+                <span class="card-title">
+                    MOVEMENT
+                </span>
+
             </div>
 
-            <div class="section-body">
+            <div class="description">
 
-                <div class="control-row">
+                <span class="key">W</span>
+                <span class="key">A</span>
+                <span class="key">S</span>
+                <span class="key">D</span>
 
-                    <div class="key">
-                        W A S D
-                    </div>
+                <br>
 
-                    <div class="description">
-                        Move the player.
-                    </div>
-
-                </div>
+                연구시설 내부를 이동합니다.
 
             </div>
 
@@ -584,25 +528,29 @@ body {{
 
         <!-- INTERACTION -->
 
-        <div class="section">
+        <div class="card">
 
-            <div class="section-title">
-                [ 02 ] INTERACTION
+            <div class="card-header">
+
+                <span class="number">
+                    02
+                </span>
+
+                <span class="card-title">
+                    INTERACTION
+                </span>
+
             </div>
 
-            <div class="section-body">
+            <div class="description">
 
-                <div class="control-row">
+                <span class="key">E</span>
 
-                    <div class="key">
-                        E
-                    </div>
+                주변의 물체를 조사하거나
 
-                    <div class="description">
-                        Inspect objects, interact with devices, and collect items.
-                    </div>
+                <br>
 
-                </div>
+                아이템을 획득합니다.
 
             </div>
 
@@ -611,38 +559,31 @@ body {{
 
         <!-- INVENTORY -->
 
-        <div class="section">
+        <div class="card">
 
-            <div class="section-title">
-                [ 03 ] INVENTORY
+            <div class="card-header">
+
+                <span class="number">
+                    03
+                </span>
+
+                <span class="card-title">
+                    INVENTORY
+                </span>
+
             </div>
 
-            <div class="section-body">
+            <div class="description">
 
-                <div class="control-row">
+                <span class="key">I</span>
 
-                    <div class="key">
-                        I
-                    </div>
+                보유한 아이템과 단서를 확인합니다.
 
-                    <div class="description">
-                        Open or close the inventory.
-                    </div>
+                <br>
 
-                </div>
+                <span class="key">ESC</span>
 
-
-                <div class="control-row">
-
-                    <div class="key">
-                        ESC
-                    </div>
-
-                    <div class="description">
-                        Close the inventory or current menu.
-                    </div>
-
-                </div>
+                인벤토리 또는 메뉴를 닫습니다.
 
             </div>
 
@@ -651,25 +592,29 @@ body {{
 
         <!-- SYSTEM MESSAGE -->
 
-        <div class="section">
+        <div class="card">
 
-            <div class="section-title">
-                [ 04 ] SYSTEM MESSAGE
+            <div class="card-header">
+
+                <span class="number">
+                    04
+                </span>
+
+                <span class="card-title">
+                    SYSTEM MESSAGE
+                </span>
+
             </div>
 
-            <div class="section-body">
+            <div class="description">
 
-                <div class="control-row">
+                <span class="key">SPACE</span>
 
-                    <div class="key">
-                        SPACE
-                    </div>
+                대화와 시스템 메시지를 진행합니다.
 
-                    <div class="description">
-                        Advance system messages and dialogue.
-                    </div>
+                <br>
 
-                </div>
+                중요한 정보가 표시될 수 있습니다.
 
             </div>
 
@@ -678,51 +623,51 @@ body {{
 
         <!-- IMPORTANT -->
 
-        <div class="section">
+        <div class="important">
 
-            <div class="section-title">
-                [ 05 ] IMPORTANT
+            <div class="important-title">
+                IMPORTANT
             </div>
 
-            <div class="section-body">
+            <div class="important-text">
 
-                <div class="warning">
-                    Examine your surroundings carefully.
-                    Not every piece of information provided by the system
-                    should be trusted.
-                </div>
+                주변의 물체와 기록을 자세히 조사하십시오.
 
                 <br>
 
-                <div class="warning">
-                    Some clues may contradict one another.
-                    Compare records, inspect objects, and determine
-                    what information is actually reliable.
-                </div>
+                <span class="warning">
+                    ECHO가 제공하는 모든 정보가 사실이라고 가정하지 마십시오.
+                </span>
+
+                <br>
+
+                서로 모순되는 단서가 발견될 수 있습니다.
+
+                무엇을 믿을 것인지는 당신의 판단에 달려 있습니다.
 
             </div>
 
-        </div>
-
-
-        <div class="footer">
-            ECHO SYSTEM // INFORMATION IS NOT ALWAYS TRUE
         </div>
 
 
     </div>
 
 
-    <!-- =================================================
-         BACK
-         ================================================= -->
+    <!-- BACK -->
 
     <button
         id="back"
-        class="back-button"
+        class="back"
     >
         BACK TO TITLE
     </button>
+
+
+    <!-- FOOTER -->
+
+    <div class="footer">
+        ECHO SYSTEM // INFORMATION IS NOT ALWAYS TRUE
+    </div>
 
 
 </div>
@@ -730,15 +675,14 @@ body {{
 
 <script>
 
-
 document
     .getElementById("back")
-    .addEventListener("click", function() {{
+    .addEventListener("click", function(){{
 
-        window.parent.location.href = "?action=title";
+        window.parent.location.href =
+            window.parent.location.pathname;
 
     }});
-
 
 </script>
 
@@ -749,59 +693,8 @@ document
 """
 
 
-# =========================================================
-# RENDER
-# =========================================================
-
 components.html(
     html,
     height=900,
-    scrolling=True,
+    scrolling=False,
 )
-st.markdown(
-    """
-    <style>
-
-    div[data-testid="stButton"] {
-        position: fixed !important;
-
-        bottom: 30px !important;
-        left: 50% !important;
-
-        transform: translateX(-50%) !important;
-
-        width: 210px !important;
-        height: 48px !important;
-
-        z-index: 9999 !important;
-    }
-
-    div[data-testid="stButton"] > button {
-        width: 210px !important;
-        height: 48px !important;
-
-        background: #000000 !important;
-
-        border: 1px solid #ffffff !important;
-        border-radius: 0 !important;
-
-        color: #ffffff !important;
-
-        font-family: "NeoDungGeunMo", monospace !important;
-
-        font-size: 15px !important;
-    }
-
-    div[data-testid="stButton"] > button:hover {
-        background: #ffffff !important;
-        color: #000000 !important;
-    }
-
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-
-if st.button("BACK TO TITLE", key="back_to_title"):
-    st.switch_page("main.py")
