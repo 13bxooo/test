@@ -36,35 +36,6 @@ for font_path in font_candidates:
 
 
 # =========================================================
-# PAGE ROUTING
-# =========================================================
-
-action = st.query_params.get("action")
-
-
-if action == "how_to_play":
-    st.query_params.clear()
-    st.switch_page("pages/1_How_To_Play.py")
-
-
-elif action == "new_game":
-    st.query_params.clear()
-
-    # 나중에 게임 페이지가 만들어지면 연결
-    # st.switch_page("pages/2_Game.py")
-
-    st.info("GAME SYSTEM은 현재 준비 중입니다.")
-
-
-elif action == "continue":
-    st.query_params.clear()
-
-    st.warning(
-        "이전 플레이 기록이 존재하지 않습니다. 새 게임을 시작해주세요."
-    )
-
-
-# =========================================================
 # HIDE STREAMLIT UI
 # =========================================================
 
@@ -488,7 +459,7 @@ body {{
 
         <a
             class="popup-button"
-            href="?action=continue"
+            href="./1_How_To_Play"
             target="_top"
         >
             CONTINUE
@@ -497,7 +468,7 @@ body {{
 
         <a
             class="popup-button"
-            href="?action=new_game"
+            href="./2_Game"
             target="_top"
         >
             NEW GAME
@@ -512,7 +483,7 @@ body {{
 
     <a
         class="how"
-        href="?action=how_to_play"
+        href="./1_How_To_Play"
         target="_top"
     >
         HOW TO PLAY
