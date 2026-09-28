@@ -36,6 +36,14 @@ for font_path in font_candidates:
 
 
 # =========================================================
+# STREAMLIT STATE
+# =========================================================
+
+if "start_open" not in st.session_state:
+    st.session_state.start_open = False
+
+
+# =========================================================
 # HIDE STREAMLIT UI
 # =========================================================
 
@@ -68,6 +76,229 @@ st.markdown(
         max-width: 100% !important;
     }
 
+    /* =====================================================
+       NATIVE STREAMLIT PAGE LINKS
+       ===================================================== */
+
+    div[data-testid="stPageLink"] {
+        position: fixed !important;
+
+        z-index: 999999 !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    div[data-testid="stPageLink"] a {
+        font-family: "NeoDungGeunMo", monospace !important;
+
+        text-decoration: none !important;
+
+        box-sizing: border-box !important;
+    }
+
+
+    /* =====================================================
+       HOW TO PLAY NATIVE LINK
+       ===================================================== */
+
+    div[data-testid="stPageLink"].how-link {
+        top: 65vh !important;
+        left: 50% !important;
+
+        transform: translateX(-50%) !important;
+
+        width: 220px !important;
+        height: 55px !important;
+    }
+
+    div[data-testid="stPageLink"].how-link a {
+        width: 220px !important;
+        height: 55px !important;
+
+        display: flex !important;
+
+        align-items: center !important;
+        justify-content: center !important;
+
+        background: transparent !important;
+
+        border: none !important;
+
+        color: #ffffff !important;
+
+        font-size: 19px !important;
+
+        cursor: pointer !important;
+    }
+
+    div[data-testid="stPageLink"].how-link a:hover {
+        background: #ffffff !important;
+
+        color: #000000 !important;
+    }
+
+
+    /* =====================================================
+       CONTINUE / NEW GAME
+       ===================================================== */
+
+    div[data-testid="stPageLink"].continue-link,
+    div[data-testid="stPageLink"].newgame-link {
+
+        width: 190px !important;
+        height: 42px !important;
+
+        left: calc(50% + 105px) !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+
+    div[data-testid="stPageLink"].continue-link {
+        top: calc(51vh - 3px) !important;
+    }
+
+
+    div[data-testid="stPageLink"].newgame-link {
+        top: calc(51vh + 39px) !important;
+    }
+
+
+    div[data-testid="stPageLink"].continue-link a,
+    div[data-testid="stPageLink"].newgame-link a {
+
+        width: 190px !important;
+        height: 42px !important;
+
+        display: flex !important;
+
+        align-items: center !important;
+
+        padding-left: 18px !important;
+
+        background: #050505 !important;
+
+        color: #ffffff !important;
+
+        border: none !important;
+
+        font-size: 14px !important;
+
+        cursor: pointer !important;
+    }
+
+
+    div[data-testid="stPageLink"].continue-link a:hover,
+    div[data-testid="stPageLink"].newgame-link a:hover {
+
+        background: #ffffff !important;
+
+        color: #000000 !important;
+    }
+
+
+    /* =====================================================
+       HIDE LINKS WHEN POPUP IS CLOSED
+       ===================================================== */
+
+    body:not(.popup-open)
+    div[data-testid="stPageLink"].continue-link,
+
+    body:not(.popup-open)
+    div[data-testid="stPageLink"].newgame-link {
+
+        display: none !important;
+    }
+
+
+    /* =====================================================
+       START BUTTON
+       ===================================================== */
+
+    div[data-testid="stButton"].start-streamlit {
+
+        position: fixed !important;
+
+        top: 51vh !important;
+        left: 50% !important;
+
+        transform: translateX(-50%) !important;
+
+        width: 170px !important;
+        height: 55px !important;
+
+        z-index: 999999 !important;
+    }
+
+
+    div[data-testid="stButton"].start-streamlit button {
+
+        width: 170px !important;
+        height: 55px !important;
+
+        padding: 0 !important;
+
+        background: transparent !important;
+
+        border: none !important;
+
+        border-radius: 0 !important;
+
+        color: #ffffff !important;
+
+        font-family: "NeoDungGeunMo", monospace !important;
+
+        font-size: 19px !important;
+
+        cursor: pointer !important;
+    }
+
+
+    div[data-testid="stButton"].start-streamlit button:hover {
+
+        background: #ffffff !important;
+
+        color: #000000 !important;
+    }
+
+
+    /* =====================================================
+       MOBILE
+       ===================================================== */
+
+    @media (max-width: 600px) {
+
+        div[data-testid="stPageLink"].how-link {
+
+            top: 73vh !important;
+
+        }
+
+        div[data-testid="stPageLink"].continue-link,
+        div[data-testid="stPageLink"].newgame-link {
+
+            left: 50% !important;
+
+            transform: translateX(-50%) !important;
+
+        }
+
+        div[data-testid="stPageLink"].continue-link {
+
+            top: 59vh !important;
+
+        }
+
+        div[data-testid="stPageLink"].newgame-link {
+
+            top: calc(59vh + 42px) !important;
+
+        }
+
+    }
+
     </style>
     """,
     unsafe_allow_html=True,
@@ -75,7 +306,31 @@ st.markdown(
 
 
 # =========================================================
-# START SCREEN
+# POPUP STATE → BODY CLASS
+# =========================================================
+
+if st.session_state.start_open:
+    st.markdown(
+        """
+        <script>
+        document.body.classList.add("popup-open");
+        </script>
+        """,
+        unsafe_allow_html=True,
+    )
+else:
+    st.markdown(
+        """
+        <script>
+        document.body.classList.remove("popup-open");
+        </script>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+# =========================================================
+# START SCREEN HTML
 # =========================================================
 
 html = f"""
@@ -95,6 +350,7 @@ html = f"""
 
 @font-face {{
     font-family: "NeoDungGeunMo";
+
     src: url(data:font/ttf;base64,{font_data});
 }}
 
@@ -128,6 +384,7 @@ body {{
    ===================================================== */
 
 .screen {{
+
     position: fixed;
 
     inset: 0;
@@ -146,6 +403,7 @@ body {{
    ===================================================== */
 
 .title {{
+
     position: absolute;
 
     top: 12vh;
@@ -166,6 +424,7 @@ body {{
 
 
 .subtitle {{
+
     position: absolute;
 
     top: 22vh;
@@ -186,10 +445,11 @@ body {{
 
 
 /* =====================================================
-   START
+   START VISUAL
    ===================================================== */
 
-.start {{
+.start-visual {{
+
     position: absolute;
 
     top: 51vh;
@@ -205,40 +465,27 @@ body {{
     align-items: center;
     justify-content: center;
 
-    background: transparent;
-
-    border: none;
-
     color: #ffffff;
-
-    font-family: "NeoDungGeunMo", monospace;
 
     font-size: 19px;
 
-    cursor: pointer;
-
-    user-select: none;
-}}
-
-
-.start:hover {{
-    background: #ffffff;
-
-    color: #000000;
+    pointer-events: none;
 }}
 
 
 /* =====================================================
-   START POPUP
+   POPUP VISUAL
    ===================================================== */
 
-.popup {{
+.popup-visual {{
+
     position: absolute;
 
     top: calc(51vh - 3px);
     left: calc(50% + 105px);
 
     width: 190px;
+    height: 84px;
 
     background: #050505;
 
@@ -248,68 +495,48 @@ body {{
 
     visibility: hidden;
 
-    transform: translateX(-10px);
-
     transition:
         opacity 0.15s ease,
-        transform 0.15s ease,
         visibility 0.15s;
 }}
 
 
-.popup.show {{
+.popup-visual.show {{
+
     opacity: 1;
 
     visibility: visible;
-
-    transform: translateX(0);
 }}
 
 
 /* =====================================================
-   POPUP BUTTON
+   POPUP SEPARATOR
    ===================================================== */
 
-.popup-button {{
+.popup-visual::after {{
+
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+
+    top: 42px;
+
     width: 100%;
-    height: 42px;
 
-    display: flex;
+    height: 1px;
 
-    align-items: center;
-
-    padding-left: 18px;
-
-    background: #050505;
-
-    border: none;
-
-    color: #ffffff;
-
-    font-family: "NeoDungGeunMo", monospace;
-
-    font-size: 14px;
-
-    text-align: left;
-
-    cursor: pointer;
-
-    text-decoration: none;
-}}
-
-
-.popup-button:hover {{
-    background: #ffffff;
-
-    color: #000000;
+    background: #222222;
 }}
 
 
 /* =====================================================
-   HOW TO PLAY
+   HOW TO PLAY VISUAL
    ===================================================== */
 
-.how {{
+.how-visual {{
+
     position: absolute;
 
     top: 65vh;
@@ -325,28 +552,13 @@ body {{
     align-items: center;
     justify-content: center;
 
-    background: transparent;
-
-    border: none;
-
     color: #ffffff;
 
     font-family: "NeoDungGeunMo", monospace;
 
     font-size: 19px;
 
-    cursor: pointer;
-
-    user-select: none;
-
-    text-decoration: none;
-}}
-
-
-.how:hover {{
-    background: #ffffff;
-
-    color: #000000;
+    pointer-events: none;
 }}
 
 
@@ -374,44 +586,6 @@ body {{
 
 }}
 
-
-/* =====================================================
-   MOBILE
-   ===================================================== */
-
-@media (max-width: 600px) {{
-
-    .title {{
-        top: 12vh;
-        font-size: 30px;
-    }}
-
-    .subtitle {{
-        top: 22vh;
-        font-size: 12px;
-    }}
-
-    .start {{
-        top: 51vh;
-    }}
-
-    .popup {{
-        top: 59vh;
-        left: 50%;
-
-        transform: translateX(-50%);
-    }}
-
-    .popup.show {{
-        transform: translateX(-50%);
-    }}
-
-    .how {{
-        top: 73vh;
-    }}
-
-}}
-
 </style>
 
 </head>
@@ -421,10 +595,6 @@ body {{
 
 <div class="screen">
 
-
-    <!-- =================================================
-         TITLE
-         ================================================= -->
 
     <div class="title">
         PROJECT : LOGIC
@@ -436,86 +606,31 @@ body {{
     </div>
 
 
-    <!-- =================================================
-         START
-         ================================================= -->
+    <!-- START VISUAL -->
 
-    <button
-        id="start"
-        class="start"
-    >
+    <div class="start-visual">
         START
-    </button>
+    </div>
 
 
-    <!-- =================================================
-         START POPUP
-         ================================================= -->
+    <!-- POPUP VISUAL -->
 
     <div
-        id="popup"
-        class="popup"
+        id="popupVisual"
+        class="popup-visual"
     >
-
-        <a
-            class="popup-button"
-            href="./1_How_To_Play"
-            target="_top"
-        >
-            CONTINUE
-        </a>
-
-
-        <a
-            class="popup-button"
-            href="./2_Game"
-            target="_top"
-        >
-            NEW GAME
-        </a>
 
     </div>
 
 
-    <!-- =================================================
-         HOW TO PLAY
-         ================================================= -->
+    <!-- HOW TO PLAY VISUAL -->
 
-    <a
-        class="how"
-        href="./1_How_To_Play"
-        target="_top"
-    >
+    <div class="how-visual">
         HOW TO PLAY
-    </a>
+    </div>
 
 
 </div>
-
-
-<script>
-
-/* =======================================================
-   START BUTTON
-   ======================================================= */
-
-const start =
-    document.getElementById("start");
-
-const popup =
-    document.getElementById("popup");
-
-
-start.addEventListener(
-    "click",
-    function() {{
-
-        popup.classList.toggle("show");
-
-    }}
-);
-
-</script>
 
 
 </body>
@@ -525,7 +640,7 @@ start.addEventListener(
 
 
 # =========================================================
-# RENDER
+# RENDER HTML
 # =========================================================
 
 components.html(
@@ -533,3 +648,87 @@ components.html(
     height=900,
     scrolling=False,
 )
+
+
+# =========================================================
+# NATIVE STREAMLIT CONTROLS
+# =========================================================
+
+# START
+st.markdown(
+    '<div class="start-streamlit">',
+    unsafe_allow_html=True,
+)
+
+start_clicked = st.button(
+    "START",
+    key="start_button",
+    use_container_width=False,
+)
+
+st.markdown(
+    "</div>",
+    unsafe_allow_html=True,
+)
+
+
+if start_clicked:
+    st.session_state.start_open = not st.session_state.start_open
+    st.rerun()
+
+
+# =========================================================
+# PAGE LINKS
+# =========================================================
+
+# HOW TO PLAY
+st.markdown(
+    '<div class="how-link">',
+    unsafe_allow_html=True,
+)
+
+st.page_link(
+    "pages/1_How_To_Play.py",
+    label="HOW TO PLAY",
+)
+
+st.markdown(
+    "</div>",
+    unsafe_allow_html=True,
+)
+
+
+# CONTINUE
+if st.session_state.start_open:
+
+    st.markdown(
+        '<div class="continue-link">',
+        unsafe_allow_html=True,
+    )
+
+    st.page_link(
+        "pages/1_How_To_Play.py",
+        label="CONTINUE",
+    )
+
+    st.markdown(
+        "</div>",
+        unsafe_allow_html=True,
+    )
+
+
+    # NEW GAME
+    st.markdown(
+        '<div class="newgame-link">',
+        unsafe_allow_html=True,
+    )
+
+    st.page_link(
+        "pages/2_Game.py",
+        label="NEW GAME",
+    )
+
+    st.markdown(
+        "</div>",
+        unsafe_allow_html=True,
+    )
