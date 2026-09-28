@@ -10,7 +10,7 @@ import streamlit.components.v1 as components
 # =========================================================
 
 st.set_page_config(
-    page_title="PROJECT : LOGIC",
+    page_title="PROJECT : LOGIC // HOW TO PLAY",
     page_icon="◈",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -36,264 +36,37 @@ for font_path in font_candidates:
 
 
 # =========================================================
-# SESSION STATE
-# =========================================================
-
-if "start_open" not in st.session_state:
-    st.session_state.start_open = False
-
-
-# =========================================================
-# GLOBAL CSS
+# STREAMLIT UI HIDDEN
 # =========================================================
 
 st.markdown(
-    f"""
+    """
     <style>
 
-    /* =====================================================
-       FONT
-       ===================================================== */
-
-    @font-face {{
-        font-family: "NeoDungGeunMo";
-        src: url(data:font/ttf;base64,{font_data});
-    }}
-
-
-    /* =====================================================
-       STREAMLIT UI HIDE
-       ===================================================== */
-
-    #MainMenu {{
+    #MainMenu {
         visibility: hidden;
-    }}
+    }
 
-    header {{
+    header {
         visibility: hidden;
-    }}
+    }
 
-    footer {{
+    footer {
         visibility: hidden;
-    }}
+    }
 
-    [data-testid="stSidebar"] {{
+    [data-testid="stSidebar"] {
         display: none;
-    }}
+    }
 
-    .stApp {{
+    .stApp {
         background: #000000;
-    }}
+    }
 
-    .block-container {{
+    .block-container {
         padding: 0 !important;
         max-width: 100% !important;
-    }}
-
-
-    /* =====================================================
-       ALL NATIVE CONTROLS
-       ===================================================== */
-
-    div[data-testid="stButton"],
-    div[data-testid="stPageLink"] {{
-        position: fixed !important;
-
-        z-index: 1000000 !important;
-
-        margin: 0 !important;
-        padding: 0 !important;
-    }}
-
-
-    /* =====================================================
-       START
-       ===================================================== */
-
-    div[data-testid="stButton"] {{
-        top: 51vh !important;
-        left: 50% !important;
-
-        width: 170px !important;
-        height: 55px !important;
-
-        transform: translateX(-50%) !important;
-    }}
-
-    div[data-testid="stButton"] button {{
-        width: 170px !important;
-        height: 55px !important;
-
-        padding: 0 !important;
-
-        background: transparent !important;
-
-        border: none !important;
-        border-radius: 0 !important;
-
-        color: #ffffff !important;
-
-        font-family: "NeoDungGeunMo", monospace !important;
-        font-size: 14px !important;
-        font-weight: normal !important;
-
-        cursor: pointer !important;
-    }}
-
-    div[data-testid="stButton"] button:hover {{
-        background: #ffffff !important;
-        color: #000000 !important;
-    }}
-
-
-    /* =====================================================
-       HOW TO PLAY
-       ===================================================== */
-
-    div[data-testid="stPageLink"] a {{
-        text-decoration: none !important;
-
-        font-family: "NeoDungGeunMo", monospace !important;
-        font-weight: normal !important;
-    }}
-
-
-    /*
-       첫 번째 PageLink = HOW TO PLAY
-    */
-
-    div[data-testid="stPageLink"]:nth-of-type(1) {{
-        top: 65vh !important;
-        left: 50% !important;
-
-        width: 220px !important;
-        height: 55px !important;
-
-        transform: translateX(-50%) !important;
-    }}
-
-    div[data-testid="stPageLink"]:nth-of-type(1) a {{
-        width: 220px !important;
-        height: 55px !important;
-
-        display: flex !important;
-
-        align-items: center !important;
-        justify-content: center !important;
-
-        padding: 0 !important;
-
-        background: transparent !important;
-
-        border: none !important;
-
-        color: #ffffff !important;
-
-        font-family: "NeoDungGeunMo", monospace !important;
-        font-size: 14px !important;
-
-        text-decoration: none !important;
-
-        cursor: pointer !important;
-    }}
-
-    div[data-testid="stPageLink"]:nth-of-type(1) a:hover {{
-        background: #ffffff !important;
-        color: #000000 !important;
-    }}
-
-
-    /* =====================================================
-       CONTINUE / NEW GAME
-       ===================================================== */
-
-    /*
-       두 번째 PageLink = CONTINUE
-       세 번째 PageLink = NEW GAME
-    */
-
-    div[data-testid="stPageLink"]:nth-of-type(2),
-    div[data-testid="stPageLink"]:nth-of-type(3) {{
-        left: calc(50% + 105px) !important;
-
-        width: 190px !important;
-        height: 42px !important;
-
-        transform: none !important;
-
-        z-index: 1000001 !important;
-    }}
-
-
-    /* CONTINUE */
-
-    div[data-testid="stPageLink"]:nth-of-type(2) {{
-        top: calc(51vh - 3px) !important;
-    }}
-
-
-    /* NEW GAME */
-
-    div[data-testid="stPageLink"]:nth-of-type(3) {{
-        top: calc(51vh + 39px) !important;
-    }}
-
-
-    div[data-testid="stPageLink"]:nth-of-type(2) a,
-    div[data-testid="stPageLink"]:nth-of-type(3) a {{
-        width: 190px !important;
-        height: 42px !important;
-
-        display: flex !important;
-
-        align-items: center !important;
-        justify-content: flex-start !important;
-
-        padding: 0 0 0 18px !important;
-
-        background: #050505 !important;
-
-        border: none !important;
-
-        color: #ffffff !important;
-
-        font-family: "NeoDungGeunMo", monospace !important;
-        font-size: 14px !important;
-
-        text-decoration: none !important;
-
-        cursor: pointer !important;
-    }}
-
-
-    div[data-testid="stPageLink"]:nth-of-type(2) a:hover,
-    div[data-testid="stPageLink"]:nth-of-type(3) a:hover {{
-        background: #ffffff !important;
-        color: #000000 !important;
-    }}
-
-
-    /* =====================================================
-       MOBILE
-       ===================================================== */
-
-    @media (max-width: 600px) {{
-
-        div[data-testid="stPageLink"]:nth-of-type(1) {{
-            top: 73vh !important;
-        }}
-
-        div[data-testid="stPageLink"]:nth-of-type(2) {{
-            top: calc(59vh - 3px) !important;
-            left: calc(50% - 95px) !important;
-        }}
-
-        div[data-testid="stPageLink"]:nth-of-type(3) {{
-            top: calc(59vh + 39px) !important;
-            left: calc(50% - 95px) !important;
-        }}
-
-    }}
+    }
 
     </style>
     """,
@@ -302,10 +75,8 @@ st.markdown(
 
 
 # =========================================================
-# START SCREEN HTML
+# HOW TO PLAY
 # =========================================================
-
-popup_class = "show" if st.session_state.start_open else ""
 
 html = f"""
 <!DOCTYPE html>
@@ -317,6 +88,10 @@ html = f"""
 <meta charset="UTF-8">
 
 <style>
+
+/* =====================================================
+   FONT
+   ===================================================== */
 
 @font-face {{
     font-family: "NeoDungGeunMo";
@@ -335,34 +110,61 @@ body {{
     padding: 0;
 
     width: 100%;
-    height: 100%;
-
-    overflow: hidden;
+    min-height: 100%;
 
     background: #000000;
-}}
 
-
-body {{
     font-family: "NeoDungGeunMo", monospace;
 }}
 
 
 /* =====================================================
-   SCREEN
+   PAGE
    ===================================================== */
 
+body {{
+    color: #ffffff;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+}}
+
+
 .screen {{
-    position: fixed;
+    width: 100%;
 
-    inset: 0;
-
-    width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
 
     background: #000000;
 
-    color: #ffffff;
+    padding-bottom: 150px;
+}}
+
+
+/* =====================================================
+   HEADER
+   ===================================================== */
+
+.header {{
+    width: calc(100% - 100px);
+
+    margin: 0 auto;
+
+    padding-top: 32px;
+
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    font-size: 15px;
+
+    letter-spacing: 1px;
+}}
+
+
+.header-right {{
+    color: #666666;
 }}
 
 
@@ -370,116 +172,257 @@ body {{
    TITLE
    ===================================================== */
 
-.title {{
-    position: absolute;
+.title-area {{
+    width: calc(100% - 100px);
 
-    top: 12vh;
-    left: 50%;
+    margin: 65px auto 0;
 
-    transform: translateX(-50%);
+    max-width: 1000px;
+}}
 
-    white-space: nowrap;
 
-    font-family: "NeoDungGeunMo", monospace;
-
-    font-size: clamp(28px, 4vw, 48px);
+.main-title {{
+    font-size: clamp(32px, 4vw, 48px);
 
     letter-spacing: 2px;
 
-    animation: title-flicker 4s infinite;
+    margin-bottom: 14px;
 }}
 
 
 .subtitle {{
-    position: absolute;
+    color: #777777;
 
-    top: 22vh;
-    left: 50%;
-
-    transform: translateX(-50%);
-
-    white-space: nowrap;
-
-    color: #9c9c9c;
-
-    font-family: "NeoDungGeunMo", monospace;
-
-    font-size: clamp(13px, 1.5vw, 18px);
+    font-size: 15px;
 
     letter-spacing: 1px;
 }}
 
 
 /* =====================================================
-   POPUP BACKGROUND VISUAL
+   CONTENT
    ===================================================== */
 
-.popup-visual {{
-    position: absolute;
+.content {{
+    width: calc(100% - 100px);
 
-    top: calc(51vh - 3px);
-    left: calc(50% + 105px);
+    max-width: 1000px;
 
-    width: 190px;
-    height: 84px;
+    margin: 70px auto 0;
 
-    background: #050505;
+    display: grid;
 
-    border: 1px solid #ffffff;
+    grid-template-columns: repeat(2, minmax(280px, 1fr));
 
-    opacity: 0;
-
-    visibility: hidden;
-
-    transition:
-        opacity 0.15s ease,
-        visibility 0.15s;
-}}
-
-
-.popup-visual.show {{
-    opacity: 1;
-    visibility: visible;
-}}
-
-
-.popup-visual::after {{
-    content: "";
-
-    position: absolute;
-
-    left: 0;
-    top: 42px;
-
-    width: 100%;
-    height: 1px;
-
-    background: #222222;
+    gap: 18px;
 }}
 
 
 /* =====================================================
-   TITLE FLICKER
+   CARD
    ===================================================== */
 
-@keyframes title-flicker {{
+.card {{
+    min-height: 145px;
 
-    0%, 18%, 20%, 22%, 63%, 65%, 100% {{
-        opacity: 1;
-    }}
+    border: 1px solid #333333;
 
-    19% {{
-        opacity: 0.35;
-    }}
+    background: #050505;
 
-    21% {{
-        opacity: 0.65;
-    }}
+    padding: 20px;
 
-    64% {{
-        opacity: 0.15;
-    }}
+    transition:
+        border-color 0.15s ease,
+        background 0.15s ease;
+}}
 
+
+.card:hover {{
+    border-color: #ffffff;
+
+    background: #0b0b0b;
+}}
+
+
+.card-header {{
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 17px;
+}}
+
+
+.number {{
+    color: #666666;
+
+    font-size: 13px;
+}}
+
+
+.card-title {{
+    color: #ffffff;
+
+    font-size: 19px;
+
+    letter-spacing: 1px;
+}}
+
+
+/* =====================================================
+   KEY
+   ===================================================== */
+
+.key {{
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-width: 58px;
+    height: 32px;
+
+    padding: 0 10px;
+
+    margin-right: 7px;
+
+    border: 1px solid #777777;
+
+    background: #111111;
+
+    color: #ffffff;
+
+    font-size: 14px;
+
+    vertical-align: middle;
+}}
+
+
+/* =====================================================
+   DESCRIPTION
+   ===================================================== */
+
+.description {{
+    color: #999999;
+
+    font-size: 14px;
+
+    line-height: 1.9;
+}}
+
+
+/* =====================================================
+   IMPORTANT
+   ===================================================== */
+
+.important {{
+    grid-column: 1 / -1;
+
+    border: 1px solid #555555;
+
+    background: #030303;
+
+    padding: 24px;
+
+    margin-top: 5px;
+
+    min-height: 150px;
+}}
+
+
+.important-title {{
+    color: #ffffff;
+
+    font-size: 17px;
+
+    margin-bottom: 14px;
+
+    letter-spacing: 1px;
+}}
+
+
+.important-text {{
+    color: #888888;
+
+    font-size: 14px;
+
+    line-height: 2;
+}}
+
+
+.warning {{
+    color: #ffffff;
+}}
+
+
+/* =====================================================
+   FOOTER
+   ===================================================== */
+
+.footer {{
+    width: calc(100% - 100px);
+
+    max-width: 1000px;
+
+    margin: 55px auto 0;
+
+    color: #444444;
+
+    font-size: 11px;
+
+    letter-spacing: 1px;
+}}
+
+
+/* =====================================================
+   BACK TO TITLE OVERLAY
+   ===================================================== */
+
+.back {{
+    position: fixed;
+
+    right: 32px;
+    bottom: 28px;
+
+    width: 190px;
+    height: 50px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: 1px solid #777777;
+
+    background: rgba(5, 5, 5, 0.96);
+
+    color: #ffffff;
+
+    font-family: "NeoDungGeunMo", monospace;
+
+    font-size: 16px;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    z-index: 999999;
+
+    transition:
+        background 0.15s ease,
+        color 0.15s ease,
+        border-color 0.15s ease;
+}}
+
+
+.back:hover {{
+    background: #ffffff;
+
+    color: #000000;
+
+    border-color: #ffffff;
 }}
 
 
@@ -487,13 +430,44 @@ body {{
    MOBILE
    ===================================================== */
 
-@media (max-width: 600px) {{
+@media (max-width: 700px) {{
 
-    .popup-visual {{
-        top: 59vh;
-        left: 50%;
+    .header {{
+        width: calc(100% - 50px);
 
-        transform: translateX(-50%);
+        font-size: 12px;
+    }}
+
+    .title-area {{
+        width: calc(100% - 50px);
+
+        margin-top: 60px;
+    }}
+
+    .content {{
+        width: calc(100% - 50px);
+
+        margin-top: 55px;
+
+        grid-template-columns: 1fr;
+    }}
+
+    .important {{
+        grid-column: auto;
+    }}
+
+    .footer {{
+        width: calc(100% - 50px);
+    }}
+
+    .back {{
+        right: 20px;
+        bottom: 20px;
+
+        width: 170px;
+        height: 46px;
+
+        font-size: 14px;
     }}
 
 }}
@@ -505,20 +479,241 @@ body {{
 
 <body>
 
+
 <div class="screen">
 
-    <div class="title">
-        PROJECT : LOGIC
+
+    <!-- =================================================
+         HEADER
+         ================================================= -->
+
+    <div class="header">
+
+        <div>
+            PROJECT : LOGIC
+        </div>
+
+        <div class="header-right">
+            SYSTEM MANUAL // 01
+        </div>
+
     </div>
 
-    <div class="subtitle">
-        INFORMATION IS NOT ALWAYS TRUE
+
+    <!-- =================================================
+         TITLE
+         ================================================= -->
+
+    <div class="title-area">
+
+        <div class="main-title">
+            HOW TO PLAY
+        </div>
+
+        <div class="subtitle">
+            BASIC OPERATING INSTRUCTIONS
+        </div>
+
     </div>
 
-    <div class="popup-visual {popup_class}">
+
+    <!-- =================================================
+         CONTENT
+         ================================================= -->
+
+    <div class="content">
+
+
+        <!-- 01 MOVEMENT -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <span class="number">
+                    01
+                </span>
+
+                <span class="card-title">
+                    MOVEMENT
+                </span>
+
+            </div>
+
+            <div class="description">
+
+                <span class="key">W</span>
+                <span class="key">A</span>
+                <span class="key">S</span>
+                <span class="key">D</span>
+
+                <br>
+
+                연구시설 내부를 이동합니다.
+
+            </div>
+
+        </div>
+
+
+        <!-- 02 INTERACTION -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <span class="number">
+                    02
+                </span>
+
+                <span class="card-title">
+                    INTERACTION
+                </span>
+
+            </div>
+
+            <div class="description">
+
+                <span class="key">E</span>
+
+                주변의 물체를 조사하거나
+
+                <br>
+
+                아이템을 획득합니다.
+
+            </div>
+
+        </div>
+
+
+        <!-- 03 INVENTORY -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <span class="number">
+                    03
+                </span>
+
+                <span class="card-title">
+                    INVENTORY
+                </span>
+
+            </div>
+
+            <div class="description">
+
+                <span class="key">I</span>
+
+                보유한 아이템과 단서를 확인합니다.
+
+                <br>
+
+                <span class="key">ESC</span>
+
+                인벤토리 또는 메뉴를 닫습니다.
+
+            </div>
+
+        </div>
+
+
+        <!-- 04 SYSTEM MESSAGE -->
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <span class="number">
+                    04
+                </span>
+
+                <span class="card-title">
+                    SYSTEM MESSAGE
+                </span>
+
+            </div>
+
+            <div class="description">
+
+                <span class="key">SPACE</span>
+
+                대화와 시스템 메시지를 진행합니다.
+
+                <br>
+
+                중요한 정보가 표시될 수 있습니다.
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             IMPORTANT
+             ================================================= -->
+
+        <div class="important">
+
+            <div class="important-title">
+                IMPORTANT
+            </div>
+
+            <div class="important-text">
+
+                주변의 물체와 기록을 자세히 조사하십시오.
+
+                <br>
+
+                <span class="warning">
+                    ECHO가 제공하는 모든 정보가 사실이라고 가정하지 마십시오.
+                </span>
+
+                <br>
+
+                서로 모순되는 단서가 발견될 수 있습니다.
+
+                <br>
+
+                무엇을 믿을 것인지는 당신의 판단에 달려 있습니다.
+
+            </div>
+
+        </div>
+
+
     </div>
+
+
+    <!-- =================================================
+         FOOTER
+         ================================================= -->
+
+    <div class="footer">
+
+        ECHO SYSTEM // INFORMATION IS NOT ALWAYS TRUE
+
+    </div>
+
 
 </div>
+
+
+<!-- =====================================================
+     BACK TO TITLE
+     화면에 고정되는 오버레이
+     ===================================================== -->
+
+<a
+    class="back"
+    href="/"
+    target="_top"
+>
+    BACK TO TITLE
+</a>
+
 
 </body>
 
@@ -527,53 +722,11 @@ body {{
 
 
 # =========================================================
-# RENDER BACKGROUND
+# RENDER
 # =========================================================
 
 components.html(
     html,
-    height=900,
-    scrolling=False,
+    height=1000,
+    scrolling=True,
 )
-
-
-# =========================================================
-# START BUTTON
-# =========================================================
-
-start_clicked = st.button(
-    "START",
-    key="start_button",
-)
-
-
-if start_clicked:
-    st.session_state.start_open = not st.session_state.start_open
-    st.rerun()
-
-
-# =========================================================
-# HOW TO PLAY
-# =========================================================
-
-st.page_link(
-    "pages/1_How_To_Play.py",
-    label="HOW TO PLAY",
-)
-
-
-# =========================================================
-# POPUP
-# =========================================================
-
-if st.session_state.start_open:
-
-    st.page_link(
-        "pages/1_How_To_Play.py",
-        label="CONTINUE",
-    )
-
-    st.page_link(
-        "pages/2_Game.py",
-        label="NEW GAME",
-    )
