@@ -44,15 +44,12 @@ if action == "restart":
         time.time() + 15 * 60
     )
 
-    # query parameter 제거
-
     st.query_params.clear()
+
+    st.rerun()
 
 
 elif action == "title":
-
-    # query parameter 제거 후
-    # 실제 Streamlit 페이지 이동
 
     st.query_params.clear()
 
@@ -298,7 +295,6 @@ if pause_clicked:
 
     current_time = time.time()
 
-
     if not st.session_state.game_paused:
 
         st.session_state.remaining_seconds = max(
@@ -311,7 +307,6 @@ if pause_clicked:
 
         st.session_state.game_paused = True
 
-
     else:
 
         st.session_state.timer_deadline = (
@@ -320,7 +315,6 @@ if pause_clicked:
         )
 
         st.session_state.game_paused = False
-
 
     st.rerun()
 
@@ -1532,7 +1526,6 @@ body {{
 
 }}
 
-
 </style>
 
 </head>
@@ -1545,6 +1538,7 @@ body {{
     class="game"
     id="gameRoot"
     tabindex="0"
+    autofocus
 >
 
 
@@ -2335,13 +2329,13 @@ const inventorySlots =
 function renderInventory() {{
 
     inventory.forEach(
-        function(item, index) {{
+        function(item, index){{
 
             const slot =
                 inventorySlots[index];
 
 
-            if (!item) {{
+            if (!item){{
 
                 slot.innerHTML =
                     `
@@ -2380,11 +2374,11 @@ function renderInventory() {{
    ===================================================== */
 
 inventorySlots.forEach(
-    function(slot) {{
+    function(slot){{
 
         slot.addEventListener(
             "click",
-            function() {{
+            function(){{
 
                 const index =
                     Number(
@@ -2397,7 +2391,7 @@ inventorySlots.forEach(
 
 
                 inventorySlots.forEach(
-                    function(other) {{
+                    function(other){{
 
                         other.classList.remove(
                             "selected"
@@ -2416,7 +2410,7 @@ inventorySlots.forEach(
                     inventory[index];
 
 
-                if (item) {{
+                if (item){{
 
                     itemDescription.innerHTML =
                         `
@@ -2458,9 +2452,9 @@ renderInventory();
    OPEN INVENTORY
    ===================================================== */
 
-function openInventory() {{
+function openInventory(){{
 
-    if (finished) {{
+    if (finished){{
 
         return;
 
@@ -2470,9 +2464,7 @@ function openInventory() {{
     helpOpen = false;
 
 
-    document.getElementById(
-        "helpOverlay"
-    ).style.display =
+    helpOverlay.style.display =
         "none";
 
 
@@ -2492,7 +2484,7 @@ function openInventory() {{
    CLOSE INVENTORY
    ===================================================== */
 
-function closeInventory() {{
+function closeInventory(){{
 
     inventoryOpen = false;
 
@@ -2516,9 +2508,9 @@ const helpOverlay =
     );
 
 
-function openHelp() {{
+function openHelp(){{
 
-    if (finished) {{
+    if (finished){{
 
         return;
 
@@ -2544,7 +2536,7 @@ function openHelp() {{
 }}
 
 
-function closeHelp() {{
+function closeHelp(){{
 
     helpOpen = false;
 
@@ -2562,22 +2554,62 @@ function closeHelp() {{
    FOCUS GAME
    ===================================================== */
 
-function focusGame() {{
+function focusGame(){{
 
-    try {{
+    try{{
 
-        gameRoot.focus();
+        gameRoot.focus({{
+            preventScroll: true
+        }});
 
-    }} catch (error) {{
+    }} catch (error){{
+
+        try{{
+
+            gameRoot.focus();
+
+        }} catch (error2){{
+
+        }}
 
     }}
 
 }}
 
 
+/*
+   iframe이 로딩된 직후
+   게임에 포커스를 준다.
+*/
+
 window.addEventListener(
     "load",
-    function() {{
+    function(){{
+
+        focusGame();
+
+
+        setTimeout(
+            function(){{
+
+                focusGame();
+
+            }},
+            100
+        );
+
+    }}
+);
+
+
+/*
+   게임 영역을 터치하거나 클릭하면
+   다시 키보드 입력을 활성화한다.
+*/
+
+gameRoot.addEventListener(
+    "pointerdown",
+    function(){{
 
         focusGame();
 
@@ -2587,7 +2619,7 @@ window.addEventListener(
 
 gameRoot.addEventListener(
     "click",
-    function() {{
+    function(){{
 
         focusGame();
 
@@ -2599,7 +2631,7 @@ gameRoot.addEventListener(
    CLEAR MOVEMENT
    ===================================================== */
 
-function clearMovementKeys() {{
+function clearMovementKeys(){{
 
     keys.w = false;
 
@@ -2616,16 +2648,7 @@ function clearMovementKeys() {{
    MOVEMENT LOOP
    ===================================================== */
 
-function updatePlayer() {{
-
-    /*
-       중요:
-       상태가 막혔다고 requestAnimationFrame을
-       종료하지 않는다.
-
-       루프는 계속 유지하고,
-       실제 이동만 제한한다.
-    */
+function updatePlayer(){{
 
     if (
         !paused &&
@@ -2634,28 +2657,28 @@ function updatePlayer() {{
         !finished
     ){{
 
-        if (keys.w) {{
+        if (keys.w){{
 
             playerY -= moveSpeed;
 
         }}
 
 
-        if (keys.s) {{
+        if (keys.s){{
 
             playerY += moveSpeed;
 
         }}
 
 
-        if (keys.a) {{
+        if (keys.a){{
 
             playerX -= moveSpeed;
 
         }}
 
 
-        if (keys.d) {{
+        if (keys.d){{
 
             playerX += moveSpeed;
 
@@ -2716,7 +2739,7 @@ const interactionMessage =
     );
 
 
-function distanceToObject(object) {{
+function distanceToObject(object){{
 
     const centerX =
         object.x +
@@ -2747,7 +2770,7 @@ function distanceToObject(object) {{
 let nearbyObject = null;
 
 
-function checkInteraction() {{
+function checkInteraction(){{
 
     nearbyObject = null;
 
@@ -2757,7 +2780,7 @@ function checkInteraction() {{
 
 
     objects.forEach(
-        function(object) {{
+        function(object){{
 
             const distance =
                 distanceToObject(
@@ -2768,7 +2791,7 @@ function checkInteraction() {{
             if (
                 distance < 12 &&
                 distance < closestDistance
-            ) {{
+            ){{
 
                 nearbyObject =
                     object;
@@ -2783,7 +2806,7 @@ function checkInteraction() {{
     );
 
 
-    if (nearbyObject) {{
+    if (nearbyObject){{
 
         interactionMessage.textContent =
             nearbyObject.interactionKey
@@ -2810,7 +2833,7 @@ function checkInteraction() {{
    INTERACT
    ===================================================== */
 
-function interact() {{
+function interact(){{
 
     if (
         paused ||
@@ -2824,7 +2847,7 @@ function interact() {{
     }}
 
 
-    if (!nearbyObject) {{
+    if (!nearbyObject){{
 
         return;
 
@@ -2840,7 +2863,7 @@ function interact() {{
         "terminal"
     ){{
 
-        if (!inventory[0]) {{
+        if (!inventory[0]){{
 
             inventory[0] = {{
 
@@ -2948,52 +2971,51 @@ function interact() {{
    KEYBOARD
    ===================================================== */
 
-document.addEventListener(
-    "keydown",
-    function(event){{
+function handleKeyDown(event){{
 
-        const key =
-            event.key.toLowerCase();
+    const key =
+        event.key.toLowerCase();
 
 
-        /* =============================================
-           ESC
-           ============================================= */
+    /* =============================================
+       ESC
+       ============================================= */
 
-        if (
-            key === "escape"
-        ){{
+    if (key === "escape"){{
 
-            if (helpOpen){{
+        if (helpOpen){{
 
-                closeHelp();
+            closeHelp();
 
-                event.preventDefault();
+            event.preventDefault();
 
-                return;
-
-            }}
-
-
-            if (inventoryOpen){{
-
-                closeInventory();
-
-                event.preventDefault();
-
-                return;
-
-            }}
+            return;
 
         }}
 
 
-        /* =============================================
-           H
-           ============================================= */
+        if (inventoryOpen){{
+
+            closeInventory();
+
+            event.preventDefault();
+
+            return;
+
+        }}
+
+    }}
+
+
+    /* =============================================
+       H
+       ============================================= */
+
+    if (key === "h"){{
 
         if (
-            key === "h"
+            !paused &&
+            !finished
         ){{
 
             if (inventoryOpen){{
@@ -3013,20 +3035,25 @@ document.addEventListener(
 
             }}
 
-
-            event.preventDefault();
-
-            return;
-
         }}
 
 
-        /* =============================================
-           I
-           ============================================= */
+        event.preventDefault();
+
+        return;
+
+    }}
+
+
+    /* =============================================
+       I
+       ============================================= */
+
+    if (key === "i"){{
 
         if (
-            key === "i"
+            !paused &&
+            !finished
         ){{
 
             if (helpOpen){{
@@ -3046,88 +3073,106 @@ document.addEventListener(
 
             }}
 
-
-            event.preventDefault();
-
-            return;
-
         }}
 
 
-        /* =============================================
-           E
-           ============================================= */
+        event.preventDefault();
 
-        if (
-            key === "e"
-        ){{
-
-            interact();
-
-            event.preventDefault();
-
-            return;
-
-        }}
-
-
-        /* =============================================
-           MOVEMENT
-           ============================================= */
-
-        if (
-            key === "w" ||
-            key === "a" ||
-            key === "s" ||
-            key === "d"
-        ){{
-
-            if (
-                !paused &&
-                !helpOpen &&
-                !inventoryOpen &&
-                !finished
-            ){{
-
-                keys[key] = true;
-
-            }}
-
-
-            event.preventDefault();
-
-        }}
+        return;
 
     }}
-);
+
+
+    /* =============================================
+       E
+       ============================================= */
+
+    if (key === "e"){{
+
+        interact();
+
+        event.preventDefault();
+
+        return;
+
+    }}
+
+
+    /* =============================================
+       MOVEMENT
+       ============================================= */
+
+    if (
+        key === "w" ||
+        key === "a" ||
+        key === "s" ||
+        key === "d"
+    ){{
+
+        if (
+            !paused &&
+            !helpOpen &&
+            !inventoryOpen &&
+            !finished
+        ){{
+
+            keys[key] = true;
+
+        }}
+
+
+        event.preventDefault();
+
+        return;
+
+    }}
+
+}}
 
 
 /* =====================================================
    KEYBOARD RELEASE
    ===================================================== */
 
-document.addEventListener(
-    "keyup",
-    function(event){{
+function handleKeyUp(event){{
 
-        const key =
-            event.key.toLowerCase();
+    const key =
+        event.key.toLowerCase();
 
 
-        if (
-            key === "w" ||
-            key === "a" ||
-            key === "s" ||
-            key === "d"
-        ){{
+    if (
+        key === "w" ||
+        key === "a" ||
+        key === "s" ||
+        key === "d"
+    ){{
 
-            keys[key] = false;
+        keys[key] = false;
 
-            event.preventDefault();
-
-        }}
+        event.preventDefault();
 
     }}
+
+}}
+
+
+/*
+   window에 한 번만 등록한다.
+   gameRoot에도 별도 keydown을 등록하지 않아
+   H / I / E가 두 번 실행되는 문제를 방지한다.
+*/
+
+window.addEventListener(
+    "keydown",
+    handleKeyDown,
+    true
+);
+
+
+window.addEventListener(
+    "keyup",
+    handleKeyUp,
+    true
 );
 
 
@@ -3333,13 +3378,6 @@ restartButton.addEventListener(
     "click",
     function(){{
 
-        /*
-           Python 쪽으로 restart 요청.
-
-           현재 페이지에
-           ?action=restart 를 붙인다.
-        */
-
         const currentURL =
             new URL(
                 window.parent.location.href
@@ -3366,12 +3404,6 @@ restartButton.addEventListener(
 titleButton.addEventListener(
     "click",
     function(){{
-
-        /*
-           Python 쪽에서
-           실제 st.switch_page("main.py")
-           를 실행한다.
-        */
 
         const currentURL =
             new URL(
@@ -3427,6 +3459,15 @@ function showTimeOver(){{
         "timeOver"
     ).style.display =
         "flex";
+
+
+    /*
+       SYSTEM FAILURE가 표시되면
+       게임 화면이 더 이상 키 입력을
+       처리하지 않도록 한다.
+    */
+
+    focusGame();
 
 }}
 
@@ -3530,7 +3571,21 @@ requestAnimationFrame(
 );
 
 
+/* =====================================================
+   INITIAL FOCUS
+   ===================================================== */
+
 focusGame();
+
+
+setTimeout(
+    function(){{
+
+        focusGame();
+
+    }},
+    100
+);
 
 
 </script>
