@@ -18,6 +18,48 @@ st.set_page_config(
 
 
 # =========================================================
+# PAGE ACTION
+# =========================================================
+# SYSTEM FAILURE 화면에서
+# RESTART / TITLE을 눌렀을 때 처리
+#
+# components.html 내부의 JavaScript에서는
+# st.switch_page()를 직접 사용할 수 없기 때문에
+# query parameter를 이용하여 Python 쪽으로 전달한다.
+# =========================================================
+
+action = st.query_params.get("action")
+
+
+if action == "restart":
+
+    # NEW GAME과 동일한 초기화
+
+    st.session_state.game_paused = False
+    st.session_state.game_finished = False
+
+    st.session_state.remaining_seconds = 15 * 60
+
+    st.session_state.timer_deadline = (
+        time.time() + 15 * 60
+    )
+
+    # query parameter 제거
+
+    st.query_params.clear()
+
+
+elif action == "title":
+
+    # query parameter 제거 후
+    # 실제 Streamlit 페이지 이동
+
+    st.query_params.clear()
+
+    st.switch_page("main.py")
+
+
+# =========================================================
 # SESSION STATE
 # =========================================================
 
@@ -31,7 +73,9 @@ if "remaining_seconds" not in st.session_state:
     st.session_state.remaining_seconds = 15 * 60
 
 if "timer_deadline" not in st.session_state:
-    st.session_state.timer_deadline = time.time() + 15 * 60
+    st.session_state.timer_deadline = (
+        time.time() + 15 * 60
+    )
 
 
 # =========================================================
@@ -51,6 +95,7 @@ if not st.session_state.game_paused:
     )
 
     if st.session_state.remaining_seconds <= 0:
+
         st.session_state.game_finished = True
 
 
@@ -65,7 +110,9 @@ for name in ["neodgm.ttf", "neodgm(2).ttf"]:
     candidate = Path(name)
 
     if candidate.exists():
+
         font_path = candidate
+
         break
 
 
@@ -96,27 +143,40 @@ st.markdown(
             format('truetype');
     }}
 
+
     html,
     body,
     [class*="css"] {{
+
         font-family:
             'NeoDungGeunMo',
             monospace !important;
+
     }}
+
 
     #MainMenu,
     header,
     footer {{
+
         visibility: hidden;
+
     }}
+
 
     .stApp {{
+
         background: #000000 !important;
+
     }}
 
+
     .block-container {{
+
         padding: 0 !important;
+
         max-width: 100vw !important;
+
     }}
 
 
@@ -138,6 +198,7 @@ st.markdown(
 
         padding: 0 !important;
         margin: 0 !important;
+
     }}
 
 
@@ -165,17 +226,20 @@ st.markdown(
         font-size: 24px !important;
 
         cursor: pointer !important;
+
     }}
 
 
     .st-key-pause_game_button button:hover {{
 
         background: #ffffff !important;
+
         color: #000000 !important;
 
         border: none !important;
         outline: none !important;
         box-shadow: none !important;
+
     }}
 
 
@@ -184,6 +248,7 @@ st.markdown(
         border: none !important;
         outline: none !important;
         box-shadow: none !important;
+
     }}
 
 
@@ -196,7 +261,9 @@ st.markdown(
 
             width: 40px !important;
             height: 40px !important;
+
         }}
+
 
         .st-key-pause_game_button button {{
 
@@ -204,7 +271,9 @@ st.markdown(
             height: 40px !important;
 
             font-size: 21px !important;
+
         }}
+
     }}
 
     </style>
@@ -229,6 +298,7 @@ if pause_clicked:
 
     current_time = time.time()
 
+
     if not st.session_state.game_paused:
 
         st.session_state.remaining_seconds = max(
@@ -241,6 +311,7 @@ if pause_clicked:
 
         st.session_state.game_paused = True
 
+
     else:
 
         st.session_state.timer_deadline = (
@@ -250,6 +321,7 @@ if pause_clicked:
 
         st.session_state.game_paused = False
 
+
     st.rerun()
 
 
@@ -257,14 +329,27 @@ if pause_clicked:
 # INITIAL VALUES
 # =========================================================
 
-remaining = st.session_state.remaining_seconds
-paused = st.session_state.game_paused
-finished = st.session_state.game_finished
+remaining = (
+    st.session_state.remaining_seconds
+)
+
+paused = (
+    st.session_state.game_paused
+)
+
+finished = (
+    st.session_state.game_finished
+)
+
 
 minutes = remaining // 60
+
 seconds = remaining % 60
 
-timer_text = f"{minutes:02d}:{seconds:02d}"
+
+timer_text = (
+    f"{minutes:02d}:{seconds:02d}"
+)
 
 
 # =========================================================
@@ -295,6 +380,7 @@ html = f"""
     src:
         url(data:font/ttf;base64,{font_base64})
         format('truetype');
+
 }}
 
 
@@ -305,6 +391,7 @@ html = f"""
     user-select: none;
 
     -webkit-user-select: none;
+
 }}
 
 
@@ -324,12 +411,14 @@ body {{
     font-family:
         'NeoDungGeunMo',
         monospace;
+
 }}
 
 
 body {{
 
     color: #ffffff;
+
 }}
 
 
@@ -349,6 +438,7 @@ body {{
     overflow: hidden;
 
     outline: none;
+
 }}
 
 
@@ -368,6 +458,7 @@ body {{
     letter-spacing: 1px;
 
     z-index: 20;
+
 }}
 
 
@@ -385,6 +476,7 @@ body {{
     letter-spacing: 1px;
 
     z-index: 20;
+
 }}
 
 
@@ -403,6 +495,7 @@ body {{
     letter-spacing: 2px;
 
     z-index: 20;
+
 }}
 
 
@@ -437,6 +530,7 @@ body {{
         );
 
     background-size: 40px 40px;
+
 }}
 
 
@@ -459,6 +553,7 @@ body {{
         rgba(255,255,255,0.12);
 
     overflow: hidden;
+
 }}
 
 
@@ -479,6 +574,7 @@ body {{
 
     background:
         rgba(255,255,255,0.045);
+
 }}
 
 
@@ -495,6 +591,7 @@ body {{
 
     background:
         rgba(255,255,255,0.045);
+
 }}
 
 
@@ -522,6 +619,7 @@ body {{
     font-size: 12px;
 
     text-align: center;
+
 }}
 
 
@@ -532,6 +630,7 @@ body {{
 
     width: 14%;
     height: 12%;
+
 }}
 
 
@@ -542,6 +641,7 @@ body {{
 
     width: 30%;
     height: 12%;
+
 }}
 
 
@@ -552,6 +652,7 @@ body {{
 
     width: 14%;
     height: 17%;
+
 }}
 
 
@@ -570,6 +671,7 @@ body {{
         vertical-rl;
 
     letter-spacing: 2px;
+
 }}
 
 
@@ -592,6 +694,7 @@ body {{
     font-size: 10px;
 
     color: #555555;
+
 }}
 
 
@@ -618,6 +721,7 @@ body {{
 
     box-shadow:
         0 0 0 1px #000000;
+
 }}
 
 
@@ -636,6 +740,7 @@ body {{
 
     background:
         rgba(255,255,255,0.15);
+
 }}
 
 
@@ -669,12 +774,14 @@ body {{
         opacity 0.1s linear;
 
     z-index: 30;
+
 }}
 
 
 .interaction-message.visible {{
 
     opacity: 1;
+
 }}
 
 
@@ -694,6 +801,7 @@ body {{
     color: #777777;
 
     z-index: 20;
+
 }}
 
 
@@ -716,6 +824,7 @@ body {{
 
     background:
         rgba(0,0,0,0.90);
+
 }}
 
 
@@ -731,6 +840,7 @@ body {{
     background: #050505;
 
     padding: 34px 38px;
+
 }}
 
 
@@ -749,6 +859,7 @@ body {{
 
     border-bottom:
         1px solid #333333;
+
 }}
 
 
@@ -757,6 +868,7 @@ body {{
     font-size: 24px;
 
     letter-spacing: 1px;
+
 }}
 
 
@@ -765,6 +877,7 @@ body {{
     font-size: 12px;
 
     color: #666666;
+
 }}
 
 
@@ -776,6 +889,7 @@ body {{
         repeat(4, 1fr);
 
     gap: 10px;
+
 }}
 
 
@@ -800,6 +914,7 @@ body {{
     transition:
         background 0.1s linear,
         color 0.1s linear;
+
 }}
 
 
@@ -808,6 +923,7 @@ body {{
     background: #ffffff;
 
     color: #000000;
+
 }}
 
 
@@ -816,6 +932,7 @@ body {{
     background: #ffffff;
 
     color: #000000;
+
 }}
 
 
@@ -829,6 +946,7 @@ body {{
     font-size: 10px;
 
     color: #555555;
+
 }}
 
 
@@ -837,6 +955,7 @@ body {{
     font-size: 13px;
 
     text-align: center;
+
 }}
 
 
@@ -845,6 +964,7 @@ body {{
     color: #444444;
 
     font-size: 11px;
+
 }}
 
 
@@ -866,6 +986,7 @@ body {{
     line-height: 1.8;
 
     color: #888888;
+
 }}
 
 
@@ -885,6 +1006,7 @@ body {{
     background: #050505;
 
     padding: 36px 40px;
+
 }}
 
 
@@ -901,12 +1023,14 @@ body {{
 
     border-bottom:
         1px solid #333333;
+
 }}
 
 
 .help-title {{
 
     font-size: 24px;
+
 }}
 
 
@@ -915,6 +1039,7 @@ body {{
     font-size: 12px;
 
     color: #666666;
+
 }}
 
 
@@ -928,6 +1053,7 @@ body {{
 
     border-bottom:
         1px solid #1f1f1f;
+
 }}
 
 
@@ -936,6 +1062,7 @@ body {{
     width: 30px;
 
     color: #555555;
+
 }}
 
 
@@ -944,6 +1071,7 @@ body {{
     width: 145px;
 
     font-size: 14px;
+
 }}
 
 
@@ -954,6 +1082,7 @@ body {{
     font-size: 12px;
 
     line-height: 1.7;
+
 }}
 
 
@@ -967,6 +1096,7 @@ body {{
 
     border-left:
         2px solid #ffffff;
+
 }}
 
 
@@ -975,6 +1105,7 @@ body {{
     margin-bottom: 8px;
 
     font-size: 13px;
+
 }}
 
 
@@ -985,6 +1116,7 @@ body {{
     font-size: 11px;
 
     line-height: 1.8;
+
 }}
 
 
@@ -1007,6 +1139,7 @@ body {{
 
     background:
         rgba(0,0,0,0.90);
+
 }}
 
 
@@ -1017,6 +1150,7 @@ body {{
     text-align: center;
 
     margin-bottom: 14px;
+
 }}
 
 
@@ -1027,11 +1161,12 @@ body {{
     font-size: 13px;
 
     text-align: center;
+
 }}
 
 
 /* =====================================================
-   TIME OVER
+   SYSTEM FAILURE
    ===================================================== */
 
 .time-over {{
@@ -1048,6 +1183,22 @@ body {{
     justify-content: center;
 
     background: #000000;
+
+}}
+
+
+.time-over-content {{
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
 }}
 
 
@@ -1055,9 +1206,8 @@ body {{
 
     font-size: 30px;
 
-    text-align: center;
-
     margin-bottom: 16px;
+
 }}
 
 
@@ -1067,9 +1217,80 @@ body {{
 
     font-size: 13px;
 
-    text-align: center;
-
     line-height: 1.8;
+
+    margin-bottom: 30px;
+
+}}
+
+
+/* =====================================================
+   SYSTEM FAILURE BUTTONS
+   ===================================================== */
+
+.time-over-buttons {{
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 8px;
+
+}}
+
+
+.time-over-button {{
+
+    width: 170px;
+
+    height: 44px;
+
+    padding: 0;
+
+    margin: 0;
+
+    border: none;
+
+    outline: none;
+
+    box-shadow: none;
+
+    border-radius: 0;
+
+    background: #000000;
+
+    color: #ffffff;
+
+    font-family:
+        'NeoDungGeunMo',
+        monospace;
+
+    font-size: 15px;
+
+    cursor: pointer;
+
+}}
+
+
+.time-over-button:hover {{
+
+    background: #ffffff;
+
+    color: #000000;
+
+}}
+
+
+.time-over-button:focus {{
+
+    border: none;
+
+    outline: none;
+
+    box-shadow: none;
+
 }}
 
 
@@ -1090,6 +1311,7 @@ body {{
     height: 132px;
 
     z-index: 150;
+
 }}
 
 
@@ -1125,6 +1347,7 @@ body {{
 
     -webkit-user-select: none;
     user-select: none;
+
 }}
 
 
@@ -1133,6 +1356,7 @@ body {{
     background: #ffffff;
 
     color: #000000;
+
 }}
 
 
@@ -1140,6 +1364,7 @@ body {{
 
     top: 0;
     left: 45px;
+
 }}
 
 
@@ -1147,6 +1372,7 @@ body {{
 
     top: 45px;
     left: 0;
+
 }}
 
 
@@ -1154,6 +1380,7 @@ body {{
 
     top: 45px;
     right: 0;
+
 }}
 
 
@@ -1161,6 +1388,7 @@ body {{
 
     bottom: 0;
     left: 45px;
+
 }}
 
 
@@ -1171,70 +1399,134 @@ body {{
 @media (max-width: 700px) {{
 
     .project-title {{
+
         top: 18px;
         left: 16px;
+
         font-size: 14px;
+
     }}
+
 
     .stage-title {{
+
         top: 40px;
         left: 16px;
+
         font-size: 11px;
+
     }}
+
 
     .timer {{
+
         top: 18px;
+
         font-size: 17px;
+
     }}
 
+
     .game-area {{
+
         top: 68px;
+
         left: 16px;
         right: 16px;
+
         bottom: 58px;
 
         background-size: 30px 30px;
+
     }}
 
+
     .status {{
+
         left: 16px;
+
         bottom: 18px;
+
         font-size: 11px;
+
     }}
+
 
     .inventory-panel,
     .help-panel {{
+
         width: 90vw;
+
         padding: 24px 20px;
+
     }}
+
 
     .inventory-grid {{
+
         gap: 6px;
+
     }}
+
 
     .item-name {{
+
         font-size: 10px;
+
     }}
+
 
     .help-row {{
+
         gap: 10px;
+
     }}
+
 
     .help-key {{
+
         width: 90px;
+
         font-size: 11px;
+
     }}
+
 
     .help-description {{
+
         font-size: 10px;
+
     }}
 
-
-    /* 모바일 방향키 표시 */
 
     .mobile-controls {{
 
         display: block;
+
+    }}
+
+
+    .time-over-title {{
+
+        font-size: 25px;
+
+    }}
+
+
+    .time-over-text {{
+
+        font-size: 11px;
+
+    }}
+
+
+    .time-over-button {{
+
+        width: 150px;
+
+        height: 42px;
+
+        font-size: 13px;
 
     }}
 
@@ -1288,6 +1580,7 @@ body {{
 
         <div class="mobile-controls">
 
+
             <button
                 class="control-button control-up"
                 data-direction="w"
@@ -1295,6 +1588,7 @@ body {{
             >
                 ▲
             </button>
+
 
             <button
                 class="control-button control-left"
@@ -1304,6 +1598,7 @@ body {{
                 ◀
             </button>
 
+
             <button
                 class="control-button control-right"
                 data-direction="d"
@@ -1312,6 +1607,7 @@ body {{
                 ▶
             </button>
 
+
             <button
                 class="control-button control-down"
                 data-direction="s"
@@ -1319,6 +1615,7 @@ body {{
             >
                 ▼
             </button>
+
 
         </div>
 
@@ -1593,6 +1890,7 @@ body {{
 
                     ITEM DESCRIPTION
                     <br><br>
+
                     아이템을 선택하면 설명이 표시됩니다.
 
                 </div>
@@ -1772,7 +2070,7 @@ body {{
 
 
         <!-- =================================================
-             TIME OVER
+             SYSTEM FAILURE
              ================================================= -->
 
         <div
@@ -1781,11 +2079,13 @@ body {{
             style="display:none;"
         >
 
-            <div>
+            <div class="time-over-content">
+
 
                 <div class="time-over-title">
                     SYSTEM FAILURE
                 </div>
+
 
                 <div class="time-over-text">
 
@@ -1794,6 +2094,31 @@ body {{
                     CONNECTION TO ECHO LOST
 
                 </div>
+
+
+                <div class="time-over-buttons">
+
+
+                    <button
+                        class="time-over-button"
+                        id="restartButton"
+                        type="button"
+                    >
+                        RESTART
+                    </button>
+
+
+                    <button
+                        class="time-over-button"
+                        id="titleButton"
+                        type="button"
+                    >
+                        TITLE
+                    </button>
+
+
+                </div>
+
 
             </div>
 
@@ -1807,7 +2132,10 @@ body {{
          STATUS
          ================================================= -->
 
-    <div class="status" id="status">
+    <div
+        class="status"
+        id="status"
+    >
         ECHO SYSTEM // ONLINE
     </div>
 
@@ -1852,6 +2180,7 @@ const player =
         "player"
     );
 
+
 const room =
     document.querySelector(
         ".room"
@@ -1862,14 +2191,6 @@ let playerX = 50;
 
 let playerY = 43;
 
-
-/*
-   이동 속도
-
-   이전 1.2보다 낮춰서
-   모바일 버튼과 키보드 모두
-   자연스럽게 움직이도록 함.
-*/
 
 const moveSpeed = 0.65;
 
@@ -1896,36 +2217,59 @@ const objects = [
 
     {{
         id: "monitor",
+
         name: "CENTRAL MONITOR",
+
+        interactionKey: "E",
+
         x: 43,
         y: 13,
+
         width: 14,
         height: 12
     }},
 
+
     {{
         id: "desk",
+
         name: "RESEARCH DESK",
+
+        interactionKey: "E",
+
         x: 35,
         y: 62,
+
         width: 30,
         height: 12
     }},
 
+
     {{
         id: "terminal",
+
         name: "SECURITY TERMINAL",
+
+        interactionKey: "E",
+
         x: 18,
         y: 35,
+
         width: 14,
         height: 17
     }},
 
+
     {{
         id: "exitDoor",
+
         name: "SECURITY DOOR",
+
+        interactionKey: "E",
+
         x: 92,
         y: 35,
+
         width: 8,
         height: 30
     }}
@@ -1940,10 +2284,12 @@ const objects = [
 const inventory = [
 
     {{
-        name: "ACCESS CARD",
+        name:
+            "ACCESS CARD",
 
         description:
             "연구시설 보안구역에 접근할 수 있는 카드입니다."
+
     }},
 
     null,
@@ -1969,10 +2315,12 @@ const inventoryOverlay =
         "inventoryOverlay"
     );
 
+
 const itemDescription =
     document.getElementById(
         "itemDescription"
     );
+
 
 const inventorySlots =
     document.querySelectorAll(
@@ -2018,6 +2366,7 @@ function renderInventory() {{
                         ${{item.name}}
                     </div>
                     `;
+
             }}
 
         }}
@@ -2072,7 +2421,9 @@ inventorySlots.forEach(
                     itemDescription.innerHTML =
                         `
                         ${{item.name}}
+
                         <br><br>
+
                         ${{item.description}}
                         `;
 
@@ -2081,7 +2432,9 @@ inventorySlots.forEach(
                     itemDescription.innerHTML =
                         `
                         ITEM DESCRIPTION
+
                         <br><br>
+
                         비어 있는 슬롯입니다.
                         `;
 
@@ -2108,11 +2461,14 @@ renderInventory();
 function openInventory() {{
 
     if (finished) {{
+
         return;
+
     }}
 
 
     helpOpen = false;
+
 
     document.getElementById(
         "helpOverlay"
@@ -2121,6 +2477,7 @@ function openInventory() {{
 
 
     inventoryOpen = true;
+
 
     inventoryOverlay.style.display =
         "flex";
@@ -2138,6 +2495,7 @@ function openInventory() {{
 function closeInventory() {{
 
     inventoryOpen = false;
+
 
     inventoryOverlay.style.display =
         "none";
@@ -2161,17 +2519,21 @@ const helpOverlay =
 function openHelp() {{
 
     if (finished) {{
+
         return;
+
     }}
 
 
     inventoryOpen = false;
+
 
     inventoryOverlay.style.display =
         "none";
 
 
     helpOpen = true;
+
 
     helpOverlay.style.display =
         "flex";
@@ -2185,6 +2547,7 @@ function openHelp() {{
 function closeHelp() {{
 
     helpOpen = false;
+
 
     helpOverlay.style.display =
         "none";
@@ -2239,8 +2602,11 @@ gameRoot.addEventListener(
 function clearMovementKeys() {{
 
     keys.w = false;
+
     keys.a = false;
+
     keys.s = false;
+
     keys.d = false;
 
 }}
@@ -2252,12 +2618,21 @@ function clearMovementKeys() {{
 
 function updatePlayer() {{
 
+    /*
+       중요:
+       상태가 막혔다고 requestAnimationFrame을
+       종료하지 않는다.
+
+       루프는 계속 유지하고,
+       실제 이동만 제한한다.
+    */
+
     if (
         !paused &&
         !helpOpen &&
         !inventoryOpen &&
         !finished
-    ) {{
+    ){{
 
         if (keys.w) {{
 
@@ -2411,7 +2786,8 @@ function checkInteraction() {{
     if (nearbyObject) {{
 
         interactionMessage.textContent =
-            "E  //  "
+            nearbyObject.interactionKey
+            + "  //  "
             + nearbyObject.name;
 
 
@@ -2441,13 +2817,17 @@ function interact() {{
         helpOpen ||
         inventoryOpen ||
         finished
-    ) {{
+    ){{
+
         return;
+
     }}
 
 
     if (!nearbyObject) {{
+
         return;
+
     }}
 
 
@@ -2458,7 +2838,7 @@ function interact() {{
     if (
         nearbyObject.id ===
         "terminal"
-    ) {{
+    ){{
 
         if (!inventory[0]) {{
 
@@ -2503,7 +2883,7 @@ function interact() {{
     if (
         nearbyObject.id ===
         "monitor"
-    ) {{
+    ){{
 
         document.getElementById(
             "status"
@@ -2522,7 +2902,7 @@ function interact() {{
     if (
         nearbyObject.id ===
         "desk"
-    ) {{
+    ){{
 
         document.getElementById(
             "status"
@@ -2541,9 +2921,9 @@ function interact() {{
     if (
         nearbyObject.id ===
         "exitDoor"
-    ) {{
+    ){{
 
-        if (inventory[0]) {{
+        if (inventory[0]){{
 
             document.getElementById(
                 "status"
@@ -2570,7 +2950,7 @@ function interact() {{
 
 document.addEventListener(
     "keydown",
-    function(event) {{
+    function(event){{
 
         const key =
             event.key.toLowerCase();
@@ -2582,9 +2962,9 @@ document.addEventListener(
 
         if (
             key === "escape"
-        ) {{
+        ){{
 
-            if (helpOpen) {{
+            if (helpOpen){{
 
                 closeHelp();
 
@@ -2595,7 +2975,7 @@ document.addEventListener(
             }}
 
 
-            if (inventoryOpen) {{
+            if (inventoryOpen){{
 
                 closeInventory();
 
@@ -2614,14 +2994,16 @@ document.addEventListener(
 
         if (
             key === "h"
-        ) {{
+        ){{
 
-            if (inventoryOpen) {{
+            if (inventoryOpen){{
+
                 return;
+
             }}
 
 
-            if (helpOpen) {{
+            if (helpOpen){{
 
                 closeHelp();
 
@@ -2645,14 +3027,16 @@ document.addEventListener(
 
         if (
             key === "i"
-        ) {{
+        ){{
 
-            if (helpOpen) {{
+            if (helpOpen){{
+
                 return;
+
             }}
 
 
-            if (inventoryOpen) {{
+            if (inventoryOpen){{
 
                 closeInventory();
 
@@ -2676,7 +3060,7 @@ document.addEventListener(
 
         if (
             key === "e"
-        ) {{
+        ){{
 
             interact();
 
@@ -2696,14 +3080,14 @@ document.addEventListener(
             key === "a" ||
             key === "s" ||
             key === "d"
-        ) {{
+        ){{
 
             if (
                 !paused &&
                 !helpOpen &&
                 !inventoryOpen &&
                 !finished
-            ) {{
+            ){{
 
                 keys[key] = true;
 
@@ -2724,7 +3108,7 @@ document.addEventListener(
 
 document.addEventListener(
     "keyup",
-    function(event) {{
+    function(event){{
 
         const key =
             event.key.toLowerCase();
@@ -2735,7 +3119,7 @@ document.addEventListener(
             key === "a" ||
             key === "s" ||
             key === "d"
-        ) {{
+        ){{
 
             keys[key] = false;
 
@@ -2753,7 +3137,7 @@ document.addEventListener(
 
 window.addEventListener(
     "blur",
-    function() {{
+    function(){{
 
         clearMovementKeys();
 
@@ -2772,7 +3156,7 @@ const mobileButtons =
 
 
 mobileButtons.forEach(
-    function(button) {{
+    function(button){{
 
         const direction =
             button.dataset.direction;
@@ -2784,16 +3168,17 @@ mobileButtons.forEach(
 
         button.addEventListener(
             "touchstart",
-            function(event) {{
+            function(event){{
 
                 event.preventDefault();
+
 
                 if (
                     !paused &&
                     !helpOpen &&
                     !inventoryOpen &&
                     !finished
-                ) {{
+                ){{
 
                     keys[direction] =
                         true;
@@ -2813,7 +3198,7 @@ mobileButtons.forEach(
 
         button.addEventListener(
             "touchend",
-            function(event) {{
+            function(event){{
 
                 event.preventDefault();
 
@@ -2833,7 +3218,7 @@ mobileButtons.forEach(
 
         button.addEventListener(
             "touchcancel",
-            function(event) {{
+            function(event){{
 
                 event.preventDefault();
 
@@ -2848,21 +3233,22 @@ mobileButtons.forEach(
 
 
         /* =============================================
-           POINTER SUPPORT
+           POINTER DOWN
            ============================================= */
 
         button.addEventListener(
             "pointerdown",
-            function(event) {{
+            function(event){{
 
                 event.preventDefault();
+
 
                 if (
                     !paused &&
                     !helpOpen &&
                     !inventoryOpen &&
                     !finished
-                ) {{
+                ){{
 
                     keys[direction] =
                         true;
@@ -2873,9 +3259,13 @@ mobileButtons.forEach(
         );
 
 
+        /* =============================================
+           POINTER UP
+           ============================================= */
+
         button.addEventListener(
             "pointerup",
-            function(event) {{
+            function(event){{
 
                 event.preventDefault();
 
@@ -2886,9 +3276,13 @@ mobileButtons.forEach(
         );
 
 
+        /* =============================================
+           POINTER CANCEL
+           ============================================= */
+
         button.addEventListener(
             "pointercancel",
-            function() {{
+            function(){{
 
                 keys[direction] =
                     false;
@@ -2897,9 +3291,13 @@ mobileButtons.forEach(
         );
 
 
+        /* =============================================
+           POINTER LEAVE
+           ============================================= */
+
         button.addEventListener(
             "pointerleave",
-            function() {{
+            function(){{
 
                 keys[direction] =
                     false;
@@ -2912,10 +3310,93 @@ mobileButtons.forEach(
 
 
 /* =====================================================
+   SYSTEM FAILURE BUTTONS
+   ===================================================== */
+
+const restartButton =
+    document.getElementById(
+        "restartButton"
+    );
+
+
+const titleButton =
+    document.getElementById(
+        "titleButton"
+    );
+
+
+/* =====================================================
+   RESTART
+   ===================================================== */
+
+restartButton.addEventListener(
+    "click",
+    function(){{
+
+        /*
+           Python 쪽으로 restart 요청.
+
+           현재 페이지에
+           ?action=restart 를 붙인다.
+        */
+
+        const currentURL =
+            new URL(
+                window.parent.location.href
+            );
+
+
+        currentURL.searchParams.set(
+            "action",
+            "restart"
+        );
+
+
+        window.parent.location.href =
+            currentURL.toString();
+
+    }}
+);
+
+
+/* =====================================================
+   TITLE
+   ===================================================== */
+
+titleButton.addEventListener(
+    "click",
+    function(){{
+
+        /*
+           Python 쪽에서
+           실제 st.switch_page("main.py")
+           를 실행한다.
+        */
+
+        const currentURL =
+            new URL(
+                window.parent.location.href
+            );
+
+
+        currentURL.searchParams.set(
+            "action",
+            "title"
+        );
+
+
+        window.parent.location.href =
+            currentURL.toString();
+
+    }}
+);
+
+
+/* =====================================================
    TIMER
    ===================================================== */
 
-function formatTime(seconds) {{
+function formatTime(seconds){{
 
     const min =
         Math.floor(
@@ -2934,32 +3415,41 @@ function formatTime(seconds) {{
 }}
 
 
-function updateTimer() {{
+function showTimeOver(){{
+
+    finished = true;
+
+
+    clearMovementKeys();
+
+
+    document.getElementById(
+        "timeOver"
+    ).style.display =
+        "flex";
+
+}}
+
+
+function updateTimer(){{
 
     if (
         paused ||
         helpOpen ||
         inventoryOpen ||
         finished
-    ) {{
+    ){{
+
         return;
+
     }}
 
 
-    if (remaining <= 0) {{
+    if (remaining <= 0){{
 
         remaining = 0;
 
-        finished = true;
-
-
-        document.getElementById(
-            "timeOver"
-        ).style.display =
-            "flex";
-
-
-        clearMovementKeys();
+        showTimeOver();
 
         return;
 
@@ -2977,18 +3467,9 @@ function updateTimer() {{
         );
 
 
-    if (remaining <= 0) {{
+    if (remaining <= 0){{
 
-        finished = true;
-
-
-        clearMovementKeys();
-
-
-        document.getElementById(
-            "timeOver"
-        ).style.display =
-            "flex";
+        showTimeOver();
 
     }}
 
@@ -3005,7 +3486,7 @@ setInterval(
    INITIAL STATE
    ===================================================== */
 
-if (paused) {{
+if (paused){{
 
     document.getElementById(
         "pauseOverlay"
@@ -3015,7 +3496,7 @@ if (paused) {{
 }}
 
 
-if (finished) {{
+if (finished){{
 
     document.getElementById(
         "timeOver"
