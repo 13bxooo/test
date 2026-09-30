@@ -17,6 +17,14 @@ st.set_page_config(
 
 
 # =========================================================
+# SESSION STATE
+# =========================================================
+
+if "game_paused" not in st.session_state:
+    st.session_state.game_paused = False
+
+
+# =========================================================
 # PAGE ACTION
 # =========================================================
 
@@ -24,8 +32,6 @@ action = st.query_params.get("action")
 
 
 if action == "restart":
-
-    # 게임 전체 초기화
 
     st.session_state.game_paused = False
 
@@ -36,22 +42,14 @@ if action == "restart":
 
 elif action == "title":
 
-    # query parameter 제거
+    # main.py에서 Continue 경고를 표시하기 위한 플래그
+    st.session_state.show_continue_warning = True
+
+    st.session_state.game_paused = False
 
     st.query_params.clear()
 
-    # 실제 타이틀 페이지 이동
-
     st.switch_page("main.py")
-
-
-# =========================================================
-# SESSION STATE
-# =========================================================
-
-if "game_paused" not in st.session_state:
-
-    st.session_state.game_paused = False
 
 
 # =========================================================
@@ -60,15 +58,12 @@ if "game_paused" not in st.session_state:
 
 font_path = None
 
-
 for name in ["neodgm.ttf", "neodgm(2).ttf"]:
 
     candidate = Path(name)
 
     if candidate.exists():
-
         font_path = candidate
-
         break
 
 
@@ -93,47 +88,32 @@ st.markdown(
 
     @font-face {{
         font-family: 'NeoDungGeunMo';
-
         src:
             url(data:font/ttf;base64,{font_base64})
             format('truetype');
     }}
 
-
     html,
     body,
     [class*="css"] {{
-
         font-family:
             'NeoDungGeunMo',
             monospace !important;
-
     }}
-
 
     #MainMenu,
     header,
     footer {{
-
         visibility: hidden;
-
     }}
-
 
     .stApp {{
-
-        background:
-            #000000 !important;
-
+        background: #000000 !important;
     }}
 
-
     .block-container {{
-
         padding: 0 !important;
-
         max-width: 100vw !important;
-
     }}
 
 
@@ -263,8 +243,8 @@ html = f"""
 
 <meta charset="UTF-8">
 
-
 <style>
+
 
 /* =====================================================
    FONT
@@ -303,13 +283,20 @@ html = f"""
 html,
 body {{
 
-    margin: 0;
-    padding: 0;
+    margin:
+        0;
 
-    width: 100%;
-    height: 100%;
+    padding:
+        0;
 
-    overflow: hidden;
+    width:
+        100%;
+
+    height:
+        100%;
+
+    overflow:
+        hidden;
 
     background:
         #000000;
@@ -591,6 +578,9 @@ body {{
     height:
         14%;
 
+    z-index:
+        5;
+
 }}
 
 
@@ -612,11 +602,14 @@ body {{
     height:
         12%;
 
+    z-index:
+        5;
+
 }}
 
 
 /* =====================================================
-   EXIT
+   EXIT WALL
    ===================================================== */
 
 .exit-door {{
@@ -634,19 +627,176 @@ body {{
         30%;
 
     background:
-        #111111;
+        #090909;
 
-    writing-mode:
-        vertical-rl;
+    border:
+        1px solid
+        rgba(255,255,255,0.16);
 
-    letter-spacing:
-        2px;
+    z-index:
+        5;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    flex-direction:
+        column;
 
 }}
 
 
 /* =====================================================
-   LABEL
+   LOCKED EXIT
+   ===================================================== */
+
+.exit-locked-wall {{
+
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    color:
+        #444444;
+
+    font-size:
+        9px;
+
+    letter-spacing:
+        1px;
+
+}}
+
+
+.exit-lock-line {{
+
+    position:
+        absolute;
+
+    top:
+        50%;
+
+    left:
+        8px;
+
+    right:
+        8px;
+
+    height:
+        1px;
+
+    background:
+        rgba(255,255,255,0.12);
+
+}}
+
+
+/* =====================================================
+   UNLOCKED EXIT
+   ===================================================== */
+
+.exit-unlocked {{
+
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    display:
+        none;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    flex-direction:
+        column;
+
+    gap:
+        5px;
+
+}}
+
+
+.exit-unlocked.visible {{
+
+    display:
+        flex;
+
+}}
+
+
+.exit-arrow {{
+
+    font-size:
+        18px;
+
+    line-height:
+        1;
+
+    animation:
+        exitArrowMove 1.05s
+        ease-in-out
+        infinite;
+
+}}
+
+
+@keyframes exitArrowMove {{
+
+    0% {{
+        transform:
+            translateY(4px);
+    }}
+
+    50% {{
+        transform:
+            translateY(-5px);
+    }}
+
+    100% {{
+        transform:
+            translateY(4px);
+    }}
+
+}}
+
+
+.exit-label {{
+
+    font-size:
+        10px;
+
+    white-space:
+        nowrap;
+
+    letter-spacing:
+        1px;
+
+}}
+
+
+/* =====================================================
+   OBJECT LABEL
    ===================================================== */
 
 .object-label {{
@@ -708,6 +858,14 @@ body {{
     display:
         none;
 
+    z-index:
+        20;
+
+    animation:
+        keyPulse 1.2s
+        ease-in-out
+        infinite;
+
 }}
 
 
@@ -741,6 +899,26 @@ body {{
 
     display:
         block;
+
+}}
+
+
+@keyframes keyPulse {{
+
+    0% {{
+        opacity:
+            0.45;
+    }}
+
+    50% {{
+        opacity:
+            1;
+    }}
+
+    100% {{
+        opacity:
+            0.45;
+    }}
 
 }}
 
@@ -820,7 +998,7 @@ body {{
         50%;
 
     bottom:
-        19%;
+        21%;
 
     transform:
         translateX(-50%);
@@ -933,6 +1111,12 @@ body {{
     line-height:
         1.7;
 
+    min-height:
+        34px;
+
+    padding-right:
+        55px;
+
 }}
 
 
@@ -952,6 +1136,14 @@ body {{
 
     color:
         #555555;
+
+}}
+
+
+.echo-next.ready {{
+
+    color:
+        #ffffff;
 
 }}
 
@@ -1382,7 +1574,62 @@ body {{
         11px;
 
     margin-bottom:
-        24px;
+        16px;
+
+}}
+
+
+/* =====================================================
+   RANDOM ACCESS CODE
+   ===================================================== */
+
+.terminal-code-box {{
+
+    margin-bottom:
+        20px;
+
+    padding:
+        14px;
+
+    background:
+        #090909;
+
+    border:
+        1px solid #222222;
+
+    text-align:
+        center;
+
+}}
+
+
+.terminal-code-label {{
+
+    font-size:
+        9px;
+
+    color:
+        #555555;
+
+    margin-bottom:
+        8px;
+
+    letter-spacing:
+        2px;
+
+}}
+
+
+.terminal-code {{
+
+    font-size:
+        28px;
+
+    letter-spacing:
+        9px;
+
+    color:
+        #ffffff;
 
 }}
 
@@ -1490,6 +1737,369 @@ body {{
 
 
 /* =====================================================
+   EXIT CARD SCAN
+   ===================================================== */
+
+.card-overlay {{
+
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    z-index:
+        130;
+
+    display:
+        none;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    background:
+        rgba(0,0,0,0.94);
+
+}}
+
+
+.card-panel {{
+
+    width:
+        min(620px, 88vw);
+
+    background:
+        #050505;
+
+    border:
+        1px solid #333333;
+
+    padding:
+        30px;
+
+}}
+
+
+.card-title {{
+
+    font-size:
+        21px;
+
+    margin-bottom:
+        8px;
+
+}}
+
+
+.card-subtitle {{
+
+    font-size:
+        11px;
+
+    color:
+        #666666;
+
+    margin-bottom:
+        25px;
+
+}}
+
+
+.card-reader-area {{
+
+    position:
+        relative;
+
+    height:
+        230px;
+
+    border:
+        1px solid #222222;
+
+    background:
+        #080808;
+
+    overflow:
+        hidden;
+
+    touch-action:
+        none;
+
+}}
+
+
+.reader-line {{
+
+    position:
+        absolute;
+
+    left:
+        12%;
+
+    right:
+        12%;
+
+    top:
+        50%;
+
+    height:
+        2px;
+
+    background:
+        #ffffff;
+
+    opacity:
+        0.25;
+
+}}
+
+
+.reader-label {{
+
+    position:
+        absolute;
+
+    left:
+        50%;
+
+    top:
+        31%;
+
+    transform:
+        translateX(-50%);
+
+    color:
+        #555555;
+
+    font-size:
+        10px;
+
+    white-space:
+        nowrap;
+
+}}
+
+
+.card-reader {{
+
+    position:
+        absolute;
+
+    left:
+        50%;
+
+    top:
+        55%;
+
+    width:
+        96px;
+
+    height:
+        48px;
+
+    transform:
+        translate(-50%, -50%);
+
+    border:
+        1px solid #555555;
+
+    background:
+        #111111;
+
+}}
+
+
+.card-reader::before {{
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    left:
+        10px;
+
+    right:
+        10px;
+
+    top:
+        15px;
+
+    height:
+        2px;
+
+    background:
+        #777777;
+
+}}
+
+
+.card-reader::after {{
+
+    content:
+        "CARD";
+
+    position:
+        absolute;
+
+    left:
+        50%;
+
+    bottom:
+        5px;
+
+    transform:
+        translateX(-50%);
+
+    font-size:
+        7px;
+
+    color:
+        #444444;
+
+}}
+
+
+.access-card {{
+
+    position:
+        absolute;
+
+    left:
+        16%;
+
+    top:
+        42%;
+
+    width:
+        105px;
+
+    height:
+        58px;
+
+    background:
+        #ffffff;
+
+    color:
+        #000000;
+
+    border:
+        1px solid #000000;
+
+    cursor:
+        grab;
+
+    touch-action:
+        none;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    font-size:
+        9px;
+
+    letter-spacing:
+        1px;
+
+    transform:
+        translate(-50%, -50%)
+        rotate(-3deg);
+
+    z-index:
+        5;
+
+}}
+
+
+.access-card:active {{
+
+    cursor:
+        grabbing;
+
+}}
+
+
+.access-card-chip {{
+
+    position:
+        absolute;
+
+    left:
+        10px;
+
+    top:
+        12px;
+
+    width:
+        18px;
+
+    height:
+        14px;
+
+    border:
+        1px solid #777777;
+
+}}
+
+
+.card-status {{
+
+    height:
+        22px;
+
+    margin-top:
+        12px;
+
+    color:
+        #666666;
+
+    font-size:
+        10px;
+
+    text-align:
+        center;
+
+}}
+
+
+.card-close {{
+
+    margin-top:
+        8px;
+
+    width:
+        100%;
+
+    height:
+        40px;
+
+    border:
+        1px solid #333333;
+
+    background:
+        #000000;
+
+    color:
+        #777777;
+
+    font-family:
+        'NeoDungGeunMo',
+        monospace;
+
+}}
+
+
+/* =====================================================
    PAUSE
    ===================================================== */
 
@@ -1502,7 +2112,7 @@ body {{
         0;
 
     z-index:
-        90;
+        200;
 
     display:
         none;
@@ -1566,13 +2176,16 @@ body {{
         22px;
 
     width:
-        132px;
+        144px;
 
     height:
-        132px;
+        144px;
 
     z-index:
-        150;
+        250;
+
+    pointer-events:
+        none;
 
 }}
 
@@ -1583,16 +2196,16 @@ body {{
         absolute;
 
     width:
-        42px;
+        44px;
 
     height:
-        42px;
+        44px;
 
     padding:
         0;
 
     border:
-        1px solid #555555;
+        1px solid #666666;
 
     background:
         rgba(0,0,0,0.88);
@@ -1619,6 +2232,12 @@ body {{
     touch-action:
         none;
 
+    pointer-events:
+        auto;
+
+    -webkit-tap-highlight-color:
+        transparent;
+
 }}
 
 
@@ -1639,7 +2258,7 @@ body {{
         0;
 
     left:
-        45px;
+        50px;
 
 }}
 
@@ -1647,7 +2266,7 @@ body {{
 .control-left {{
 
     top:
-        45px;
+        50px;
 
     left:
         0;
@@ -1658,7 +2277,7 @@ body {{
 .control-right {{
 
     top:
-        45px;
+        50px;
 
     right:
         0;
@@ -1672,7 +2291,7 @@ body {{
         0;
 
     left:
-        45px;
+        50px;
 
 }}
 
@@ -1753,6 +2372,28 @@ body {{
         bottom:
             2%;
 
+        min-height:
+            84px;
+
+    }}
+
+
+    .echo-message {{
+
+        font-size:
+            10px;
+
+    }}
+
+
+    .interaction-message {{
+
+        bottom:
+            24%;
+
+        font-size:
+            10px;
+
     }}
 
 
@@ -1816,9 +2457,24 @@ body {{
         display:
             block;
 
+        right:
+            12px;
+
+        bottom:
+            12px;
+
+    }}
+
+
+    .card-reader-area {{
+
+        height:
+            210px;
+
     }}
 
 }}
+
 
 </style>
 
@@ -1965,10 +2621,39 @@ body {{
                 id="exitDoor"
             >
 
-                EXIT
+                <div
+                    class="exit-locked-wall"
+                    id="exitLocked"
+                >
 
-                <div class="object-label">
-                    SECURITY DOOR
+                    <span>
+                        LOCKED
+                    </span>
+
+                    <div
+                        class="exit-lock-line"
+                    ></div>
+
+                </div>
+
+
+                <div
+                    class="exit-unlocked"
+                    id="exitUnlocked"
+                >
+
+                    <div class="exit-arrow">
+                        ↑
+                    </div>
+
+                    <div class="exit-label">
+                        [EXIT]
+                    </div>
+
+                    <div class="exit-label">
+                        SECURITY ROOM
+                    </div>
+
                 </div>
 
             </div>
@@ -2016,8 +2701,11 @@ body {{
                 ></div>
 
 
-                <div class="echo-next">
-                    E // NEXT
+                <div
+                    class="echo-next"
+                    id="echoNext"
+                >
+                    SPACE // SKIP
                 </div>
 
             </div>
@@ -2218,7 +2906,8 @@ body {{
                     </div>
 
                     <div class="help-description">
-                        시스템 메시지를 확인합니다.
+                        ECHO의 채팅을 즉시 표시하거나
+                        다음 메시지로 진행합니다.
                     </div>
 
                 </div>
@@ -2305,7 +2994,23 @@ body {{
 
 
                 <div class="computer-sub">
-                    ENTER THE ACCESS SEQUENCE PROVIDED BY ECHO.
+                    ACCESS SEQUENCE REQUIRED
+                </div>
+
+
+                <div class="terminal-code-box">
+
+                    <div class="terminal-code-label">
+                        ACCESS CODE
+                    </div>
+
+                    <div
+                        class="terminal-code"
+                        id="terminalCode"
+                    >
+                        ----
+                    </div>
+
                 </div>
 
 
@@ -2333,6 +3038,82 @@ body {{
                     class="code-error"
                     id="codeError"
                 ></div>
+
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             CARD SCAN
+             ================================================= -->
+
+        <div
+            class="card-overlay"
+            id="cardOverlay"
+        >
+
+            <div class="card-panel">
+
+
+                <div class="card-title">
+                    SECURITY ACCESS
+                </div>
+
+
+                <div class="card-subtitle">
+                    DRAG THE ACCESS KEY ACROSS THE READER.
+                </div>
+
+
+                <div
+                    class="card-reader-area"
+                    id="cardReaderArea"
+                >
+
+                    <div class="reader-label">
+                        SECURITY CARD READER
+                    </div>
+
+
+                    <div class="reader-line"></div>
+
+
+                    <div class="card-reader"></div>
+
+
+                    <div
+                        class="access-card"
+                        id="accessCard"
+                    >
+
+                        <div
+                            class="access-card-chip"
+                        ></div>
+
+                        ACCESS KEY
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="card-status"
+                    id="cardStatus"
+                >
+                    CARD READY // DRAG TO READER
+                </div>
+
+
+                <button
+                    class="card-close"
+                    id="cardClose"
+                    type="button"
+                >
+                    CANCEL
+                </button>
 
 
             </div>
@@ -2446,6 +3227,10 @@ let computerOpen =
     false;
 
 
+let cardOverlayOpen =
+    false;
+
+
 let accessKeyCreated =
     false;
 
@@ -2454,12 +3239,79 @@ let accessKeyCollected =
     false;
 
 
+let exitUnlocked =
+    false;
+
+
+let exitCompleted =
+    false;
+
+
 /* =====================================================
-   ACCESS CODE
+   RANDOM ACCESS CODE
    ===================================================== */
 
+function generateAccessCode() {{
+
+    return String(
+        Math.floor(
+            1000 +
+            Math.random() * 9000
+        )
+    );
+
+}}
+
+
 const ACCESS_CODE =
-    "4817";
+    generateAccessCode();
+
+
+/* =====================================================
+   CHAT STATE
+   ===================================================== */
+
+let currentChat =
+    0;
+
+
+let chatTyping =
+    false;
+
+
+let chatFinished =
+    false;
+
+
+let typingTimer =
+    null;
+
+
+let chatIndex =
+    0;
+
+
+/*
+ * 0 : 최초 연결
+ * 1 : 이동 안내
+ * 2 : 컴퓨터 안내
+ * 3 : 암호 입력 완료 후 책상 안내
+ * 4 : ACCESS KEY 획득
+ */
+
+const chatMessages = [
+
+    "연결이 확인되었습니다. 저는 ECHO입니다. 이 시설에서의 첫 번째 절차를 안내하겠습니다.",
+
+    "먼저 이동 방법을 익혀야 합니다. W A S D 키를 사용하여 시설 내부를 이동해 보세요. 중앙의 COMPUTER로 이동하십시오.",
+
+    "좋습니다. COMPUTER에 접근했습니다. E 키를 사용하여 COMPUTER와 상호작용하십시오.",
+
+    "코드가 확인되었습니다. 이제 DESK를 확인하십시오. 그곳에 ACCESS KEY가 생성되었습니다.",
+
+    "ACCESS KEY를 획득했습니다. 이제 SECURITY ROOM으로 이동할 수 있습니다. EXIT에서 ACCESS KEY를 사용하십시오."
+
+];
 
 
 /* =====================================================
@@ -2502,6 +3354,12 @@ const computerOverlay =
     );
 
 
+const cardOverlay =
+    document.getElementById(
+        "cardOverlay"
+    );
+
+
 const pauseOverlay =
     document.getElementById(
         "pauseOverlay"
@@ -2520,6 +3378,12 @@ const echoMessage =
     );
 
 
+const echoNext =
+    document.getElementById(
+        "echoNext"
+    );
+
+
 const status =
     document.getElementById(
         "status"
@@ -2529,6 +3393,12 @@ const status =
 const accessKey =
     document.getElementById(
         "accessKey"
+    );
+
+
+const terminalCode =
+    document.getElementById(
+        "terminalCode"
     );
 
 
@@ -2562,6 +3432,36 @@ const itemDescription =
     );
 
 
+const exitLocked =
+    document.getElementById(
+        "exitLocked"
+    );
+
+
+const exitUnlocked =
+    document.getElementById(
+        "exitUnlocked"
+    );
+
+
+const accessCard =
+    document.getElementById(
+        "accessCard"
+    );
+
+
+const cardReaderArea =
+    document.getElementById(
+        "cardReaderArea"
+    );
+
+
+const cardStatus =
+    document.getElementById(
+        "cardStatus"
+    );
+
+
 /* =====================================================
    PLAYER
    ===================================================== */
@@ -2576,6 +3476,15 @@ let playerY =
 
 const moveSpeed =
     0.65;
+
+
+/*
+ * 플레이어의 실제 크기
+ * 충돌 계산에서 사용할 값
+ */
+
+const PLAYER_SIZE =
+    2.8;
 
 
 /* =====================================================
@@ -2595,11 +3504,8 @@ const keys = {{
 function clearMovementKeys() {{
 
     keys.w = false;
-
     keys.a = false;
-
     keys.s = false;
-
     keys.d = false;
 
 }}
@@ -2626,7 +3532,7 @@ const inventory = [
 function renderInventory() {{
 
     inventory.forEach(
-        function(item, index) {{
+        function(item, index){{
 
             const slot =
                 inventorySlots[index];
@@ -2670,37 +3576,330 @@ renderInventory();
 
 
 /* =====================================================
-   ECHO TUTORIAL
+   CHAT TYPING
    ===================================================== */
 
-const tutorialMessages = [
+function stopTypingTimer() {{
 
-    "연결이 확인되었습니다. 저는 ECHO입니다. 이 시설에서의 첫 번째 절차를 안내하겠습니다.",
+    if (typingTimer !== null) {{
 
-    "먼저 이동 방법을 익혀야 합니다. W A S D 키를 사용하여 시설 내부를 이동해 보세요. 중앙의 COMPUTER로 이동하십시오.",
+        clearInterval(
+            typingTimer
+        );
 
-    "좋습니다. COMPUTER에 접근했습니다. 가까운 물체에서는 E 키를 사용하여 상호작용할 수 있습니다. COMPUTER를 조사하십시오.",
+        typingTimer =
+            null;
 
-    "확인되었습니다. 이제 제가 전달하는 접근 코드를 COMPUTER에 입력하십시오. 접근 코드: 4817",
-
-    "코드가 확인되었습니다. DESK를 확인하십시오. 필요한 ACCESS KEY가 생성되었습니다.",
-
-    "ACCESS KEY를 획득했습니다. 이것으로 다음 구역으로 이동할 수 있습니다. EXIT로 이동하여 E 키를 눌러보십시오."
-
-];
-
-
-function setEchoMessage(message) {{
-
-    echoMessage.textContent =
-        message;
+    }}
 
 }}
 
 
-setEchoMessage(
-    tutorialMessages[0]
-);
+function typeChatMessage(message) {{
+
+    stopTypingTimer();
+
+
+    chatTyping =
+        true;
+
+
+    chatFinished =
+        false;
+
+
+    chatIndex =
+        0;
+
+
+    echoMessage.textContent =
+        "";
+
+
+    echoNext.textContent =
+        "SPACE // SKIP";
+
+
+    echoNext.classList.remove(
+        "ready"
+    );
+
+
+    typingTimer =
+        setInterval(
+            function(){{
+
+                if (
+                    chatIndex >=
+                    message.length
+                ){{
+
+                    stopTypingTimer();
+
+                    chatTyping =
+                        false;
+
+                    chatFinished =
+                        true;
+
+                    echoNext.textContent =
+                        "SPACE // NEXT";
+
+                    echoNext.classList.add(
+                        "ready"
+                    );
+
+                    return;
+
+                }}
+
+
+                echoMessage.textContent +=
+                    message.charAt(
+                        chatIndex
+                    );
+
+
+                chatIndex +=
+                    1;
+
+            }},
+            32
+        );
+
+}}
+
+
+/* =====================================================
+   CHAT SET
+   ===================================================== */
+
+function setChat(index) {{
+
+    if (
+        index < 0 ||
+        index >= chatMessages.length
+    ){{
+
+        return;
+
+    }}
+
+
+    currentChat =
+        index;
+
+
+    typeChatMessage(
+        chatMessages[index]
+    );
+
+}}
+
+
+/* =====================================================
+   CHAT CAN ADVANCE?
+   ===================================================== */
+
+function canAdvanceChat() {{
+
+    /*
+     * COMPUTER 암호 입력 이전에
+     * SPACE로 다음 단계의 채팅을
+     * 건너뛰는 것을 막는다.
+     *
+     * currentChat 2 = COMPUTER 안내
+     *
+     * COMPUTER와 실제 상호작용하기 전에는
+     * 다음 채팅으로 넘어갈 수 없음.
+     */
+
+    if (
+        currentChat === 2 &&
+        tutorialStep < 2
+    ){{
+
+        return false;
+
+    }}
+
+
+    /*
+     * 암호를 입력하기 전에는
+     * currentChat 3으로 이동할 수 없음.
+     */
+
+    if (
+        currentChat === 2 &&
+        tutorialStep === 2
+    ){{
+
+        return false;
+
+    }}
+
+
+    return true;
+
+}}
+
+
+/* =====================================================
+   CHAT SPACE
+   ===================================================== */
+
+function handleChatSpace() {{
+
+    if (
+        paused ||
+        computerOpen ||
+        cardOverlayOpen ||
+        inventoryOpen ||
+        helpOpen
+    ){{
+
+        return;
+
+    }}
+
+
+    /*
+     * 아직 글자가 입력되는 중이면
+     * SPACE 한 번으로 전체 표시
+     */
+
+    if (chatTyping){{
+
+        stopTypingTimer();
+
+
+        echoMessage.textContent =
+            chatMessages[currentChat];
+
+
+        chatIndex =
+            chatMessages[currentChat].length;
+
+
+        chatTyping =
+            false;
+
+
+        chatFinished =
+            true;
+
+
+        echoNext.textContent =
+            "SPACE // NEXT";
+
+
+        echoNext.classList.add(
+            "ready"
+        );
+
+
+        return;
+
+    }}
+
+
+    /*
+     * 글자가 모두 출력된 상태
+     */
+
+    if (chatFinished){{
+
+        /*
+         * 현재 단계가 아직 행동을
+         * 요구하는 상태라면
+         * SPACE만으로 다음 단계로
+         * 넘어가지 않는다.
+         */
+
+        if (
+            !canAdvanceChat()
+        ){{
+
+            status.textContent =
+                "ECHO // 현재 안내를 먼저 수행하십시오.";
+
+            return;
+
+        }}
+
+
+        /*
+         * chat 0 → chat 1
+         */
+
+        if (
+            currentChat === 0
+        ){{
+
+            setChat(1);
+
+            return;
+
+        }}
+
+
+        /*
+         * chat 1은 이동 행동이 필요
+         */
+
+        if (
+            currentChat === 1
+        ){{
+
+            status.textContent =
+                "TUTORIAL // COMPUTER로 이동하십시오.";
+
+            return;
+
+        }}
+
+
+        /*
+         * chat 2는 COMPUTER 상호작용 필요
+         */
+
+        if (
+            currentChat === 2
+        ){{
+
+            status.textContent =
+                "TUTORIAL // COMPUTER를 조사하십시오.";
+
+            return;
+
+        }}
+
+
+        /*
+         * chat 3은 DESK 이동 필요
+         */
+
+        if (
+            currentChat === 3
+        ){{
+
+            status.textContent =
+                "TUTORIAL // DESK로 이동하십시오.";
+
+            return;
+
+        }}
+
+    }}
+
+}}
+
+
+/* =====================================================
+   INITIAL CHAT
+   ===================================================== */
+
+setChat(0);
 
 
 /* =====================================================
@@ -2761,7 +3960,7 @@ const objects = [
             "exitDoor",
 
         name:
-            "SECURITY DOOR",
+            "SECURITY ROOM",
 
         x:
             92,
@@ -2785,10 +3984,146 @@ let nearbyObject =
 
 
 /* =====================================================
-   DISTANCE
+   RECT COLLISION
    ===================================================== */
 
-function distanceToObject(object) {{
+function rectanglesOverlap(
+    x1,
+    y1,
+    width1,
+    height1,
+    x2,
+    y2,
+    width2,
+    height2
+){{
+
+    return (
+        x1 < x2 + width2 &&
+        x1 + width1 > x2 &&
+        y1 < y2 + height2 &&
+        y1 + height1 > y2
+    );
+
+}}
+
+
+/* =====================================================
+   CAN MOVE TO
+   ===================================================== */
+
+function canMoveTo(
+    nextX,
+    nextY
+){{
+
+    const half =
+        PLAYER_SIZE / 2;
+
+
+    const playerLeft =
+        nextX - half;
+
+
+    const playerTop =
+        nextY - half;
+
+
+    const playerWidth =
+        PLAYER_SIZE;
+
+
+    const playerHeight =
+        PLAYER_SIZE;
+
+
+    /*
+     * 방 외벽
+     */
+
+    if (
+        playerLeft < 1 ||
+        playerTop < 1 ||
+        playerLeft + playerWidth > 99 ||
+        playerTop + playerHeight > 99
+    ){{
+
+        return false;
+
+    }}
+
+
+    /*
+     * 물체 충돌
+     *
+     * COMPUTER / DESK / EXIT 모두
+     * 플레이어가 위로 지나가지 못한다.
+     */
+
+    for (
+        const object of objects
+    ){{
+
+        /*
+         * EXIT가 실제로 열렸다면
+         * 출구 영역은 통과 가능하도록 한다.
+         */
+
+        if (
+            object.id ===
+            "exitDoor" &&
+            exitUnlocked
+        ){{
+
+            continue;
+
+        }}
+
+
+        /*
+         * 약간의 여유 공간을 추가하여
+         * 물체 가장자리에 끼지 않도록 한다.
+         */
+
+        const padding =
+            0.7;
+
+
+        if (
+            rectanglesOverlap(
+                playerLeft,
+                playerTop,
+                playerWidth,
+                playerHeight,
+
+                object.x - padding,
+                object.y - padding,
+                object.width +
+                    padding * 2,
+                object.height +
+                    padding * 2
+            )
+        ){{
+
+            return false;
+
+        }}
+
+    }}
+
+
+    return true;
+
+}}
+
+
+/* =====================================================
+   DISTANCE TO OBJECT
+   ===================================================== */
+
+function distanceToObject(
+    object
+){{
 
     const centerX =
         object.x +
@@ -2822,7 +4157,7 @@ function distanceToObject(object) {{
    INTERACTION CHECK
    ===================================================== */
 
-function checkInteraction() {{
+function checkInteraction(){{
 
     nearbyObject =
         null;
@@ -2833,7 +4168,7 @@ function checkInteraction() {{
 
 
     objects.forEach(
-        function(object) {{
+        function(object){{
 
             const distance =
                 distanceToObject(
@@ -2844,7 +4179,7 @@ function checkInteraction() {{
             if (
                 distance < 12 &&
                 distance < closestDistance
-            ) {{
+            ){{
 
                 nearbyObject =
                     object;
@@ -2863,7 +4198,9 @@ function checkInteraction() {{
         nearbyObject &&
         !computerOpen &&
         !inventoryOpen &&
-        !helpOpen
+        !helpOpen &&
+        !cardOverlayOpen &&
+        !paused
     ){{
 
         interactionMessage.textContent =
@@ -2890,7 +4227,7 @@ function checkInteraction() {{
    INACCESSIBLE
    ===================================================== */
 
-function inaccessible() {{
+function inaccessible(){{
 
     status.textContent =
         "SYSTEM // 접근할 수 없는 과정입니다.";
@@ -2899,286 +4236,13 @@ function inaccessible() {{
 
 
 /* =====================================================
-   INTERACT
+   COMPUTER OPEN
    ===================================================== */
 
-function interact() {{
+function openComputer(){{
 
     if (
-        paused ||
-        computerOpen ||
-        inventoryOpen ||
-        helpOpen
-    ){{
-
-        return;
-
-    }}
-
-
-    if (!nearbyObject) {{
-
-        return;
-
-    }}
-
-
-    /* =================================================
-       STEP 0
-       이동 전에 E를 누르면 차단
-       ================================================= */
-
-    if (
-        tutorialStep === 0
-    ){{
-
-        inaccessible();
-
-        return;
-
-    }}
-
-
-    /* =================================================
-       STEP 1
-       COMPUTER
-       ================================================= */
-
-    if (
-        tutorialStep === 1
-    ){{
-
-        if (
-            nearbyObject.id !==
-            "computer"
-        ){{
-
-            inaccessible();
-
-            return;
-
-        }}
-
-
-        tutorialStep =
-            2;
-
-
-        openComputer();
-
-
-        setEchoMessage(
-            tutorialMessages[2]
-        );
-
-
-        status.textContent =
-            "ECHO SYSTEM // TERMINAL CONNECTED";
-
-
-        return;
-
-    }}
-
-
-    /* =================================================
-       STEP 2
-       COMPUTER CODE
-       ================================================= */
-
-    if (
-        tutorialStep === 2
-    ){{
-
-        if (
-            nearbyObject.id !==
-            "computer"
-        ){{
-
-            inaccessible();
-
-            return;
-
-        }}
-
-
-        openComputer();
-
-
-        return;
-
-    }}
-
-
-    /* =================================================
-       STEP 3
-       DESK
-       ================================================= */
-
-    if (
-        tutorialStep === 3
-    ){{
-
-        if (
-            nearbyObject.id !==
-            "desk"
-        ){{
-
-            inaccessible();
-
-            return;
-
-        }}
-
-
-        tutorialStep =
-            4;
-
-
-        accessKeyCreated =
-            true;
-
-
-        accessKey.classList.add(
-            "visible"
-        );
-
-
-        setEchoMessage(
-            tutorialMessages[4]
-        );
-
-
-        status.textContent =
-            "DESK // ACCESS KEY GENERATED";
-
-
-        return;
-
-    }}
-
-
-    /* =================================================
-       STEP 4
-       GET ACCESS KEY
-       ================================================= */
-
-    if (
-        tutorialStep === 4
-    ){{
-
-        if (
-            nearbyObject.id !==
-            "desk"
-        ){{
-
-            inaccessible();
-
-            return;
-
-        }}
-
-
-        accessKeyCreated =
-            false;
-
-
-        accessKey.classList.remove(
-            "visible"
-        );
-
-
-        accessKeyCollected =
-            true;
-
-
-        inventory[0] = {{
-
-            name:
-                "ACCESS KEY",
-
-            description:
-                "ECHO TERMINAL에서 인증된 보안구역 접근 키입니다."
-
-        }};
-
-
-        renderInventory();
-
-
-        tutorialStep =
-            5;
-
-
-        setEchoMessage(
-            tutorialMessages[5]
-        );
-
-
-        status.textContent =
-            "SYSTEM // ACCESS KEY ACQUIRED";
-
-
-        return;
-
-    }}
-
-
-    /* =================================================
-       STEP 5
-       EXIT
-       ================================================= */
-
-    if (
-        tutorialStep === 5
-    ){{
-
-        if (
-            nearbyObject.id !==
-            "exitDoor"
-        ){{
-
-            inaccessible();
-
-            return;
-
-        }}
-
-
-        if (
-            !accessKeyCollected
-        ){{
-
-            inaccessible();
-
-            return;
-
-        }}
-
-
-        status.textContent =
-            "SECURITY DOOR // ACCESS GRANTED";
-
-
-        setEchoMessage(
-            "튜토리얼 절차가 완료되었습니다. 다음 구역으로 이동할 준비가 되었습니다."
-        );
-
-
-        return;
-
-    }}
-
-}}
-
-
-/* =====================================================
-   COMPUTER
-   ===================================================== */
-
-function openComputer() {{
-
-    if (
+        tutorialStep !== 1 &&
         tutorialStep !== 2
     ){{
 
@@ -3201,8 +4265,30 @@ function openComputer() {{
     );
 
 
-    computerOverlay.style.display =
-        "flex";
+    /*
+     * COMPUTER와 최초 상호작용했을 때
+     * tutorialStep 1 → 2
+     */
+
+    if (
+        tutorialStep === 1
+    ){{
+
+        tutorialStep =
+            2;
+
+
+        setChat(2);
+
+
+        status.textContent =
+            "ECHO SYSTEM // TERMINAL CONNECTED";
+
+    }}
+
+
+    terminalCode.textContent =
+        ACCESS_CODE;
 
 
     codeError.textContent =
@@ -3211,6 +4297,10 @@ function openComputer() {{
 
     codeInput.value =
         "";
+
+
+    computerOverlay.style.display =
+        "flex";
 
 
     setTimeout(
@@ -3225,7 +4315,11 @@ function openComputer() {{
 }}
 
 
-function closeComputer() {{
+/* =====================================================
+   CLOSE COMPUTER
+   ===================================================== */
+
+function closeComputer(){{
 
     computerOpen =
         false;
@@ -3247,7 +4341,7 @@ function closeComputer() {{
    CODE SUBMIT
    ===================================================== */
 
-function submitCode() {{
+function submitCode(){{
 
     const entered =
         codeInput.value.trim();
@@ -3258,8 +4352,26 @@ function submitCode() {{
         ACCESS_CODE
     ){{
 
+        /*
+         * 암호 입력 성공
+         */
+
         tutorialStep =
             3;
+
+
+        /*
+         * 암호를 입력하는 즉시
+         * 책상 위에 ACCESS KEY 생성
+         */
+
+        accessKeyCreated =
+            true;
+
+
+        accessKey.classList.add(
+            "visible"
+        );
 
 
         closeComputer();
@@ -3269,15 +4381,17 @@ function submitCode() {{
             "ECHO TERMINAL // CODE VERIFIED";
 
 
-        setEchoMessage(
-            "코드가 확인되었습니다. 이제 DESK로 이동하십시오. 그곳에서 ACCESS KEY를 확인할 수 있습니다."
-        );
+        /*
+         * 이제서야 다음 채팅으로 이동
+         */
+
+        setChat(3);
 
 
     }} else {{
 
         codeError.textContent =
-            "ACCESS DENIED // ECHO가 전달한 숫자를 그대로 입력하십시오.";
+            "ACCESS DENIED // 표시된 숫자를 그대로 입력하십시오.";
 
 
         codeInput.select();
@@ -3386,11 +4500,12 @@ inventorySlots.forEach(
    INVENTORY OPEN
    ===================================================== */
 
-function openInventory() {{
+function openInventory(){{
 
     if (
         paused ||
-        computerOpen
+        computerOpen ||
+        cardOverlayOpen
     ){{
 
         return;
@@ -3423,7 +4538,7 @@ function openInventory() {{
    INVENTORY CLOSE
    ===================================================== */
 
-function closeInventory() {{
+function closeInventory(){{
 
     inventoryOpen =
         false;
@@ -3442,11 +4557,12 @@ function closeInventory() {{
    HELP
    ===================================================== */
 
-function openHelp() {{
+function openHelp(){{
 
     if (
         paused ||
-        computerOpen
+        computerOpen ||
+        cardOverlayOpen
     ){{
 
         return;
@@ -3475,7 +4591,7 @@ function openHelp() {{
 }}
 
 
-function closeHelp() {{
+function closeHelp(){{
 
     helpOpen =
         false;
@@ -3491,10 +4607,713 @@ function closeHelp() {{
 
 
 /* =====================================================
+   EXIT UNLOCK
+   ===================================================== */
+
+function unlockExit(){{
+
+    exitUnlocked =
+        true;
+
+
+    exitLocked.style.display =
+        "none";
+
+
+    exitUnlocked.classList.add(
+        "visible"
+    );
+
+}}
+
+
+/* =====================================================
+   OPEN CARD SCANNER
+   ===================================================== */
+
+function openCardScanner(){{
+
+    if (
+        !accessKeyCollected
+    ){{
+
+        inaccessible();
+
+        return;
+
+    }}
+
+
+    cardOverlayOpen =
+        true;
+
+
+    clearMovementKeys();
+
+
+    interactionMessage.classList.remove(
+        "visible"
+    );
+
+
+    cardOverlay.style.display =
+        "flex";
+
+
+    resetCardPosition();
+
+
+    cardStatus.textContent =
+        "CARD READY // DRAG TO READER";
+
+}}
+
+
+/* =====================================================
+   CLOSE CARD SCANNER
+   ===================================================== */
+
+function closeCardScanner(){{
+
+    cardOverlayOpen =
+        false;
+
+
+    cardOverlay.style.display =
+        "none";
+
+
+    resetCardPosition();
+
+
+    focusGame();
+
+}}
+
+
+/* =====================================================
+   CARD POSITION
+   ===================================================== */
+
+let cardX =
+    16;
+
+
+let cardY =
+    42;
+
+
+function resetCardPosition(){{
+
+    cardX =
+        16;
+
+
+    cardY =
+        42;
+
+
+    accessCard.style.left =
+        cardX + "%";
+
+
+    accessCard.style.top =
+        cardY + "%";
+
+
+    accessCard.style.transform =
+        "translate(-50%, -50%) rotate(-3deg)";
+
+}}
+
+
+/* =====================================================
+   CARD DRAG
+   ===================================================== */
+
+let draggingCard =
+    false;
+
+
+let dragPointerId =
+    null;
+
+
+function updateCardFromPointer(
+    event
+){{
+
+    const rect =
+        cardReaderArea.getBoundingClientRect();
+
+
+    let x =
+        ((event.clientX - rect.left) /
+            rect.width) *
+        100;
+
+
+    let y =
+        ((event.clientY - rect.top) /
+            rect.height) *
+        100;
+
+
+    x =
+        Math.max(
+            5,
+            Math.min(
+                95,
+                x
+            )
+        );
+
+
+    y =
+        Math.max(
+            12,
+            Math.min(
+                88,
+                y
+            )
+        );
+
+
+    cardX =
+        x;
+
+
+    cardY =
+        y;
+
+
+    accessCard.style.left =
+        cardX + "%";
+
+
+    accessCard.style.top =
+        cardY + "%";
+
+
+    accessCard.style.transform =
+        "translate(-50%, -50%) rotate(0deg)";
+
+
+    checkCardReaderDistance();
+
+}}
+
+
+/* =====================================================
+   CHECK CARD READER
+   ===================================================== */
+
+function checkCardReaderDistance(){{
+
+    const readerX =
+        50;
+
+
+    const readerY =
+        55;
+
+
+    const dx =
+        cardX -
+        readerX;
+
+
+    const dy =
+        cardY -
+        readerY;
+
+
+    const distance =
+        Math.sqrt(
+            dx * dx +
+            dy * dy
+        );
+
+
+    if (
+        distance < 12
+    ){{
+
+        cardStatus.textContent =
+            "CARD READER // RELEASE TO SCAN";
+
+    }} else {{
+
+        cardStatus.textContent =
+            "CARD READY // DRAG TO READER";
+
+    }}
+
+}}
+
+
+/* =====================================================
+   COMPLETE CARD SCAN
+   ===================================================== */
+
+function completeCardScan(){{
+
+    const readerX =
+        50;
+
+
+    const readerY =
+        55;
+
+
+    const dx =
+        cardX -
+        readerX;
+
+
+    const dy =
+        cardY -
+        readerY;
+
+
+    const distance =
+        Math.sqrt(
+            dx * dx +
+            dy * dy
+        );
+
+
+    if (
+        distance >= 12
+    ){{
+
+        return false;
+
+    }}
+
+
+    accessCard.style.left =
+        "50%";
+
+
+    accessCard.style.top =
+        "55%";
+
+
+    accessCard.style.transform =
+        "translate(-50%, -50%) rotate(0deg)";
+
+
+    cardStatus.textContent =
+        "ACCESS KEY // VERIFIED";
+
+
+    setTimeout(
+        function(){{
+
+            cardOverlayOpen =
+                false;
+
+
+            cardOverlay.style.display =
+                "none";
+
+
+            exitCompleted =
+                true;
+
+
+            status.textContent =
+                "SECURITY ROOM // ACCESS GRANTED";
+
+
+            setChat(4);
+
+
+            focusGame();
+
+        }},
+        800
+    );
+
+
+    return true;
+
+}}
+
+
+/* =====================================================
+   CARD POINTER DOWN
+   ===================================================== */
+
+accessCard.addEventListener(
+    "pointerdown",
+    function(event){{
+
+        if (
+            !cardOverlayOpen
+        ){{
+
+            return;
+
+        }}
+
+
+        draggingCard =
+            true;
+
+
+        dragPointerId =
+            event.pointerId;
+
+
+        accessCard.setPointerCapture(
+            event.pointerId
+        );
+
+
+        event.preventDefault();
+
+    }}
+);
+
+
+/* =====================================================
+   CARD POINTER MOVE
+   ===================================================== */
+
+accessCard.addEventListener(
+    "pointermove",
+    function(event){{
+
+        if (
+            !draggingCard ||
+            event.pointerId !==
+            dragPointerId
+        ){{
+
+            return;
+
+        }}
+
+
+        updateCardFromPointer(
+            event
+        );
+
+
+        event.preventDefault();
+
+    }}
+);
+
+
+/* =====================================================
+   CARD POINTER UP
+   ===================================================== */
+
+accessCard.addEventListener(
+    "pointerup",
+    function(event){{
+
+        if (
+            !draggingCard
+        ){{
+
+            return;
+
+        }}
+
+
+        draggingCard =
+            false;
+
+
+        dragPointerId =
+            null;
+
+
+        completeCardScan();
+
+
+        event.preventDefault();
+
+    }}
+);
+
+
+/* =====================================================
+   CARD POINTER CANCEL
+   ===================================================== */
+
+accessCard.addEventListener(
+    "pointercancel",
+    function(event){{
+
+        draggingCard =
+            false;
+
+
+        dragPointerId =
+            null;
+
+
+        event.preventDefault();
+
+    }}
+);
+
+
+/* =====================================================
+   CARD CLOSE
+   ===================================================== */
+
+document
+    .getElementById(
+        "cardClose"
+    )
+    .addEventListener(
+        "click",
+        function(){{
+
+            closeCardScanner();
+
+        }}
+    );
+
+
+/* =====================================================
+   INTERACT
+   ===================================================== */
+
+function interact(){{
+
+    if (
+        paused ||
+        computerOpen ||
+        inventoryOpen ||
+        helpOpen ||
+        cardOverlayOpen
+    ){{
+
+        return;
+
+    }}
+
+
+    if (!nearbyObject){{
+
+        return;
+
+    }}
+
+
+    /* =================================================
+       STEP 0
+       ================================================= */
+
+    if (
+        tutorialStep === 0
+    ){{
+
+        inaccessible();
+
+        return;
+
+    }}
+
+
+    /* =================================================
+       STEP 1
+       COMPUTER
+       ================================================= */
+
+    if (
+        tutorialStep === 1
+    ){{
+
+        if (
+            nearbyObject.id !==
+            "computer"
+        ){{
+
+            inaccessible();
+
+            return;
+
+        }}
+
+
+        openComputer();
+
+        return;
+
+    }}
+
+
+    /* =================================================
+       STEP 2
+       COMPUTER
+       암호 입력이 완료되기 전에는
+       다른 과정으로 넘어갈 수 없음
+       ================================================= */
+
+    if (
+        tutorialStep === 2
+    ){{
+
+        if (
+            nearbyObject.id !==
+            "computer"
+        ){{
+
+            inaccessible();
+
+            return;
+
+        }}
+
+
+        openComputer();
+
+        return;
+
+    }}
+
+
+    /* =================================================
+       STEP 3
+       DESK
+       ================================================= */
+
+    if (
+        tutorialStep === 3
+    ){{
+
+        if (
+            nearbyObject.id !==
+            "desk"
+        ){{
+
+            inaccessible();
+
+            return;
+
+        }}
+
+
+        if (
+            !accessKeyCreated
+        ){{
+
+            inaccessible();
+
+            return;
+
+        }}
+
+
+        /*
+         * 책상에서 ACCESS KEY 획득
+         */
+
+        accessKeyCreated =
+            false;
+
+
+        accessKey.classList.remove(
+            "visible"
+        );
+
+
+        accessKeyCollected =
+            true;
+
+
+        inventory[0] = {{
+
+            name:
+                "ACCESS KEY",
+
+            description:
+                "ECHO TERMINAL에서 인증된 보안구역 접근 키입니다."
+
+        }};
+
+
+        renderInventory();
+
+
+        tutorialStep =
+            4;
+
+
+        setChat(4);
+
+
+        status.textContent =
+            "SYSTEM // ACCESS KEY ACQUIRED";
+
+
+        /*
+         * 카드키를 얻으면
+         * EXIT 구조 변경
+         */
+
+        unlockExit();
+
+
+        return;
+
+    }}
+
+
+    /* =================================================
+       STEP 4
+       EXIT
+       ================================================= */
+
+    if (
+        tutorialStep === 4
+    ){{
+
+        if (
+            nearbyObject.id !==
+            "exitDoor"
+        ){{
+
+            inaccessible();
+
+            return;
+
+        }}
+
+
+        if (
+            !accessKeyCollected
+        ){{
+
+            inaccessible();
+
+            return;
+
+        }}
+
+
+        openCardScanner();
+
+        return;
+
+    }}
+
+}}
+
+
+/* =====================================================
    FOCUS
    ===================================================== */
 
-function focusGame() {{
+function focusGame(){{
 
     try {{
 
@@ -3505,7 +5324,7 @@ function focusGame() {{
             }}
         );
 
-    }} catch (error) {{
+    }} catch (error){{
 
         gameRoot.focus();
 
@@ -3519,7 +5338,8 @@ gameRoot.addEventListener(
     function(){{
 
         if (
-            !computerOpen
+            !computerOpen &&
+            !cardOverlayOpen
         ){{
 
             focusGame();
@@ -3563,8 +5383,7 @@ document.addEventListener(
 
 
         /*
-         * 컴퓨터 입력창에 커서가 있을 때는
-         * 게임 조작 키를 가로채지 않는다.
+         * COMPUTER INPUT
          */
 
         if (
@@ -3588,9 +5407,27 @@ document.addEventListener(
         }}
 
 
-        /* =================================================
-           ESC
-           ================================================= */
+        /*
+         * SPACE
+         */
+
+        if (
+            event.code ===
+            "Space"
+        ){{
+
+            handleChatSpace();
+
+            event.preventDefault();
+
+            return;
+
+        }}
+
+
+        /*
+         * ESC
+         */
 
         if (
             key ===
@@ -3602,6 +5439,19 @@ document.addEventListener(
             ){{
 
                 closeComputer();
+
+                event.preventDefault();
+
+                return;
+
+            }}
+
+
+            if (
+                cardOverlayOpen
+            ){{
+
+                closeCardScanner();
 
                 event.preventDefault();
 
@@ -3638,9 +5488,9 @@ document.addEventListener(
         }}
 
 
-        /* =================================================
-           H
-           ================================================= */
+        /*
+         * H
+         */
 
         if (
             key ===
@@ -3648,7 +5498,8 @@ document.addEventListener(
         ){{
 
             if (
-                computerOpen
+                computerOpen ||
+                cardOverlayOpen
             ){{
 
                 return;
@@ -3676,9 +5527,9 @@ document.addEventListener(
         }}
 
 
-        /* =================================================
-           I
-           ================================================= */
+        /*
+         * I
+         */
 
         if (
             key ===
@@ -3687,7 +5538,8 @@ document.addEventListener(
 
             if (
                 computerOpen ||
-                helpOpen
+                helpOpen ||
+                cardOverlayOpen
             ){{
 
                 return;
@@ -3715,9 +5567,9 @@ document.addEventListener(
         }}
 
 
-        /* =================================================
-           E
-           ================================================= */
+        /*
+         * E
+         */
 
         if (
             key ===
@@ -3733,9 +5585,9 @@ document.addEventListener(
         }}
 
 
-        /* =================================================
-           WASD
-           ================================================= */
+        /*
+         * WASD
+         */
 
         if (
             key === "w" ||
@@ -3748,7 +5600,8 @@ document.addEventListener(
                 !paused &&
                 !helpOpen &&
                 !inventoryOpen &&
-                !computerOpen
+                !computerOpen &&
+                !cardOverlayOpen
             ){{
 
                 keys[key] =
@@ -3756,8 +5609,8 @@ document.addEventListener(
 
 
                 /*
-                 * 첫 번째 단계:
-                 * 이동을 시작하면 튜토리얼 진행
+                 * 최초 이동 시
+                 * 이동 안내 채팅을 보여준다.
                  */
 
                 if (
@@ -3769,9 +5622,12 @@ document.addEventListener(
                         1;
 
 
-                    setEchoMessage(
-                        tutorialMessages[1]
-                    );
+                    /*
+                     * 최초 채팅이 아직 진행 중이어도
+                     * 이동하면 다음 안내로 전환
+                     */
+
+                    setChat(1);
 
 
                     status.textContent =
@@ -3842,12 +5698,15 @@ document
 
                     event.preventDefault();
 
+                    event.stopPropagation();
+
 
                     if (
                         !paused &&
                         !helpOpen &&
                         !inventoryOpen &&
-                        !computerOpen
+                        !computerOpen &&
+                        !cardOverlayOpen
                     ){{
 
                         keys[direction] =
@@ -3863,9 +5722,7 @@ document
                                 1;
 
 
-                            setEchoMessage(
-                                tutorialMessages[1]
-                            );
+                            setChat(1);
 
 
                             status.textContent =
@@ -3882,6 +5739,8 @@ document
             function release(event){{
 
                 event.preventDefault();
+
+                event.stopPropagation();
 
                 keys[direction] =
                     false;
@@ -3906,12 +5765,23 @@ document
                 release
             );
 
+
+            button.addEventListener(
+                "lostpointercapture",
+                function(){{
+
+                    keys[direction] =
+                        false;
+
+                }}
+            );
+
         }}
     );
 
 
 /* =====================================================
-   MOVEMENT LOOP
+   MOVEMENT
    ===================================================== */
 
 function updatePlayer(){{
@@ -3920,14 +5790,23 @@ function updatePlayer(){{
         !paused &&
         !helpOpen &&
         !inventoryOpen &&
-        !computerOpen
+        !computerOpen &&
+        !cardOverlayOpen
     ){{
+
+        let nextX =
+            playerX;
+
+
+        let nextY =
+            playerY;
+
 
         if (
             keys.w
         ){{
 
-            playerY -=
+            nextY -=
                 moveSpeed;
 
         }}
@@ -3937,7 +5816,7 @@ function updatePlayer(){{
             keys.s
         ){{
 
-            playerY +=
+            nextY +=
                 moveSpeed;
 
         }}
@@ -3947,7 +5826,7 @@ function updatePlayer(){{
             keys.a
         ){{
 
-            playerX -=
+            nextX -=
                 moveSpeed;
 
         }}
@@ -3957,30 +5836,42 @@ function updatePlayer(){{
             keys.d
         ){{
 
-            playerX +=
+            nextX +=
                 moveSpeed;
 
         }}
 
 
-        playerX =
-            Math.max(
-                2,
-                Math.min(
-                    98,
-                    playerX
-                )
-            );
+        /*
+         * X / Y를 따로 검사하여
+         * 벽이나 물체에 대각선으로
+         * 끼이는 것을 줄인다.
+         */
+
+        if (
+            canMoveTo(
+                nextX,
+                playerY
+            )
+        ){{
+
+            playerX =
+                nextX;
+
+        }}
 
 
-        playerY =
-            Math.max(
-                2,
-                Math.min(
-                    98,
-                    playerY
-                )
-            );
+        if (
+            canMoveTo(
+                playerX,
+                nextY
+            )
+        ){{
+
+            playerY =
+                nextY;
+
+        }}
 
 
         player.style.left =
@@ -4004,7 +5895,7 @@ function updatePlayer(){{
 
 
 /* =====================================================
-   RESTART / TITLE
+   RESTART
    ===================================================== */
 
 document
@@ -4016,21 +5907,33 @@ document
         function(){{
 
             /*
-             * 기존 코드처럼
-             * window.parent.location.href를
-             * 읽어서 URL 객체를 만드는 방식을
-             * 사용하지 않는다.
+             * iframe 내부에서
+             * 부모 Streamlit 페이지로
+             * 직접 action을 전달한다.
              *
-             * 부모 Streamlit 페이지에
-             * action=restart를 전달한다.
+             * 기존처럼 부모 URL을 읽어서
+             * URL 객체를 만드는 방식은 사용하지 않는다.
              */
 
-            window.parent.location.href =
-                "?action=restart";
+            try {{
+
+                window.parent.location.href =
+                    "?action=restart";
+
+            }} catch (error) {{
+
+                window.top.location.href =
+                    "?action=restart";
+
+            }}
 
         }}
     );
 
+
+/* =====================================================
+   TITLE
+   ===================================================== */
 
 document
     .getElementById(
@@ -4040,8 +5943,17 @@ document
         "click",
         function(){{
 
-            window.parent.location.href =
-                "?action=title";
+            try {{
+
+                window.parent.location.href =
+                    "?action=title";
+
+            }} catch (error) {{
+
+                window.top.location.href =
+                    "?action=title";
+
+            }}
 
         }}
     );
@@ -4074,6 +5986,13 @@ player.style.top =
 
 
 /* =====================================================
+   INITIAL CARD
+   ===================================================== */
+
+resetCardPosition();
+
+
+/* =====================================================
    INITIAL INTERACTION
    ===================================================== */
 
@@ -4088,7 +6007,7 @@ focusGame();
 
 
 /* =====================================================
-   START MOVEMENT LOOP
+   START
    ===================================================== */
 
 requestAnimationFrame(
