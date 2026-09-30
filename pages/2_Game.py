@@ -1,5 +1,4 @@
 import base64
-import time
 from pathlib import Path
 
 import streamlit as st
@@ -20,29 +19,15 @@ st.set_page_config(
 # =========================================================
 # PAGE ACTION
 # =========================================================
-# SYSTEM FAILURE 화면에서
-# RESTART / TITLE을 눌렀을 때 처리
-#
-# components.html 내부의 JavaScript에서는
-# st.switch_page()를 직접 사용할 수 없기 때문에
-# query parameter를 이용하여 Python 쪽으로 전달한다.
-# =========================================================
 
 action = st.query_params.get("action")
 
 
 if action == "restart":
 
-    # NEW GAME과 동일한 초기화
+    # 게임 전체 초기화
 
     st.session_state.game_paused = False
-    st.session_state.game_finished = False
-
-    st.session_state.remaining_seconds = 15 * 60
-
-    st.session_state.timer_deadline = (
-        time.time() + 15 * 60
-    )
 
     st.query_params.clear()
 
@@ -51,7 +36,11 @@ if action == "restart":
 
 elif action == "title":
 
+    # query parameter 제거
+
     st.query_params.clear()
+
+    # 실제 타이틀 페이지 이동
 
     st.switch_page("main.py")
 
@@ -61,39 +50,8 @@ elif action == "title":
 # =========================================================
 
 if "game_paused" not in st.session_state:
+
     st.session_state.game_paused = False
-
-if "game_finished" not in st.session_state:
-    st.session_state.game_finished = False
-
-if "remaining_seconds" not in st.session_state:
-    st.session_state.remaining_seconds = 15 * 60
-
-if "timer_deadline" not in st.session_state:
-    st.session_state.timer_deadline = (
-        time.time() + 15 * 60
-    )
-
-
-# =========================================================
-# TIMER
-# =========================================================
-
-if not st.session_state.game_paused:
-
-    current_time = time.time()
-
-    st.session_state.remaining_seconds = max(
-        0,
-        int(
-            st.session_state.timer_deadline
-            - current_time
-        )
-    )
-
-    if st.session_state.remaining_seconds <= 0:
-
-        st.session_state.game_finished = True
 
 
 # =========================================================
@@ -101,6 +59,7 @@ if not st.session_state.game_paused:
 # =========================================================
 
 font_path = None
+
 
 for name in ["neodgm.ttf", "neodgm(2).ttf"]:
 
@@ -125,7 +84,7 @@ else:
 
 
 # =========================================================
-# PAUSE BUTTON CSS
+# STREAMLIT CSS
 # =========================================================
 
 st.markdown(
@@ -163,7 +122,8 @@ st.markdown(
 
     .stApp {{
 
-        background: #000000 !important;
+        background:
+            #000000 !important;
 
     }}
 
@@ -177,9 +137,9 @@ st.markdown(
     }}
 
 
-    /* =========================================
+    /* =====================================================
        PAUSE BUTTON
-       ========================================= */
+       ===================================================== */
 
     .st-key-pause_game_button {{
 
@@ -233,19 +193,6 @@ st.markdown(
 
         color: #000000 !important;
 
-        border: none !important;
-        outline: none !important;
-        box-shadow: none !important;
-
-    }}
-
-
-    .st-key-pause_game_button button:focus {{
-
-        border: none !important;
-        outline: none !important;
-        box-shadow: none !important;
-
     }}
 
 
@@ -293,57 +240,14 @@ pause_clicked = st.button(
 
 if pause_clicked:
 
-    current_time = time.time()
-
-    if not st.session_state.game_paused:
-
-        st.session_state.remaining_seconds = max(
-            0,
-            int(
-                st.session_state.timer_deadline
-                - current_time
-            )
-        )
-
-        st.session_state.game_paused = True
-
-    else:
-
-        st.session_state.timer_deadline = (
-            time.time()
-            + st.session_state.remaining_seconds
-        )
-
-        st.session_state.game_paused = False
+    st.session_state.game_paused = (
+        not st.session_state.game_paused
+    )
 
     st.rerun()
 
 
-# =========================================================
-# INITIAL VALUES
-# =========================================================
-
-remaining = (
-    st.session_state.remaining_seconds
-)
-
-paused = (
-    st.session_state.game_paused
-)
-
-finished = (
-    st.session_state.game_finished
-)
-
-
-minutes = remaining // 60
-
-seconds = remaining % 60
-
-
-timer_text = (
-    f"{minutes:02d}:{seconds:02d}"
-)
+paused = st.session_state.game_paused
 
 
 # =========================================================
@@ -378,13 +282,20 @@ html = f"""
 }}
 
 
+/* =====================================================
+   GLOBAL
+   ===================================================== */
+
 * {{
 
-    box-sizing: border-box;
+    box-sizing:
+        border-box;
 
-    user-select: none;
+    user-select:
+        none;
 
-    -webkit-user-select: none;
+    -webkit-user-select:
+        none;
 
 }}
 
@@ -400,7 +311,8 @@ body {{
 
     overflow: hidden;
 
-    background: #000000;
+    background:
+        #000000;
 
     font-family:
         'NeoDungGeunMo',
@@ -411,7 +323,8 @@ body {{
 
 body {{
 
-    color: #ffffff;
+    color:
+        #ffffff;
 
 }}
 
@@ -422,93 +335,106 @@ body {{
 
 .game {{
 
-    position: relative;
+    position:
+        relative;
 
-    width: 100vw;
-    height: 100vh;
+    width:
+        100vw;
 
-    background: #000000;
+    height:
+        100vh;
 
-    overflow: hidden;
+    background:
+        #000000;
 
-    outline: none;
+    overflow:
+        hidden;
+
+    outline:
+        none;
 
 }}
 
 
 /* =====================================================
-   TOP UI
+   TOP
    ===================================================== */
 
 .project-title {{
 
-    position: absolute;
+    position:
+        absolute;
 
-    top: 24px;
-    left: 28px;
+    top:
+        24px;
 
-    font-size: 18px;
+    left:
+        28px;
 
-    letter-spacing: 1px;
+    font-size:
+        18px;
 
-    z-index: 20;
+    letter-spacing:
+        1px;
+
+    z-index:
+        20;
 
 }}
 
 
 .stage-title {{
 
-    position: absolute;
+    position:
+        absolute;
 
-    top: 52px;
-    left: 28px;
+    top:
+        52px;
 
-    font-size: 13px;
+    left:
+        28px;
 
-    color: #777777;
+    font-size:
+        13px;
 
-    letter-spacing: 1px;
+    color:
+        #777777;
 
-    z-index: 20;
+    letter-spacing:
+        1px;
 
-}}
-
-
-.timer {{
-
-    position: absolute;
-
-    top: 24px;
-    left: 50%;
-
-    transform:
-        translateX(-50%);
-
-    font-size: 22px;
-
-    letter-spacing: 2px;
-
-    z-index: 20;
+    z-index:
+        20;
 
 }}
 
 
 /* =====================================================
-   GAME WORLD
+   GAME AREA
    ===================================================== */
 
 .game-area {{
 
-    position: absolute;
+    position:
+        absolute;
 
-    top: 90px;
-    left: 28px;
-    right: 28px;
-    bottom: 70px;
+    top:
+        90px;
 
-    overflow: hidden;
+    left:
+        28px;
 
-    background-color: #080808;
+    right:
+        28px;
+
+    bottom:
+        70px;
+
+    overflow:
+        hidden;
+
+    background-color:
+        #080808;
 
     background-image:
 
@@ -523,48 +449,63 @@ body {{
             transparent 1px
         );
 
-    background-size: 40px 40px;
+    background-size:
+        40px 40px;
 
 }}
 
 
 /* =====================================================
-   ROOM BOUNDARY
+   ROOM
    ===================================================== */
 
 .room {{
 
-    position: absolute;
+    position:
+        absolute;
 
-    left: 7%;
-    top: 8%;
+    left:
+        7%;
 
-    width: 86%;
-    height: 82%;
+    top:
+        8%;
+
+    width:
+        86%;
+
+    height:
+        82%;
 
     border:
         1px solid
         rgba(255,255,255,0.12);
 
-    overflow: hidden;
+    overflow:
+        hidden;
 
 }}
 
 
 /* =====================================================
-   ROOM DETAILS
+   ROOM LINES
    ===================================================== */
 
 .room-line-horizontal {{
 
-    position: absolute;
+    position:
+        absolute;
 
-    left: 0;
-    right: 0;
+    left:
+        0;
 
-    top: 50%;
+    right:
+        0;
 
-    height: 1px;
+    top:
+        50%;
+
+    height:
+        1px;
 
     background:
         rgba(255,255,255,0.045);
@@ -574,14 +515,20 @@ body {{
 
 .room-line-vertical {{
 
-    position: absolute;
+    position:
+        absolute;
 
-    top: 0;
-    bottom: 0;
+    top:
+        0;
 
-    left: 50%;
+    bottom:
+        0;
 
-    width: 1px;
+    left:
+        50%;
+
+    width:
+        1px;
 
     background:
         rgba(255,255,255,0.045);
@@ -590,104 +537,210 @@ body {{
 
 
 /* =====================================================
-   CONTROL ROOM OBJECTS
+   OBJECT
    ===================================================== */
 
 .object {{
 
-    position: absolute;
+    position:
+        absolute;
 
-    display: flex;
+    display:
+        flex;
 
-    align-items: center;
-    justify-content: center;
+    align-items:
+        center;
 
-    background: #0b0b0b;
+    justify-content:
+        center;
+
+    background:
+        #0b0b0b;
 
     border:
         1px solid
         rgba(255,255,255,0.22);
 
-    color: #777777;
+    color:
+        #777777;
 
-    font-size: 12px;
+    font-size:
+        12px;
 
-    text-align: center;
-
-}}
-
-
-.monitor {{
-
-    left: 43%;
-    top: 13%;
-
-    width: 14%;
-    height: 12%;
-
-}}
-
-
-.desk {{
-
-    left: 35%;
-    top: 62%;
-
-    width: 30%;
-    height: 12%;
-
-}}
-
-
-.terminal {{
-
-    left: 18%;
-    top: 35%;
-
-    width: 14%;
-    height: 17%;
-
-}}
-
-
-.exit-door {{
-
-    right: 0;
-
-    top: 35%;
-
-    width: 8%;
-    height: 30%;
-
-    background: #111111;
-
-    writing-mode:
-        vertical-rl;
-
-    letter-spacing: 2px;
+    text-align:
+        center;
 
 }}
 
 
 /* =====================================================
-   OBJECT LABEL
+   COMPUTER
+   ===================================================== */
+
+.computer {{
+
+    left:
+        42%;
+
+    top:
+        13%;
+
+    width:
+        16%;
+
+    height:
+        14%;
+
+}}
+
+
+/* =====================================================
+   DESK
+   ===================================================== */
+
+.desk {{
+
+    left:
+        35%;
+
+    top:
+        62%;
+
+    width:
+        30%;
+
+    height:
+        12%;
+
+}}
+
+
+/* =====================================================
+   EXIT
+   ===================================================== */
+
+.exit-door {{
+
+    right:
+        0;
+
+    top:
+        35%;
+
+    width:
+        8%;
+
+    height:
+        30%;
+
+    background:
+        #111111;
+
+    writing-mode:
+        vertical-rl;
+
+    letter-spacing:
+        2px;
+
+}}
+
+
+/* =====================================================
+   LABEL
    ===================================================== */
 
 .object-label {{
 
-    position: absolute;
+    position:
+        absolute;
 
-    bottom: -22px;
-    left: 50%;
+    bottom:
+        -22px;
+
+    left:
+        50%;
 
     transform:
         translateX(-50%);
 
-    white-space: nowrap;
+    white-space:
+        nowrap;
 
-    font-size: 10px;
+    font-size:
+        10px;
 
-    color: #555555;
+    color:
+        #555555;
+
+}}
+
+
+/* =====================================================
+   ACCESS KEY
+   ===================================================== */
+
+.access-key {{
+
+    position:
+        absolute;
+
+    width:
+        18px;
+
+    height:
+        8px;
+
+    left:
+        50%;
+
+    top:
+        45%;
+
+    transform:
+        translate(-50%, -50%);
+
+    background:
+        #ffffff;
+
+    box-shadow:
+        0 0 0 1px #000000;
+
+    display:
+        none;
+
+}}
+
+
+.access-key::after {{
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    right:
+        -7px;
+
+    top:
+        2px;
+
+    width:
+        7px;
+
+    height:
+        4px;
+
+    background:
+        #ffffff;
+
+}}
+
+
+.access-key.visible {{
+
+    display:
+        block;
 
 }}
 
@@ -698,20 +751,29 @@ body {{
 
 .player {{
 
-    position: absolute;
+    position:
+        absolute;
 
-    width: 24px;
-    height: 24px;
+    width:
+        24px;
 
-    left: 50%;
-    top: 43%;
+    height:
+        24px;
+
+    left:
+        50%;
+
+    top:
+        43%;
 
     transform:
         translate(-50%, -50%);
 
-    background: #ffffff;
+    background:
+        #ffffff;
 
-    z-index: 15;
+    z-index:
+        15;
 
     box-shadow:
         0 0 0 1px #000000;
@@ -721,16 +783,23 @@ body {{
 
 .player::after {{
 
-    content: "";
+    content:
+        "";
 
-    position: absolute;
+    position:
+        absolute;
 
-    left: 4px;
-    right: 4px;
+    left:
+        4px;
 
-    bottom: -5px;
+    right:
+        4px;
 
-    height: 4px;
+    bottom:
+        -5px;
+
+    height:
+        4px;
 
     background:
         rgba(255,255,255,0.15);
@@ -744,77 +813,199 @@ body {{
 
 .interaction-message {{
 
-    position: absolute;
+    position:
+        absolute;
 
-    left: 50%;
-    bottom: 5%;
+    left:
+        50%;
+
+    bottom:
+        19%;
 
     transform:
         translateX(-50%);
 
-    padding: 10px 18px;
+    padding:
+        9px 16px;
 
-    background: #000000;
+    background:
+        #000000;
 
-    font-size: 13px;
+    border:
+        1px solid #333333;
 
-    color: #ffffff;
+    font-size:
+        12px;
 
-    opacity: 0;
+    color:
+        #ffffff;
 
-    pointer-events: none;
+    opacity:
+        0;
+
+    pointer-events:
+        none;
 
     transition:
         opacity 0.1s linear;
 
-    z-index: 30;
+    z-index:
+        40;
+
+    white-space:
+        nowrap;
 
 }}
 
 
 .interaction-message.visible {{
 
-    opacity: 1;
+    opacity:
+        1;
 
 }}
 
 
 /* =====================================================
-   BOTTOM STATUS
+   ECHO CHAT
+   ===================================================== */
+
+.echo-bar {{
+
+    position:
+        absolute;
+
+    left:
+        50%;
+
+    bottom:
+        3%;
+
+    transform:
+        translateX(-50%);
+
+    width:
+        min(760px, 82%);
+
+    min-height:
+        74px;
+
+    padding:
+        13px 18px;
+
+    background:
+        #050505;
+
+    border:
+        1px solid #3a3a3a;
+
+    z-index:
+        35;
+
+}}
+
+
+.echo-name {{
+
+    font-size:
+        11px;
+
+    color:
+        #ffffff;
+
+    letter-spacing:
+        1px;
+
+    margin-bottom:
+        8px;
+
+}}
+
+
+.echo-message {{
+
+    font-size:
+        12px;
+
+    color:
+        #999999;
+
+    line-height:
+        1.7;
+
+}}
+
+
+.echo-next {{
+
+    position:
+        absolute;
+
+    right:
+        12px;
+
+    bottom:
+        8px;
+
+    font-size:
+        9px;
+
+    color:
+        #555555;
+
+}}
+
+
+/* =====================================================
+   STATUS
    ===================================================== */
 
 .status {{
 
-    position: absolute;
+    position:
+        absolute;
 
-    bottom: 24px;
-    left: 28px;
+    bottom:
+        24px;
 
-    font-size: 14px;
+    left:
+        28px;
 
-    color: #777777;
+    font-size:
+        14px;
 
-    z-index: 20;
+    color:
+        #777777;
+
+    z-index:
+        20;
 
 }}
 
 
 /* =====================================================
-   OVERLAY COMMON
+   COMMON OVERLAY
    ===================================================== */
 
 .overlay {{
 
-    position: absolute;
+    position:
+        absolute;
 
-    inset: 0;
+    inset:
+        0;
 
-    z-index: 100;
+    z-index:
+        100;
 
-    display: flex;
+    display:
+        flex;
 
-    align-items: center;
-    justify-content: center;
+    align-items:
+        center;
+
+    justify-content:
+        center;
 
     background:
         rgba(0,0,0,0.90);
@@ -831,25 +1022,31 @@ body {{
     width:
         min(820px, 88vw);
 
-    background: #050505;
+    background:
+        #050505;
 
-    padding: 34px 38px;
+    padding:
+        34px 38px;
 
 }}
 
 
 .inventory-header {{
 
-    display: flex;
+    display:
+        flex;
 
     justify-content:
         space-between;
 
-    align-items: center;
+    align-items:
+        center;
 
-    padding-bottom: 18px;
+    padding-bottom:
+        18px;
 
-    margin-bottom: 22px;
+    margin-bottom:
+        22px;
 
     border-bottom:
         1px solid #333333;
@@ -859,133 +1056,151 @@ body {{
 
 .inventory-title {{
 
-    font-size: 24px;
-
-    letter-spacing: 1px;
+    font-size:
+        24px;
 
 }}
 
 
 .inventory-close {{
 
-    font-size: 12px;
+    font-size:
+        12px;
 
-    color: #666666;
+    color:
+        #666666;
 
 }}
 
 
 .inventory-grid {{
 
-    display: grid;
+    display:
+        grid;
 
     grid-template-columns:
         repeat(4, 1fr);
 
-    gap: 10px;
+    gap:
+        10px;
 
 }}
 
 
 .inventory-slot {{
 
-    position: relative;
+    position:
+        relative;
 
-    aspect-ratio: 1 / 1;
+    aspect-ratio:
+        1 / 1;
 
-    background: #090909;
+    background:
+        #090909;
 
     border:
         1px solid #292929;
 
-    display: flex;
+    display:
+        flex;
 
-    align-items: center;
-    justify-content: center;
+    align-items:
+        center;
 
-    cursor: pointer;
+    justify-content:
+        center;
 
-    transition:
-        background 0.1s linear,
-        color 0.1s linear;
-
-}}
-
-
-.inventory-slot:hover {{
-
-    background: #ffffff;
-
-    color: #000000;
+    cursor:
+        pointer;
 
 }}
 
 
+.inventory-slot:hover,
 .inventory-slot.selected {{
 
-    background: #ffffff;
+    background:
+        #ffffff;
 
-    color: #000000;
+    color:
+        #000000;
 
 }}
 
 
 .slot-number {{
 
-    position: absolute;
+    position:
+        absolute;
 
-    top: 7px;
-    left: 9px;
+    top:
+        7px;
 
-    font-size: 10px;
+    left:
+        9px;
 
-    color: #555555;
+    font-size:
+        10px;
+
+    color:
+        #555555;
 
 }}
 
 
 .item-name {{
 
-    font-size: 13px;
+    font-size:
+        13px;
 
-    text-align: center;
+    text-align:
+        center;
 
 }}
 
 
 .empty-text {{
 
-    color: #444444;
+    color:
+        #444444;
 
-    font-size: 11px;
+    font-size:
+        11px;
 
 }}
 
 
 .item-description {{
 
-    min-height: 70px;
+    min-height:
+        70px;
 
-    margin-top: 20px;
+    margin-top:
+        20px;
 
-    padding: 15px;
+    padding:
+        15px;
 
-    background: #090909;
+    background:
+        #090909;
 
     border-top:
         1px solid #292929;
 
-    font-size: 12px;
+    font-size:
+        12px;
 
-    line-height: 1.8;
+    line-height:
+        1.8;
 
-    color: #888888;
+    color:
+        #888888;
 
 }}
 
 
 /* =====================================================
-   HOW TO PLAY
+   HELP
    ===================================================== */
 
 .help-panel {{
@@ -993,27 +1208,34 @@ body {{
     width:
         min(760px, 86vw);
 
-    max-height: 82vh;
+    max-height:
+        82vh;
 
-    overflow-y: auto;
+    overflow-y:
+        auto;
 
-    background: #050505;
+    background:
+        #050505;
 
-    padding: 36px 40px;
+    padding:
+        36px 40px;
 
 }}
 
 
 .help-header {{
 
-    display: flex;
+    display:
+        flex;
 
     justify-content:
         space-between;
 
-    padding-bottom: 18px;
+    padding-bottom:
+        18px;
 
-    margin-bottom: 20px;
+    margin-bottom:
+        20px;
 
     border-bottom:
         1px solid #333333;
@@ -1023,27 +1245,33 @@ body {{
 
 .help-title {{
 
-    font-size: 24px;
+    font-size:
+        24px;
 
 }}
 
 
 .help-close {{
 
-    font-size: 12px;
+    font-size:
+        12px;
 
-    color: #666666;
+    color:
+        #666666;
 
 }}
 
 
 .help-row {{
 
-    display: flex;
+    display:
+        flex;
 
-    gap: 20px;
+    gap:
+        20px;
 
-    padding: 14px 0;
+    padding:
+        14px 0;
 
     border-bottom:
         1px solid #1f1f1f;
@@ -1053,63 +1281,210 @@ body {{
 
 .help-number {{
 
-    width: 30px;
+    width:
+        30px;
 
-    color: #555555;
+    color:
+        #555555;
 
 }}
 
 
 .help-key {{
 
-    width: 145px;
+    width:
+        145px;
 
-    font-size: 14px;
+    font-size:
+        14px;
 
 }}
 
 
 .help-description {{
 
-    color: #888888;
+    color:
+        #888888;
 
-    font-size: 12px;
+    font-size:
+        12px;
 
-    line-height: 1.7;
-
-}}
-
-
-.help-important {{
-
-    margin-top: 22px;
-
-    padding: 16px;
-
-    background: #090909;
-
-    border-left:
-        2px solid #ffffff;
+    line-height:
+        1.7;
 
 }}
 
 
-.help-important-title {{
+/* =====================================================
+   COMPUTER
+   ===================================================== */
 
-    margin-bottom: 8px;
+.computer-overlay {{
 
-    font-size: 13px;
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    z-index:
+        120;
+
+    display:
+        none;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    background:
+        rgba(0,0,0,0.94);
 
 }}
 
 
-.help-important-text {{
+.computer-panel {{
 
-    color: #888888;
+    width:
+        min(520px, 86vw);
 
-    font-size: 11px;
+    background:
+        #050505;
 
-    line-height: 1.8;
+    border:
+        1px solid #333333;
+
+    padding:
+        28px;
+
+}}
+
+
+.computer-title {{
+
+    font-size:
+        20px;
+
+    margin-bottom:
+        8px;
+
+}}
+
+
+.computer-sub {{
+
+    color:
+        #666666;
+
+    font-size:
+        11px;
+
+    margin-bottom:
+        24px;
+
+}}
+
+
+.code-input {{
+
+    width:
+        100%;
+
+    height:
+        48px;
+
+    border:
+        1px solid #444444;
+
+    background:
+        #000000;
+
+    color:
+        #ffffff;
+
+    font-family:
+        'NeoDungGeunMo',
+        monospace;
+
+    font-size:
+        22px;
+
+    text-align:
+        center;
+
+    letter-spacing:
+        6px;
+
+    outline:
+        none;
+
+}}
+
+
+.code-input:focus {{
+
+    border-color:
+        #ffffff;
+
+}}
+
+
+.code-button {{
+
+    width:
+        100%;
+
+    height:
+        44px;
+
+    margin-top:
+        10px;
+
+    border:
+        none;
+
+    background:
+        #ffffff;
+
+    color:
+        #000000;
+
+    font-family:
+        'NeoDungGeunMo',
+        monospace;
+
+    cursor:
+        pointer;
+
+}}
+
+
+.code-button:hover {{
+
+    background:
+        #bbbbbb;
+
+}}
+
+
+.code-error {{
+
+    min-height:
+        20px;
+
+    margin-top:
+        12px;
+
+    color:
+        #777777;
+
+    font-size:
+        11px;
+
+    text-align:
+        center;
 
 }}
 
@@ -1120,16 +1495,23 @@ body {{
 
 .pause-overlay {{
 
-    position: absolute;
+    position:
+        absolute;
 
-    inset: 0;
+    inset:
+        0;
 
-    z-index: 90;
+    z-index:
+        90;
 
-    display: flex;
+    display:
+        none;
 
-    align-items: center;
-    justify-content: center;
+    align-items:
+        center;
+
+    justify-content:
+        center;
 
     background:
         rgba(0,0,0,0.90);
@@ -1139,184 +1521,75 @@ body {{
 
 .pause-title {{
 
-    font-size: 28px;
+    font-size:
+        28px;
 
-    text-align: center;
+    text-align:
+        center;
 
-    margin-bottom: 14px;
+    margin-bottom:
+        14px;
 
 }}
 
 
 .pause-sub {{
 
-    color: #777777;
+    color:
+        #777777;
 
-    font-size: 13px;
+    font-size:
+        13px;
 
-    text-align: center;
-
-}}
-
-
-/* =====================================================
-   SYSTEM FAILURE
-   ===================================================== */
-
-.time-over {{
-
-    position: absolute;
-
-    inset: 0;
-
-    z-index: 200;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    background: #000000;
-
-}}
-
-
-.time-over-content {{
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-
-    justify-content: center;
-
-    text-align: center;
-
-}}
-
-
-.time-over-title {{
-
-    font-size: 30px;
-
-    margin-bottom: 16px;
-
-}}
-
-
-.time-over-text {{
-
-    color: #777777;
-
-    font-size: 13px;
-
-    line-height: 1.8;
-
-    margin-bottom: 30px;
+    text-align:
+        center;
 
 }}
 
 
 /* =====================================================
-   SYSTEM FAILURE BUTTONS
-   ===================================================== */
-
-.time-over-buttons {{
-
-    display: flex;
-
-    flex-direction: column;
-
-    align-items: center;
-
-    gap: 8px;
-
-}}
-
-
-.time-over-button {{
-
-    width: 170px;
-
-    height: 44px;
-
-    padding: 0;
-
-    margin: 0;
-
-    border: none;
-
-    outline: none;
-
-    box-shadow: none;
-
-    border-radius: 0;
-
-    background: #000000;
-
-    color: #ffffff;
-
-    font-family:
-        'NeoDungGeunMo',
-        monospace;
-
-    font-size: 15px;
-
-    cursor: pointer;
-
-}}
-
-
-.time-over-button:hover {{
-
-    background: #ffffff;
-
-    color: #000000;
-
-}}
-
-
-.time-over-button:focus {{
-
-    border: none;
-
-    outline: none;
-
-    box-shadow: none;
-
-}}
-
-
-/* =====================================================
-   MOBILE DIRECTION PAD
+   MOBILE CONTROLS
    ===================================================== */
 
 .mobile-controls {{
 
-    display: none;
+    display:
+        none;
 
-    position: absolute;
+    position:
+        absolute;
 
-    right: 22px;
-    bottom: 22px;
+    right:
+        22px;
 
-    width: 132px;
-    height: 132px;
+    bottom:
+        22px;
 
-    z-index: 150;
+    width:
+        132px;
+
+    height:
+        132px;
+
+    z-index:
+        150;
 
 }}
 
 
 .control-button {{
 
-    position: absolute;
+    position:
+        absolute;
 
-    width: 42px;
-    height: 42px;
+    width:
+        42px;
 
-    padding: 0;
+    height:
+        42px;
+
+    padding:
+        0;
 
     border:
         1px solid #555555;
@@ -1324,64 +1597,82 @@ body {{
     background:
         rgba(0,0,0,0.88);
 
-    color: #ffffff;
+    color:
+        #ffffff;
 
     font-family:
         'NeoDungGeunMo',
         monospace;
 
-    font-size: 20px;
+    font-size:
+        20px;
 
-    display: flex;
+    display:
+        flex;
 
-    align-items: center;
-    justify-content: center;
+    align-items:
+        center;
 
-    touch-action: none;
+    justify-content:
+        center;
 
-    -webkit-user-select: none;
-    user-select: none;
+    touch-action:
+        none;
 
 }}
 
 
 .control-button:active {{
 
-    background: #ffffff;
+    background:
+        #ffffff;
 
-    color: #000000;
+    color:
+        #000000;
 
 }}
 
 
 .control-up {{
 
-    top: 0;
-    left: 45px;
+    top:
+        0;
+
+    left:
+        45px;
 
 }}
 
 
 .control-left {{
 
-    top: 45px;
-    left: 0;
+    top:
+        45px;
+
+    left:
+        0;
 
 }}
 
 
 .control-right {{
 
-    top: 45px;
-    right: 0;
+    top:
+        45px;
+
+    right:
+        0;
 
 }}
 
 
 .control-down {{
 
-    bottom: 0;
-    left: 45px;
+    bottom:
+        0;
+
+    left:
+        45px;
 
 }}
 
@@ -1394,54 +1685,73 @@ body {{
 
     .project-title {{
 
-        top: 18px;
-        left: 16px;
+        top:
+            18px;
 
-        font-size: 14px;
+        left:
+            16px;
+
+        font-size:
+            14px;
 
     }}
 
 
     .stage-title {{
 
-        top: 40px;
-        left: 16px;
+        top:
+            40px;
 
-        font-size: 11px;
+        left:
+            16px;
 
-    }}
-
-
-    .timer {{
-
-        top: 18px;
-
-        font-size: 17px;
+        font-size:
+            11px;
 
     }}
 
 
     .game-area {{
 
-        top: 68px;
+        top:
+            68px;
 
-        left: 16px;
-        right: 16px;
+        left:
+            16px;
 
-        bottom: 58px;
+        right:
+            16px;
 
-        background-size: 30px 30px;
+        bottom:
+            58px;
+
+        background-size:
+            30px 30px;
 
     }}
 
 
     .status {{
 
-        left: 16px;
+        left:
+            16px;
 
-        bottom: 18px;
+        bottom:
+            18px;
 
-        font-size: 11px;
+        font-size:
+            11px;
+
+    }}
+
+
+    .echo-bar {{
+
+        width:
+            90%;
+
+        bottom:
+            2%;
 
     }}
 
@@ -1449,78 +1759,62 @@ body {{
     .inventory-panel,
     .help-panel {{
 
-        width: 90vw;
+        width:
+            90vw;
 
-        padding: 24px 20px;
+        padding:
+            24px 20px;
 
     }}
 
 
     .inventory-grid {{
 
-        gap: 6px;
+        gap:
+            6px;
 
     }}
 
 
     .item-name {{
 
-        font-size: 10px;
+        font-size:
+            10px;
 
     }}
 
 
     .help-row {{
 
-        gap: 10px;
+        gap:
+            10px;
 
     }}
 
 
     .help-key {{
 
-        width: 90px;
+        width:
+            90px;
 
-        font-size: 11px;
+        font-size:
+            11px;
 
     }}
 
 
     .help-description {{
 
-        font-size: 10px;
+        font-size:
+            10px;
 
     }}
 
 
     .mobile-controls {{
 
-        display: block;
-
-    }}
-
-
-    .time-over-title {{
-
-        font-size: 25px;
-
-    }}
-
-
-    .time-over-text {{
-
-        font-size: 11px;
-
-    }}
-
-
-    .time-over-button {{
-
-        width: 150px;
-
-        height: 42px;
-
-        font-size: 13px;
+        display:
+            block;
 
     }}
 
@@ -1538,7 +1832,6 @@ body {{
     class="game"
     id="gameRoot"
     tabindex="0"
-    autofocus
 >
 
 
@@ -1553,11 +1846,6 @@ body {{
 
     <div class="stage-title">
         STAGE 01 // CONTROL ROOM
-    </div>
-
-
-    <div class="timer" id="timer">
-        {timer_text}
     </div>
 
 
@@ -1614,12 +1902,12 @@ body {{
         </div>
 
 
+        <!-- =================================================
+             ROOM
+             ================================================= -->
+
         <div class="room">
 
-
-            <!-- =================================================
-                 ROOM DETAILS
-                 ================================================= -->
 
             <div class="room-line-horizontal"></div>
 
@@ -1627,22 +1915,26 @@ body {{
 
 
             <!-- =================================================
-                 OBJECTS
+                 COMPUTER
                  ================================================= -->
 
             <div
-                class="object monitor"
-                id="monitor"
+                class="object computer"
+                id="computer"
             >
 
-                MONITOR
+                COMPUTER
 
                 <div class="object-label">
-                    CENTRAL MONITOR
+                    ECHO TERMINAL
                 </div>
 
             </div>
 
+
+            <!-- =================================================
+                 DESK
+                 ================================================= -->
 
             <div
                 class="object desk"
@@ -1655,22 +1947,18 @@ body {{
                     RESEARCH DESK
                 </div>
 
-            </div>
 
-
-            <div
-                class="object terminal"
-                id="terminal"
-            >
-
-                TERMINAL
-
-                <div class="object-label">
-                    SECURITY TERMINAL
-                </div>
+                <div
+                    class="access-key"
+                    id="accessKey"
+                ></div>
 
             </div>
 
+
+            <!-- =================================================
+                 EXIT
+                 ================================================= -->
 
             <div
                 class="object exit-door"
@@ -1697,7 +1985,7 @@ body {{
 
 
             <!-- =================================================
-                 INTERACTION MESSAGE
+                 INTERACTION
                  ================================================= -->
 
             <div
@@ -1708,11 +1996,38 @@ body {{
             </div>
 
 
+            <!-- =================================================
+                 ECHO CHAT
+                 ================================================= -->
+
+            <div
+                class="echo-bar"
+                id="echoBar"
+            >
+
+                <div class="echo-name">
+                    ECHO // AI SYSTEM
+                </div>
+
+
+                <div
+                    class="echo-message"
+                    id="echoMessage"
+                ></div>
+
+
+                <div class="echo-next">
+                    E // NEXT
+                </div>
+
+            </div>
+
+
         </div>
 
 
         <!-- =================================================
-             INVENTORY OVERLAY
+             INVENTORY
              ================================================= -->
 
         <div
@@ -1743,135 +2058,49 @@ body {{
                     <div
                         class="inventory-slot"
                         data-slot="0"
-                    >
-
-                        <div class="slot-number">
-                            01
-                        </div>
-
-                        <div
-                            class="empty-text"
-                            id="slot0"
-                        >
-                            EMPTY
-                        </div>
-
-                    </div>
+                    ></div>
 
 
                     <div
                         class="inventory-slot"
                         data-slot="1"
-                    >
-
-                        <div class="slot-number">
-                            02
-                        </div>
-
-                        <div
-                            class="empty-text"
-                            id="slot1"
-                        >
-                            EMPTY
-                        </div>
-
-                    </div>
+                    ></div>
 
 
                     <div
                         class="inventory-slot"
                         data-slot="2"
-                    >
-
-                        <div class="slot-number">
-                            03
-                        </div>
-
-                        <div class="empty-text">
-                            EMPTY
-                        </div>
-
-                    </div>
+                    ></div>
 
 
                     <div
                         class="inventory-slot"
                         data-slot="3"
-                    >
-
-                        <div class="slot-number">
-                            04
-                        </div>
-
-                        <div class="empty-text">
-                            EMPTY
-                        </div>
-
-                    </div>
+                    ></div>
 
 
                     <div
                         class="inventory-slot"
                         data-slot="4"
-                    >
-
-                        <div class="slot-number">
-                            05
-                        </div>
-
-                        <div class="empty-text">
-                            EMPTY
-                        </div>
-
-                    </div>
+                    ></div>
 
 
                     <div
                         class="inventory-slot"
                         data-slot="5"
-                    >
-
-                        <div class="slot-number">
-                            06
-                        </div>
-
-                        <div class="empty-text">
-                            EMPTY
-                        </div>
-
-                    </div>
+                    ></div>
 
 
                     <div
                         class="inventory-slot"
                         data-slot="6"
-                    >
-
-                        <div class="slot-number">
-                            07
-                        </div>
-
-                        <div class="empty-text">
-                            EMPTY
-                        </div>
-
-                    </div>
+                    ></div>
 
 
                     <div
                         class="inventory-slot"
                         data-slot="7"
-                    >
-
-                        <div class="slot-number">
-                            08
-                        </div>
-
-                        <div class="empty-text">
-                            EMPTY
-                        </div>
-
-                    </div>
+                    ></div>
 
 
                 </div>
@@ -1883,6 +2112,7 @@ body {{
                 >
 
                     ITEM DESCRIPTION
+
                     <br><br>
 
                     아이템을 선택하면 설명이 표시됩니다.
@@ -1896,7 +2126,7 @@ body {{
 
 
         <!-- =================================================
-             HOW TO PLAY
+             HELP
              ================================================= -->
 
         <div
@@ -2012,13 +2242,32 @@ body {{
                 </div>
 
 
-                <div class="help-important">
+                <div
+                    style="
+                    margin-top:22px;
+                    padding:16px;
+                    background:#090909;
+                    border-left:2px solid #ffffff;
+                    "
+                >
 
-                    <div class="help-important-title">
+                    <div
+                        style="
+                        margin-bottom:8px;
+                        font-size:13px;
+                        "
+                    >
                         IMPORTANT
                     </div>
 
-                    <div class="help-important-text">
+
+                    <div
+                        style="
+                        color:#888888;
+                        font-size:11px;
+                        line-height:1.8;
+                        "
+                    >
 
                         시설 내부의 물체와 기록을
                         자세히 조사하세요.<br>
@@ -2039,13 +2288,65 @@ body {{
 
 
         <!-- =================================================
+             COMPUTER
+             ================================================= -->
+
+        <div
+            class="computer-overlay"
+            id="computerOverlay"
+        >
+
+            <div class="computer-panel">
+
+
+                <div class="computer-title">
+                    ECHO TERMINAL
+                </div>
+
+
+                <div class="computer-sub">
+                    ENTER THE ACCESS SEQUENCE PROVIDED BY ECHO.
+                </div>
+
+
+                <input
+                    class="code-input"
+                    id="codeInput"
+                    type="text"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    maxlength="4"
+                    aria-label="Access code"
+                >
+
+
+                <button
+                    class="code-button"
+                    id="codeButton"
+                    type="button"
+                >
+                    EXECUTE
+                </button>
+
+
+                <div
+                    class="code-error"
+                    id="codeError"
+                ></div>
+
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
              PAUSE
              ================================================= -->
 
         <div
             class="pause-overlay"
             id="pauseOverlay"
-            style="display:none;"
         >
 
             <div>
@@ -2058,61 +2359,42 @@ body {{
                     PRESS ▶ TO CONTINUE
                 </div>
 
-            </div>
 
-        </div>
-
-
-        <!-- =================================================
-             SYSTEM FAILURE
-             ================================================= -->
-
-        <div
-            class="time-over"
-            id="timeOver"
-            style="display:none;"
-        >
-
-            <div class="time-over-content">
-
-
-                <div class="time-over-title">
-                    SYSTEM FAILURE
-                </div>
-
-
-                <div class="time-over-text">
-
-                    FACILITY RESET INITIATED
-                    <br>
-                    CONNECTION TO ECHO LOST
-
-                </div>
-
-
-                <div class="time-over-buttons">
-
+                <div
+                    style="
+                    margin-top:24px;
+                    display:flex;
+                    flex-direction:column;
+                    gap:8px;
+                    align-items:center;
+                    "
+                >
 
                     <button
-                        class="time-over-button"
+                        class="code-button"
                         id="restartButton"
                         type="button"
+                        style="width:170px;"
                     >
                         RESTART
                     </button>
 
 
                     <button
-                        class="time-over-button"
+                        class="code-button"
                         id="titleButton"
                         type="button"
+                        style="
+                        width:170px;
+                        background:#000;
+                        color:#fff;
+                        border:1px solid #333;
+                        "
                     >
                         TITLE
                     </button>
 
-
                 </div>
-
 
             </div>
 
@@ -2144,19 +2426,44 @@ body {{
    GAME STATE
    ===================================================== */
 
-let remaining = {remaining};
+let paused =
+    {str(paused).lower()};
 
-let paused = {str(paused).lower()};
 
-let finished = {str(finished).lower()};
+let tutorialStep =
+    0;
 
-let helpOpen = false;
 
-let inventoryOpen = false;
+let inventoryOpen =
+    false;
+
+
+let helpOpen =
+    false;
+
+
+let computerOpen =
+    false;
+
+
+let accessKeyCreated =
+    false;
+
+
+let accessKeyCollected =
+    false;
 
 
 /* =====================================================
-   GAME ROOT
+   ACCESS CODE
+   ===================================================== */
+
+const ACCESS_CODE =
+    "4817";
+
+
+/* =====================================================
+   ELEMENTS
    ===================================================== */
 
 const gameRoot =
@@ -2164,10 +2471,6 @@ const gameRoot =
         "gameRoot"
     );
 
-
-/* =====================================================
-   PLAYER
-   ===================================================== */
 
 const player =
     document.getElementById(
@@ -2181,12 +2484,98 @@ const room =
     );
 
 
-let playerX = 50;
+const inventoryOverlay =
+    document.getElementById(
+        "inventoryOverlay"
+    );
 
-let playerY = 43;
+
+const helpOverlay =
+    document.getElementById(
+        "helpOverlay"
+    );
 
 
-const moveSpeed = 0.65;
+const computerOverlay =
+    document.getElementById(
+        "computerOverlay"
+    );
+
+
+const pauseOverlay =
+    document.getElementById(
+        "pauseOverlay"
+    );
+
+
+const interactionMessage =
+    document.getElementById(
+        "interactionMessage"
+    );
+
+
+const echoMessage =
+    document.getElementById(
+        "echoMessage"
+    );
+
+
+const status =
+    document.getElementById(
+        "status"
+    );
+
+
+const accessKey =
+    document.getElementById(
+        "accessKey"
+    );
+
+
+const codeInput =
+    document.getElementById(
+        "codeInput"
+    );
+
+
+const codeButton =
+    document.getElementById(
+        "codeButton"
+    );
+
+
+const codeError =
+    document.getElementById(
+        "codeError"
+    );
+
+
+const inventorySlots =
+    document.querySelectorAll(
+        ".inventory-slot"
+    );
+
+
+const itemDescription =
+    document.getElementById(
+        "itemDescription"
+    );
+
+
+/* =====================================================
+   PLAYER
+   ===================================================== */
+
+let playerX =
+    50;
+
+
+let playerY =
+    43;
+
+
+const moveSpeed =
+    0.65;
 
 
 /* =====================================================
@@ -2203,72 +2592,17 @@ const keys = {{
 }};
 
 
-/* =====================================================
-   OBJECTS
-   ===================================================== */
+function clearMovementKeys() {{
 
-const objects = [
+    keys.w = false;
 
-    {{
-        id: "monitor",
+    keys.a = false;
 
-        name: "CENTRAL MONITOR",
+    keys.s = false;
 
-        interactionKey: "E",
+    keys.d = false;
 
-        x: 43,
-        y: 13,
-
-        width: 14,
-        height: 12
-    }},
-
-
-    {{
-        id: "desk",
-
-        name: "RESEARCH DESK",
-
-        interactionKey: "E",
-
-        x: 35,
-        y: 62,
-
-        width: 30,
-        height: 12
-    }},
-
-
-    {{
-        id: "terminal",
-
-        name: "SECURITY TERMINAL",
-
-        interactionKey: "E",
-
-        x: 18,
-        y: 35,
-
-        width: 14,
-        height: 17
-    }},
-
-
-    {{
-        id: "exitDoor",
-
-        name: "SECURITY DOOR",
-
-        interactionKey: "E",
-
-        x: 92,
-        y: 35,
-
-        width: 8,
-        height: 30
-    }}
-
-];
+}}
 
 
 /* =====================================================
@@ -2277,15 +2611,7 @@ const objects = [
 
 const inventory = [
 
-    {{
-        name:
-            "ACCESS CARD",
-
-        description:
-            "연구시설 보안구역에 접근할 수 있는 카드입니다."
-
-    }},
-
+    null,
     null,
     null,
     null,
@@ -2297,45 +2623,16 @@ const inventory = [
 ];
 
 
-let selectedSlot = -1;
-
-
-/* =====================================================
-   INVENTORY ELEMENTS
-   ===================================================== */
-
-const inventoryOverlay =
-    document.getElementById(
-        "inventoryOverlay"
-    );
-
-
-const itemDescription =
-    document.getElementById(
-        "itemDescription"
-    );
-
-
-const inventorySlots =
-    document.querySelectorAll(
-        ".inventory-slot"
-    );
-
-
-/* =====================================================
-   DRAW INVENTORY
-   ===================================================== */
-
 function renderInventory() {{
 
     inventory.forEach(
-        function(item, index){{
+        function(item, index) {{
 
             const slot =
                 inventorySlots[index];
 
 
-            if (!item){{
+            if (!item) {{
 
                 slot.innerHTML =
                     `
@@ -2369,8 +2666,666 @@ function renderInventory() {{
 }}
 
 
+renderInventory();
+
+
 /* =====================================================
-   SELECT INVENTORY SLOT
+   ECHO TUTORIAL
+   ===================================================== */
+
+const tutorialMessages = [
+
+    "연결이 확인되었습니다. 저는 ECHO입니다. 이 시설에서의 첫 번째 절차를 안내하겠습니다.",
+
+    "먼저 이동 방법을 익혀야 합니다. W A S D 키를 사용하여 시설 내부를 이동해 보세요. 중앙의 COMPUTER로 이동하십시오.",
+
+    "좋습니다. COMPUTER에 접근했습니다. 가까운 물체에서는 E 키를 사용하여 상호작용할 수 있습니다. COMPUTER를 조사하십시오.",
+
+    "확인되었습니다. 이제 제가 전달하는 접근 코드를 COMPUTER에 입력하십시오. 접근 코드: 4817",
+
+    "코드가 확인되었습니다. DESK를 확인하십시오. 필요한 ACCESS KEY가 생성되었습니다.",
+
+    "ACCESS KEY를 획득했습니다. 이것으로 다음 구역으로 이동할 수 있습니다. EXIT로 이동하여 E 키를 눌러보십시오."
+
+];
+
+
+function setEchoMessage(message) {{
+
+    echoMessage.textContent =
+        message;
+
+}}
+
+
+setEchoMessage(
+    tutorialMessages[0]
+);
+
+
+/* =====================================================
+   OBJECTS
+   ===================================================== */
+
+const objects = [
+
+    {{
+
+        id:
+            "computer",
+
+        name:
+            "ECHO TERMINAL",
+
+        x:
+            42,
+
+        y:
+            13,
+
+        width:
+            16,
+
+        height:
+            14
+
+    }},
+
+
+    {{
+
+        id:
+            "desk",
+
+        name:
+            "RESEARCH DESK",
+
+        x:
+            35,
+
+        y:
+            62,
+
+        width:
+            30,
+
+        height:
+            12
+
+    }},
+
+
+    {{
+
+        id:
+            "exitDoor",
+
+        name:
+            "SECURITY DOOR",
+
+        x:
+            92,
+
+        y:
+            35,
+
+        width:
+            8,
+
+        height:
+            30
+
+    }}
+
+];
+
+
+let nearbyObject =
+    null;
+
+
+/* =====================================================
+   DISTANCE
+   ===================================================== */
+
+function distanceToObject(object) {{
+
+    const centerX =
+        object.x +
+        object.width / 2;
+
+
+    const centerY =
+        object.y +
+        object.height / 2;
+
+
+    const dx =
+        playerX -
+        centerX;
+
+
+    const dy =
+        playerY -
+        centerY;
+
+
+    return Math.sqrt(
+        dx * dx +
+        dy * dy
+    );
+
+}}
+
+
+/* =====================================================
+   INTERACTION CHECK
+   ===================================================== */
+
+function checkInteraction() {{
+
+    nearbyObject =
+        null;
+
+
+    let closestDistance =
+        Infinity;
+
+
+    objects.forEach(
+        function(object) {{
+
+            const distance =
+                distanceToObject(
+                    object
+                );
+
+
+            if (
+                distance < 12 &&
+                distance < closestDistance
+            ) {{
+
+                nearbyObject =
+                    object;
+
+
+                closestDistance =
+                    distance;
+
+            }}
+
+        }}
+    );
+
+
+    if (
+        nearbyObject &&
+        !computerOpen &&
+        !inventoryOpen &&
+        !helpOpen
+    ){{
+
+        interactionMessage.textContent =
+            "E  //  " +
+            nearbyObject.name;
+
+
+        interactionMessage.classList.add(
+            "visible"
+        );
+
+    }} else {{
+
+        interactionMessage.classList.remove(
+            "visible"
+        );
+
+    }}
+
+}}
+
+
+/* =====================================================
+   INACCESSIBLE
+   ===================================================== */
+
+function inaccessible() {{
+
+    status.textContent =
+        "SYSTEM // 접근할 수 없는 과정입니다.";
+
+}}
+
+
+/* =====================================================
+   INTERACT
+   ===================================================== */
+
+function interact() {{
+
+    if (
+        paused ||
+        computerOpen ||
+        inventoryOpen ||
+        helpOpen
+    ){{
+
+        return;
+
+    }}
+
+
+    if (!nearbyObject) {{
+
+        return;
+
+    }}
+
+
+    /* =================================================
+       STEP 0
+       이동 전에 E를 누르면 차단
+       ================================================= */
+
+    if (
+        tutorialStep === 0
+    ){{
+
+        inaccessible();
+
+        return;
+
+    }}
+
+
+    /* =================================================
+       STEP 1
+       COMPUTER
+       ================================================= */
+
+    if (
+        tutorialStep === 1
+    ){{
+
+        if (
+            nearbyObject.id !==
+            "computer"
+        ){{
+
+            inaccessible();
+
+            return;
+
+        }}
+
+
+        tutorialStep =
+            2;
+
+
+        openComputer();
+
+
+        setEchoMessage(
+            tutorialMessages[2]
+        );
+
+
+        status.textContent =
+            "ECHO SYSTEM // TERMINAL CONNECTED";
+
+
+        return;
+
+    }}
+
+
+    /* =================================================
+       STEP 2
+       COMPUTER CODE
+       ================================================= */
+
+    if (
+        tutorialStep === 2
+    ){{
+
+        if (
+            nearbyObject.id !==
+            "computer"
+        ){{
+
+            inaccessible();
+
+            return;
+
+        }}
+
+
+        openComputer();
+
+
+        return;
+
+    }}
+
+
+    /* =================================================
+       STEP 3
+       DESK
+       ================================================= */
+
+    if (
+        tutorialStep === 3
+    ){{
+
+        if (
+            nearbyObject.id !==
+            "desk"
+        ){{
+
+            inaccessible();
+
+            return;
+
+        }}
+
+
+        tutorialStep =
+            4;
+
+
+        accessKeyCreated =
+            true;
+
+
+        accessKey.classList.add(
+            "visible"
+        );
+
+
+        setEchoMessage(
+            tutorialMessages[4]
+        );
+
+
+        status.textContent =
+            "DESK // ACCESS KEY GENERATED";
+
+
+        return;
+
+    }}
+
+
+    /* =================================================
+       STEP 4
+       GET ACCESS KEY
+       ================================================= */
+
+    if (
+        tutorialStep === 4
+    ){{
+
+        if (
+            nearbyObject.id !==
+            "desk"
+        ){{
+
+            inaccessible();
+
+            return;
+
+        }}
+
+
+        accessKeyCreated =
+            false;
+
+
+        accessKey.classList.remove(
+            "visible"
+        );
+
+
+        accessKeyCollected =
+            true;
+
+
+        inventory[0] = {{
+
+            name:
+                "ACCESS KEY",
+
+            description:
+                "ECHO TERMINAL에서 인증된 보안구역 접근 키입니다."
+
+        }};
+
+
+        renderInventory();
+
+
+        tutorialStep =
+            5;
+
+
+        setEchoMessage(
+            tutorialMessages[5]
+        );
+
+
+        status.textContent =
+            "SYSTEM // ACCESS KEY ACQUIRED";
+
+
+        return;
+
+    }}
+
+
+    /* =================================================
+       STEP 5
+       EXIT
+       ================================================= */
+
+    if (
+        tutorialStep === 5
+    ){{
+
+        if (
+            nearbyObject.id !==
+            "exitDoor"
+        ){{
+
+            inaccessible();
+
+            return;
+
+        }}
+
+
+        if (
+            !accessKeyCollected
+        ){{
+
+            inaccessible();
+
+            return;
+
+        }}
+
+
+        status.textContent =
+            "SECURITY DOOR // ACCESS GRANTED";
+
+
+        setEchoMessage(
+            "튜토리얼 절차가 완료되었습니다. 다음 구역으로 이동할 준비가 되었습니다."
+        );
+
+
+        return;
+
+    }}
+
+}}
+
+
+/* =====================================================
+   COMPUTER
+   ===================================================== */
+
+function openComputer() {{
+
+    if (
+        tutorialStep !== 2
+    ){{
+
+        inaccessible();
+
+        return;
+
+    }}
+
+
+    computerOpen =
+        true;
+
+
+    clearMovementKeys();
+
+
+    interactionMessage.classList.remove(
+        "visible"
+    );
+
+
+    computerOverlay.style.display =
+        "flex";
+
+
+    codeError.textContent =
+        "";
+
+
+    codeInput.value =
+        "";
+
+
+    setTimeout(
+        function(){{
+
+            codeInput.focus();
+
+        }},
+        50
+    );
+
+}}
+
+
+function closeComputer() {{
+
+    computerOpen =
+        false;
+
+
+    computerOverlay.style.display =
+        "none";
+
+
+    codeInput.blur();
+
+
+    focusGame();
+
+}}
+
+
+/* =====================================================
+   CODE SUBMIT
+   ===================================================== */
+
+function submitCode() {{
+
+    const entered =
+        codeInput.value.trim();
+
+
+    if (
+        entered ===
+        ACCESS_CODE
+    ){{
+
+        tutorialStep =
+            3;
+
+
+        closeComputer();
+
+
+        status.textContent =
+            "ECHO TERMINAL // CODE VERIFIED";
+
+
+        setEchoMessage(
+            "코드가 확인되었습니다. 이제 DESK로 이동하십시오. 그곳에서 ACCESS KEY를 확인할 수 있습니다."
+        );
+
+
+    }} else {{
+
+        codeError.textContent =
+            "ACCESS DENIED // ECHO가 전달한 숫자를 그대로 입력하십시오.";
+
+
+        codeInput.select();
+
+    }}
+
+}}
+
+
+codeButton.addEventListener(
+    "click",
+    submitCode
+);
+
+
+codeInput.addEventListener(
+    "keydown",
+    function(event){{
+
+        if (
+            event.key ===
+            "Enter"
+        ){{
+
+            submitCode();
+
+            event.preventDefault();
+
+        }}
+
+
+        if (
+            event.key ===
+            "Escape"
+        ){{
+
+            closeComputer();
+
+            event.preventDefault();
+
+        }}
+
+    }}
+);
+
+
+/* =====================================================
+   INVENTORY
    ===================================================== */
 
 inventorySlots.forEach(
@@ -2384,10 +3339,6 @@ inventorySlots.forEach(
                     Number(
                         slot.dataset.slot
                     );
-
-
-                selectedSlot =
-                    index;
 
 
                 inventorySlots.forEach(
@@ -2413,24 +3364,14 @@ inventorySlots.forEach(
                 if (item){{
 
                     itemDescription.innerHTML =
-                        `
-                        ${{item.name}}
-
+                        `${{item.name}}
                         <br><br>
-
-                        ${{item.description}}
-                        `;
+                        ${{item.description}}`;
 
                 }} else {{
 
                     itemDescription.innerHTML =
-                        `
-                        ITEM DESCRIPTION
-
-                        <br><br>
-
-                        비어 있는 슬롯입니다.
-                        `;
+                        "ITEM DESCRIPTION<br><br>비어 있는 슬롯입니다.";
 
                 }}
 
@@ -2442,33 +3383,31 @@ inventorySlots.forEach(
 
 
 /* =====================================================
-   INITIAL INVENTORY
+   INVENTORY OPEN
    ===================================================== */
 
-renderInventory();
+function openInventory() {{
 
-
-/* =====================================================
-   OPEN INVENTORY
-   ===================================================== */
-
-function openInventory(){{
-
-    if (finished){{
+    if (
+        paused ||
+        computerOpen
+    ){{
 
         return;
 
     }}
 
 
-    helpOpen = false;
+    helpOpen =
+        false;
 
 
     helpOverlay.style.display =
         "none";
 
 
-    inventoryOpen = true;
+    inventoryOpen =
+        true;
 
 
     inventoryOverlay.style.display =
@@ -2481,12 +3420,13 @@ function openInventory(){{
 
 
 /* =====================================================
-   CLOSE INVENTORY
+   INVENTORY CLOSE
    ===================================================== */
 
-function closeInventory(){{
+function closeInventory() {{
 
-    inventoryOpen = false;
+    inventoryOpen =
+        false;
 
 
     inventoryOverlay.style.display =
@@ -2502,29 +3442,28 @@ function closeInventory(){{
    HELP
    ===================================================== */
 
-const helpOverlay =
-    document.getElementById(
-        "helpOverlay"
-    );
+function openHelp() {{
 
-
-function openHelp(){{
-
-    if (finished){{
+    if (
+        paused ||
+        computerOpen
+    ){{
 
         return;
 
     }}
 
 
-    inventoryOpen = false;
+    inventoryOpen =
+        false;
 
 
     inventoryOverlay.style.display =
         "none";
 
 
-    helpOpen = true;
+    helpOpen =
+        true;
 
 
     helpOverlay.style.display =
@@ -2536,9 +3475,10 @@ function openHelp(){{
 }}
 
 
-function closeHelp(){{
+function closeHelp() {{
 
-    helpOpen = false;
+    helpOpen =
+        false;
 
 
     helpOverlay.style.display =
@@ -2551,36 +3491,44 @@ function closeHelp(){{
 
 
 /* =====================================================
-   FOCUS GAME
+   FOCUS
    ===================================================== */
 
-function focusGame(){{
+function focusGame() {{
 
-    try{{
+    try {{
 
-        gameRoot.focus({{
-            preventScroll: true
-        }});
+        gameRoot.focus(
+            {{
+                preventScroll:
+                    true
+            }}
+        );
 
-    }} catch (error){{
+    }} catch (error) {{
 
-        try{{
-
-            gameRoot.focus();
-
-        }} catch (error2){{
-
-        }}
+        gameRoot.focus();
 
     }}
 
 }}
 
 
-/*
-   iframe이 로딩된 직후
-   게임에 포커스를 준다.
-*/
+gameRoot.addEventListener(
+    "pointerdown",
+    function(){{
+
+        if (
+            !computerOpen
+        ){{
+
+            focusGame();
+
+        }}
+
+    }}
+);
+
 
 window.addEventListener(
     "load",
@@ -2588,60 +3536,378 @@ window.addEventListener(
 
         focusGame();
 
-
-        setTimeout(
-            function(){{
-
-                focusGame();
-
-            }},
-            100
-        );
-
     }}
 );
 
 
-/*
-   게임 영역을 터치하거나 클릭하면
-   다시 키보드 입력을 활성화한다.
-*/
-
-gameRoot.addEventListener(
-    "pointerdown",
+window.addEventListener(
+    "blur",
     function(){{
 
-        focusGame();
-
-    }}
-);
-
-
-gameRoot.addEventListener(
-    "click",
-    function(){{
-
-        focusGame();
+        clearMovementKeys();
 
     }}
 );
 
 
 /* =====================================================
-   CLEAR MOVEMENT
+   KEYBOARD
    ===================================================== */
 
-function clearMovementKeys(){{
+document.addEventListener(
+    "keydown",
+    function(event){{
 
-    keys.w = false;
+        const key =
+            event.key.toLowerCase();
 
-    keys.a = false;
 
-    keys.s = false;
+        /*
+         * 컴퓨터 입력창에 커서가 있을 때는
+         * 게임 조작 키를 가로채지 않는다.
+         */
 
-    keys.d = false;
+        if (
+            document.activeElement ===
+            codeInput
+        ){{
 
-}}
+            if (
+                key ===
+                "escape"
+            ){{
+
+                closeComputer();
+
+                event.preventDefault();
+
+            }}
+
+            return;
+
+        }}
+
+
+        /* =================================================
+           ESC
+           ================================================= */
+
+        if (
+            key ===
+            "escape"
+        ){{
+
+            if (
+                computerOpen
+            ){{
+
+                closeComputer();
+
+                event.preventDefault();
+
+                return;
+
+            }}
+
+
+            if (
+                helpOpen
+            ){{
+
+                closeHelp();
+
+                event.preventDefault();
+
+                return;
+
+            }}
+
+
+            if (
+                inventoryOpen
+            ){{
+
+                closeInventory();
+
+                event.preventDefault();
+
+                return;
+
+            }}
+
+        }}
+
+
+        /* =================================================
+           H
+           ================================================= */
+
+        if (
+            key ===
+            "h"
+        ){{
+
+            if (
+                computerOpen
+            ){{
+
+                return;
+
+            }}
+
+
+            if (
+                helpOpen
+            ){{
+
+                closeHelp();
+
+            }} else {{
+
+                openHelp();
+
+            }}
+
+
+            event.preventDefault();
+
+            return;
+
+        }}
+
+
+        /* =================================================
+           I
+           ================================================= */
+
+        if (
+            key ===
+            "i"
+        ){{
+
+            if (
+                computerOpen ||
+                helpOpen
+            ){{
+
+                return;
+
+            }}
+
+
+            if (
+                inventoryOpen
+            ){{
+
+                closeInventory();
+
+            }} else {{
+
+                openInventory();
+
+            }}
+
+
+            event.preventDefault();
+
+            return;
+
+        }}
+
+
+        /* =================================================
+           E
+           ================================================= */
+
+        if (
+            key ===
+            "e"
+        ){{
+
+            interact();
+
+            event.preventDefault();
+
+            return;
+
+        }}
+
+
+        /* =================================================
+           WASD
+           ================================================= */
+
+        if (
+            key === "w" ||
+            key === "a" ||
+            key === "s" ||
+            key === "d"
+        ){{
+
+            if (
+                !paused &&
+                !helpOpen &&
+                !inventoryOpen &&
+                !computerOpen
+            ){{
+
+                keys[key] =
+                    true;
+
+
+                /*
+                 * 첫 번째 단계:
+                 * 이동을 시작하면 튜토리얼 진행
+                 */
+
+                if (
+                    tutorialStep ===
+                    0
+                ){{
+
+                    tutorialStep =
+                        1;
+
+
+                    setEchoMessage(
+                        tutorialMessages[1]
+                    );
+
+
+                    status.textContent =
+                        "TUTORIAL // MOVEMENT ENABLED";
+
+                }}
+
+            }}
+
+
+            event.preventDefault();
+
+        }}
+
+    }}
+);
+
+
+/* =====================================================
+   KEYBOARD RELEASE
+   ===================================================== */
+
+document.addEventListener(
+    "keyup",
+    function(event){{
+
+        const key =
+            event.key.toLowerCase();
+
+
+        if (
+            key === "w" ||
+            key === "a" ||
+            key === "s" ||
+            key === "d"
+        ){{
+
+            keys[key] =
+                false;
+
+
+            event.preventDefault();
+
+        }}
+
+    }}
+);
+
+
+/* =====================================================
+   MOBILE CONTROLS
+   ===================================================== */
+
+document
+    .querySelectorAll(
+        ".control-button"
+    )
+    .forEach(
+        function(button){{
+
+            const direction =
+                button.dataset.direction;
+
+
+            button.addEventListener(
+                "pointerdown",
+                function(event){{
+
+                    event.preventDefault();
+
+
+                    if (
+                        !paused &&
+                        !helpOpen &&
+                        !inventoryOpen &&
+                        !computerOpen
+                    ){{
+
+                        keys[direction] =
+                            true;
+
+
+                        if (
+                            tutorialStep ===
+                            0
+                        ){{
+
+                            tutorialStep =
+                                1;
+
+
+                            setEchoMessage(
+                                tutorialMessages[1]
+                            );
+
+
+                            status.textContent =
+                                "TUTORIAL // MOVEMENT ENABLED";
+
+                        }}
+
+                    }}
+
+                }}
+            );
+
+
+            function release(event){{
+
+                event.preventDefault();
+
+                keys[direction] =
+                    false;
+
+            }}
+
+
+            button.addEventListener(
+                "pointerup",
+                release
+            );
+
+
+            button.addEventListener(
+                "pointercancel",
+                release
+            );
+
+
+            button.addEventListener(
+                "pointerleave",
+                release
+            );
+
+        }}
+    );
 
 
 /* =====================================================
@@ -2654,40 +3920,48 @@ function updatePlayer(){{
         !paused &&
         !helpOpen &&
         !inventoryOpen &&
-        !finished
+        !computerOpen
     ){{
 
-        if (keys.w){{
+        if (
+            keys.w
+        ){{
 
-            playerY -= moveSpeed;
-
-        }}
-
-
-        if (keys.s){{
-
-            playerY += moveSpeed;
+            playerY -=
+                moveSpeed;
 
         }}
 
 
-        if (keys.a){{
+        if (
+            keys.s
+        ){{
 
-            playerX -= moveSpeed;
-
-        }}
-
-
-        if (keys.d){{
-
-            playerX += moveSpeed;
+            playerY +=
+                moveSpeed;
 
         }}
 
 
-        /* =============================================
-           ROOM BOUNDARY
-           ============================================= */
+        if (
+            keys.a
+        ){{
+
+            playerX -=
+                moveSpeed;
+
+        }}
+
+
+        if (
+            keys.d
+        ){{
+
+            playerX +=
+                moveSpeed;
+
+        }}
+
 
         playerX =
             Math.max(
@@ -2730,818 +4004,58 @@ function updatePlayer(){{
 
 
 /* =====================================================
-   INTERACTION
+   RESTART / TITLE
    ===================================================== */
 
-const interactionMessage =
-    document.getElementById(
-        "interactionMessage"
-    );
-
-
-function distanceToObject(object){{
-
-    const centerX =
-        object.x +
-        object.width / 2;
-
-
-    const centerY =
-        object.y +
-        object.height / 2;
-
-
-    const dx =
-        playerX - centerX;
-
-
-    const dy =
-        playerY - centerY;
-
-
-    return Math.sqrt(
-        dx * dx +
-        dy * dy
-    );
-
-}}
-
-
-let nearbyObject = null;
-
-
-function checkInteraction(){{
-
-    nearbyObject = null;
-
-
-    let closestDistance =
-        Infinity;
-
-
-    objects.forEach(
-        function(object){{
-
-            const distance =
-                distanceToObject(
-                    object
-                );
-
-
-            if (
-                distance < 12 &&
-                distance < closestDistance
-            ){{
-
-                nearbyObject =
-                    object;
-
-
-                closestDistance =
-                    distance;
-
-            }}
-
-        }}
-    );
-
-
-    if (nearbyObject){{
-
-        interactionMessage.textContent =
-            nearbyObject.interactionKey
-            + "  //  "
-            + nearbyObject.name;
-
-
-        interactionMessage.classList.add(
-            "visible"
-        );
-
-    }} else {{
-
-        interactionMessage.classList.remove(
-            "visible"
-        );
-
-    }}
-
-}}
-
-
-/* =====================================================
-   INTERACT
-   ===================================================== */
-
-function interact(){{
-
-    if (
-        paused ||
-        helpOpen ||
-        inventoryOpen ||
-        finished
-    ){{
-
-        return;
-
-    }}
-
-
-    if (!nearbyObject){{
-
-        return;
-
-    }}
-
-
-    /* =============================================
-       SECURITY TERMINAL
-       ============================================= */
-
-    if (
-        nearbyObject.id ===
-        "terminal"
-    ){{
-
-        if (!inventory[0]){{
-
-            inventory[0] = {{
-
-                name:
-                    "ACCESS CARD",
-
-                description:
-                    "연구시설 보안구역에 접근할 수 있는 카드입니다."
-
-            }};
-
-
-            renderInventory();
-
-
-            document.getElementById(
-                "status"
-            ).textContent =
-                "SYSTEM // ACCESS CARD ACQUIRED";
-
-        }} else {{
-
-            document.getElementById(
-                "status"
-            ).textContent =
-                "TERMINAL // NO NEW DATA";
-
-        }}
-
-
-        return;
-
-    }}
-
-
-    /* =============================================
-       MONITOR
-       ============================================= */
-
-    if (
-        nearbyObject.id ===
-        "monitor"
-    ){{
-
-        document.getElementById(
-            "status"
-        ).textContent =
-            "MONITOR // SIGNAL UNSTABLE";
-
-        return;
-
-    }}
-
-
-    /* =============================================
-       DESK
-       ============================================= */
-
-    if (
-        nearbyObject.id ===
-        "desk"
-    ){{
-
-        document.getElementById(
-            "status"
-        ).textContent =
-            "DESK // NOTHING UNUSUAL";
-
-        return;
-
-    }}
-
-
-    /* =============================================
-       EXIT DOOR
-       ============================================= */
-
-    if (
-        nearbyObject.id ===
-        "exitDoor"
-    ){{
-
-        if (inventory[0]){{
-
-            document.getElementById(
-                "status"
-            ).textContent =
-                "SECURITY DOOR // ACCESS GRANTED";
-
-        }} else {{
-
-            document.getElementById(
-                "status"
-            ).textContent =
-                "SECURITY DOOR // ACCESS CARD REQUIRED";
-
-        }}
-
-    }}
-
-}}
-
-
-/* =====================================================
-   KEYBOARD
-   ===================================================== */
-
-function handleKeyDown(event){{
-
-    const key =
-        event.key.toLowerCase();
-
-
-    /* =============================================
-       ESC
-       ============================================= */
-
-    if (key === "escape"){{
-
-        if (helpOpen){{
-
-            closeHelp();
-
-            event.preventDefault();
-
-            return;
-
-        }}
-
-
-        if (inventoryOpen){{
-
-            closeInventory();
-
-            event.preventDefault();
-
-            return;
-
-        }}
-
-    }}
-
-
-    /* =============================================
-       H
-       ============================================= */
-
-    if (key === "h"){{
-
-        if (
-            !paused &&
-            !finished
-        ){{
-
-            if (inventoryOpen){{
-
-                return;
-
-            }}
-
-
-            if (helpOpen){{
-
-                closeHelp();
-
-            }} else {{
-
-                openHelp();
-
-            }}
-
-        }}
-
-
-        event.preventDefault();
-
-        return;
-
-    }}
-
-
-    /* =============================================
-       I
-       ============================================= */
-
-    if (key === "i"){{
-
-        if (
-            !paused &&
-            !finished
-        ){{
-
-            if (helpOpen){{
-
-                return;
-
-            }}
-
-
-            if (inventoryOpen){{
-
-                closeInventory();
-
-            }} else {{
-
-                openInventory();
-
-            }}
-
-        }}
-
-
-        event.preventDefault();
-
-        return;
-
-    }}
-
-
-    /* =============================================
-       E
-       ============================================= */
-
-    if (key === "e"){{
-
-        interact();
-
-        event.preventDefault();
-
-        return;
-
-    }}
-
-
-    /* =============================================
-       MOVEMENT
-       ============================================= */
-
-    if (
-        key === "w" ||
-        key === "a" ||
-        key === "s" ||
-        key === "d"
-    ){{
-
-        if (
-            !paused &&
-            !helpOpen &&
-            !inventoryOpen &&
-            !finished
-        ){{
-
-            keys[key] = true;
-
-        }}
-
-
-        event.preventDefault();
-
-        return;
-
-    }}
-
-}}
-
-
-/* =====================================================
-   KEYBOARD RELEASE
-   ===================================================== */
-
-function handleKeyUp(event){{
-
-    const key =
-        event.key.toLowerCase();
-
-
-    if (
-        key === "w" ||
-        key === "a" ||
-        key === "s" ||
-        key === "d"
-    ){{
-
-        keys[key] = false;
-
-        event.preventDefault();
-
-    }}
-
-}}
-
-
-/*
-   window에 한 번만 등록한다.
-   gameRoot에도 별도 keydown을 등록하지 않아
-   H / I / E가 두 번 실행되는 문제를 방지한다.
-*/
-
-window.addEventListener(
-    "keydown",
-    handleKeyDown,
-    true
-);
-
-
-window.addEventListener(
-    "keyup",
-    handleKeyUp,
-    true
-);
-
-
-/* =====================================================
-   WINDOW BLUR
-   ===================================================== */
-
-window.addEventListener(
-    "blur",
-    function(){{
-
-        clearMovementKeys();
-
-    }}
-);
-
-
-/* =====================================================
-   MOBILE DIRECTION BUTTONS
-   ===================================================== */
-
-const mobileButtons =
-    document.querySelectorAll(
-        ".control-button"
-    );
-
-
-mobileButtons.forEach(
-    function(button){{
-
-        const direction =
-            button.dataset.direction;
-
-
-        /* =============================================
-           TOUCH START
-           ============================================= */
-
-        button.addEventListener(
-            "touchstart",
-            function(event){{
-
-                event.preventDefault();
-
-
-                if (
-                    !paused &&
-                    !helpOpen &&
-                    !inventoryOpen &&
-                    !finished
-                ){{
-
-                    keys[direction] =
-                        true;
-
-                }}
-
-            }},
-            {{
-                passive: false
-            }}
-        );
-
-
-        /* =============================================
-           TOUCH END
-           ============================================= */
-
-        button.addEventListener(
-            "touchend",
-            function(event){{
-
-                event.preventDefault();
-
-                keys[direction] =
-                    false;
-
-            }},
-            {{
-                passive: false
-            }}
-        );
-
-
-        /* =============================================
-           TOUCH CANCEL
-           ============================================= */
-
-        button.addEventListener(
-            "touchcancel",
-            function(event){{
-
-                event.preventDefault();
-
-                keys[direction] =
-                    false;
-
-            }},
-            {{
-                passive: false
-            }}
-        );
-
-
-        /* =============================================
-           POINTER DOWN
-           ============================================= */
-
-        button.addEventListener(
-            "pointerdown",
-            function(event){{
-
-                event.preventDefault();
-
-
-                if (
-                    !paused &&
-                    !helpOpen &&
-                    !inventoryOpen &&
-                    !finished
-                ){{
-
-                    keys[direction] =
-                        true;
-
-                }}
-
-            }}
-        );
-
-
-        /* =============================================
-           POINTER UP
-           ============================================= */
-
-        button.addEventListener(
-            "pointerup",
-            function(event){{
-
-                event.preventDefault();
-
-                keys[direction] =
-                    false;
-
-            }}
-        );
-
-
-        /* =============================================
-           POINTER CANCEL
-           ============================================= */
-
-        button.addEventListener(
-            "pointercancel",
-            function(){{
-
-                keys[direction] =
-                    false;
-
-            }}
-        );
-
-
-        /* =============================================
-           POINTER LEAVE
-           ============================================= */
-
-        button.addEventListener(
-            "pointerleave",
-            function(){{
-
-                keys[direction] =
-                    false;
-
-            }}
-        );
-
-    }}
-);
-
-
-/* =====================================================
-   SYSTEM FAILURE BUTTONS
-   ===================================================== */
-
-const restartButton =
-    document.getElementById(
+document
+    .getElementById(
         "restartButton"
+    )
+    .addEventListener(
+        "click",
+        function(){{
+
+            /*
+             * 기존 코드처럼
+             * window.parent.location.href를
+             * 읽어서 URL 객체를 만드는 방식을
+             * 사용하지 않는다.
+             *
+             * 부모 Streamlit 페이지에
+             * action=restart를 전달한다.
+             */
+
+            window.parent.location.href =
+                "?action=restart";
+
+        }}
     );
 
 
-const titleButton =
-    document.getElementById(
+document
+    .getElementById(
         "titleButton"
+    )
+    .addEventListener(
+        "click",
+        function(){{
+
+            window.parent.location.href =
+                "?action=title";
+
+        }}
     );
 
 
 /* =====================================================
-   RESTART
+   PAUSE STATE
    ===================================================== */
 
-restartButton.addEventListener(
-    "click",
-    function(){{
-
-        const currentURL =
-            new URL(
-                window.parent.location.href
-            );
-
-
-        currentURL.searchParams.set(
-            "action",
-            "restart"
-        );
-
-
-        window.parent.location.href =
-            currentURL.toString();
-
-    }}
-);
-
-
-/* =====================================================
-   TITLE
-   ===================================================== */
-
-titleButton.addEventListener(
-    "click",
-    function(){{
-
-        const currentURL =
-            new URL(
-                window.parent.location.href
-            );
-
-
-        currentURL.searchParams.set(
-            "action",
-            "title"
-        );
-
-
-        window.parent.location.href =
-            currentURL.toString();
-
-    }}
-);
-
-
-/* =====================================================
-   TIMER
-   ===================================================== */
-
-function formatTime(seconds){{
-
-    const min =
-        Math.floor(
-            seconds / 60
-        );
-
-
-    const sec =
-        seconds % 60;
-
-
-    return String(min).padStart(2, "0")
-        + ":"
-        + String(sec).padStart(2, "0");
-
-}}
-
-
-function showTimeOver(){{
-
-    finished = true;
-
-
-    clearMovementKeys();
-
-
-    document.getElementById(
-        "timeOver"
-    ).style.display =
-        "flex";
-
-
-    /*
-       SYSTEM FAILURE가 표시되면
-       게임 화면이 더 이상 키 입력을
-       처리하지 않도록 한다.
-    */
-
-    focusGame();
-
-}}
-
-
-function updateTimer(){{
-
-    if (
-        paused ||
-        helpOpen ||
-        inventoryOpen ||
-        finished
-    ){{
-
-        return;
-
-    }}
-
-
-    if (remaining <= 0){{
-
-        remaining = 0;
-
-        showTimeOver();
-
-        return;
-
-    }}
-
-
-    remaining--;
-
-
-    document.getElementById(
-        "timer"
-    ).textContent =
-        formatTime(
-            remaining
-        );
-
-
-    if (remaining <= 0){{
-
-        showTimeOver();
-
-    }}
-
-}}
-
-
-setInterval(
-    updateTimer,
-    1000
-);
-
-
-/* =====================================================
-   INITIAL STATE
-   ===================================================== */
-
-if (paused){{
-
-    document.getElementById(
-        "pauseOverlay"
-    ).style.display =
-        "flex";
-
-}}
-
-
-if (finished){{
-
-    document.getElementById(
-        "timeOver"
-    ).style.display =
+if (
+    paused
+){{
+
+    pauseOverlay.style.display =
         "flex";
 
 }}
@@ -3559,7 +4073,18 @@ player.style.top =
     playerY + "%";
 
 
+/* =====================================================
+   INITIAL INTERACTION
+   ===================================================== */
+
 checkInteraction();
+
+
+/* =====================================================
+   FOCUS
+   ===================================================== */
+
+focusGame();
 
 
 /* =====================================================
@@ -3568,23 +4093,6 @@ checkInteraction();
 
 requestAnimationFrame(
     updatePlayer
-);
-
-
-/* =====================================================
-   INITIAL FOCUS
-   ===================================================== */
-
-focusGame();
-
-
-setTimeout(
-    function(){{
-
-        focusGame();
-
-    }},
-    100
 );
 
 
