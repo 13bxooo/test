@@ -17,14 +17,6 @@ st.set_page_config(
 
 
 # =========================================================
-# SESSION STATE
-# =========================================================
-
-if "game_paused" not in st.session_state:
-    st.session_state.game_paused = False
-
-
-# =========================================================
 # PAGE ACTION
 # =========================================================
 
@@ -34,18 +26,31 @@ action = st.query_params.get("action")
 if action == "restart":
 
     st.session_state.game_paused = False
+
     st.query_params.clear()
+
     st.rerun()
 
 
 elif action == "title":
 
-    # TITLE로 돌아갔다는 사실을 main.py에 전달
+    st.session_state.game_paused = False
+
+    # main.py에서 사용할 Continue 경고 플래그
     st.session_state.show_continue_warning = True
 
     st.query_params.clear()
 
     st.switch_page("main.py")
+
+
+# =========================================================
+# SESSION STATE
+# =========================================================
+
+if "game_paused" not in st.session_state:
+
+    st.session_state.game_paused = False
 
 
 # =========================================================
@@ -59,7 +64,9 @@ for name in ["neodgm.ttf", "neodgm(2).ttf"]:
     candidate = Path(name)
 
     if candidate.exists():
+
         font_path = candidate
+
         break
 
 
@@ -80,115 +87,128 @@ else:
 
 st.markdown(
     f"""
-    <style>
+<style>
 
-    @font-face {{
-        font-family: 'NeoDungGeunMo';
-        src: url(data:font/ttf;base64,{font_base64})
-             format('truetype');
-    }}
+@font-face {{
+    font-family: 'NeoDungGeunMo';
 
-    html,
-    body,
-    [class*="css"] {{
-        font-family:
-            'NeoDungGeunMo',
-            monospace !important;
-    }}
-
-    #MainMenu,
-    header,
-    footer {{
-        visibility: hidden;
-    }}
-
-    .stApp {{
-        background: #000000 !important;
-    }}
-
-    .block-container {{
-        padding: 0 !important;
-        max-width: 100vw !important;
-    }}
+    src:
+        url(data:font/ttf;base64,{font_base64})
+        format('truetype');
+}}
 
 
-    /* =====================================================
-       PAUSE BUTTON
-       ===================================================== */
+html,
+body,
+[class*="css"] {{
+    font-family:
+        'NeoDungGeunMo',
+        monospace !important;
+}}
+
+
+#MainMenu,
+header,
+footer {{
+    visibility: hidden;
+}}
+
+
+.stApp {{
+    background: #000000 !important;
+}}
+
+
+.block-container {{
+    padding: 0 !important;
+    max-width: 100vw !important;
+}}
+
+
+/* =====================================================
+   PAUSE BUTTON
+   ===================================================== */
+
+.st-key-pause_game_button {{
+
+    position: fixed !important;
+
+    top: 24px !important;
+    right: 28px !important;
+
+    width: 45px !important;
+    height: 45px !important;
+
+    z-index: 999999 !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+}}
+
+
+.st-key-pause_game_button button {{
+
+    width: 45px !important;
+    height: 45px !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    border: none !important;
+    border-radius: 0 !important;
+
+    background: #000000 !important;
+    color: #ffffff !important;
+
+    font-family:
+        'NeoDungGeunMo',
+        monospace !important;
+
+    font-size: 24px !important;
+
+}}
+
+
+.st-key-pause_game_button button:hover {{
+
+    background: #ffffff !important;
+    color: #000000 !important;
+
+}}
+
+
+@media (max-width: 700px) {{
 
     .st-key-pause_game_button {{
-        position: fixed !important;
 
-        top: 24px !important;
-        right: 28px !important;
+        top: 12px !important;
+        right: 12px !important;
 
-        width: 45px !important;
-        height: 45px !important;
+        width: 40px !important;
+        height: 40px !important;
 
-        z-index: 999999 !important;
-
-        padding: 0 !important;
-        margin: 0 !important;
     }}
+
 
     .st-key-pause_game_button button {{
-        width: 45px !important;
-        height: 45px !important;
 
-        padding: 0 !important;
-        margin: 0 !important;
+        width: 40px !important;
+        height: 40px !important;
 
-        border: none !important;
-        outline: none !important;
-        box-shadow: none !important;
-
-        border-radius: 0 !important;
-
-        background: #000000 !important;
-        color: #ffffff !important;
-
-        font-family:
-            'NeoDungGeunMo',
-            monospace !important;
-
-        font-size: 24px !important;
-
-        cursor: pointer !important;
-    }}
-
-    .st-key-pause_game_button button:hover {{
-        background: #ffffff !important;
-        color: #000000 !important;
-    }}
-
-
-    @media (max-width: 700px) {{
-
-        .st-key-pause_game_button {{
-            top: 14px !important;
-            right: 14px !important;
-
-            width: 42px !important;
-            height: 42px !important;
-        }}
-
-        .st-key-pause_game_button button {{
-            width: 42px !important;
-            height: 42px !important;
-
-            font-size: 20px !important;
-        }}
+        font-size: 20px !important;
 
     }}
 
-    </style>
-    """,
+}}
+
+</style>
+""",
     unsafe_allow_html=True,
 )
 
 
 # =========================================================
-# PAUSE BUTTON
+# PAUSE
 # =========================================================
 
 pause_clicked = st.button(
@@ -215,7 +235,7 @@ paused = st.session_state.game_paused
 # GAME HTML
 # =========================================================
 
-html = f"""
+html = r"""
 <!DOCTYPE html>
 
 <html>
@@ -224,1417 +244,2279 @@ html = f"""
 
 <meta charset="UTF-8">
 
+
 <style>
 
 /* =====================================================
    FONT
    ===================================================== */
 
-@font-face {{
-    font-family: 'NeoDungGeunMo';
+@font-face {
+
+    font-family:
+        'NeoDungGeunMo';
 
     src:
-        url(data:font/ttf;base64,{font_base64})
+        url(data:font/ttf;base64,__FONT_BASE64__)
         format('truetype');
-}}
+
+}
 
 
 /* =====================================================
    GLOBAL
    ===================================================== */
 
-* {{
-    box-sizing: border-box;
+* {
 
-    user-select: none;
-    -webkit-user-select: none;
+    box-sizing:
+        border-box;
 
-    -webkit-touch-callout: none;
-}}
+    user-select:
+        none;
+
+    -webkit-user-select:
+        none;
+
+}
+
 
 html,
-body {{
-    width: 100%;
-    height: 100%;
+body {
 
-    margin: 0;
-    padding: 0;
+    margin:
+        0;
 
-    overflow: hidden;
+    padding:
+        0;
 
-    background: #000000;
+    width:
+        100%;
+
+    height:
+        100%;
+
+    overflow:
+        hidden;
+
+    background:
+        #000000;
+
+    color:
+        #ffffff;
 
     font-family:
         'NeoDungGeunMo',
         monospace;
-}}
 
-body {{
-    color: #ffffff;
-}}
+}
 
 
-/* =====================================================
-   GAME ROOT
-   ===================================================== */
+button,
+input {
 
-.game {{
-    position: relative;
+    font-family:
+        'NeoDungGeunMo',
+        monospace;
 
-    width: 100vw;
-    height: 100vh;
-
-    overflow: hidden;
-
-    background: #000000;
-
-    outline: none;
-}}
+}
 
 
 /* =====================================================
-   HEADER
+   GAME
    ===================================================== */
 
-.project-title {{
-    position: absolute;
+.game {
 
-    top: 24px;
-    left: 28px;
+    position:
+        relative;
 
-    font-size: 18px;
+    width:
+        100vw;
 
-    letter-spacing: 1px;
+    height:
+        100vh;
 
-    z-index: 50;
-}}
+    background:
+        #000000;
 
-.stage-title {{
-    position: absolute;
+    overflow:
+        hidden;
 
-    top: 52px;
-    left: 28px;
+    outline:
+        none;
 
-    font-size: 13px;
+}
 
-    color: #777777;
 
-    letter-spacing: 1px;
+/* =====================================================
+   TOP
+   ===================================================== */
 
-    z-index: 50;
-}}
+.project-title {
+
+    position:
+        absolute;
+
+    top:
+        24px;
+
+    left:
+        28px;
+
+    font-size:
+        18px;
+
+    letter-spacing:
+        1px;
+
+    z-index:
+        20;
+
+}
+
+
+.stage-title {
+
+    position:
+        absolute;
+
+    top:
+        52px;
+
+    left:
+        28px;
+
+    font-size:
+        13px;
+
+    color:
+        #777777;
+
+    letter-spacing:
+        1px;
+
+    z-index:
+        20;
+
+}
 
 
 /* =====================================================
    GAME AREA
    ===================================================== */
 
-.game-area {{
-    position: absolute;
+.game-area {
 
-    top: 90px;
-    left: 28px;
-    right: 28px;
-    bottom: 70px;
+    position:
+        absolute;
 
-    overflow: hidden;
+    top:
+        90px;
 
-    background-color: #080808;
+    left:
+        28px;
+
+    right:
+        28px;
+
+    bottom:
+        70px;
+
+    overflow:
+        hidden;
+
+    background-color:
+        #080808;
 
     background-image:
+
         linear-gradient(
             rgba(255,255,255,0.045) 1px,
             transparent 1px
         ),
+
         linear-gradient(
             90deg,
             rgba(255,255,255,0.045) 1px,
             transparent 1px
         );
 
-    background-size: 40px 40px;
-}}
+    background-size:
+        40px 40px;
+
+}
 
 
 /* =====================================================
    ROOM
    ===================================================== */
 
-.room {{
-    position: absolute;
+.room {
 
-    left: 7%;
-    top: 8%;
+    position:
+        absolute;
 
-    width: 86%;
-    height: 82%;
+    left:
+        7%;
 
-    border: 1px solid
-        rgba(255,255,255,0.15);
+    top:
+        8%;
 
-    overflow: hidden;
-}}
+    width:
+        86%;
 
-
-/* =====================================================
-   FLOOR GRID
-   ===================================================== */
-
-.room-line-horizontal {{
-    position: absolute;
-
-    left: 0;
-    right: 0;
-
-    top: 50%;
-
-    height: 1px;
-
-    background:
-        rgba(255,255,255,0.045);
-}}
-
-.room-line-vertical {{
-    position: absolute;
-
-    top: 0;
-    bottom: 0;
-
-    left: 50%;
-
-    width: 1px;
-
-    background:
-        rgba(255,255,255,0.045);
-}}
-
-
-/* =====================================================
-   OBJECTS
-   ===================================================== */
-
-.object {{
-    position: absolute;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    background: #0b0b0b;
+    height:
+        82%;
 
     border:
         1px solid
-        rgba(255,255,255,0.28);
+        rgba(255,255,255,0.12);
 
-    color: #777777;
+    overflow:
+        hidden;
 
-    font-size: 12px;
+}
 
-    text-align: center;
 
-    z-index: 8;
-}}
+/* =====================================================
+   ROOM LINES
+   ===================================================== */
+
+.room-line-horizontal {
+
+    position:
+        absolute;
+
+    left:
+        0;
+
+    right:
+        0;
+
+    top:
+        50%;
+
+    height:
+        1px;
+
+    background:
+        rgba(255,255,255,0.045);
+
+}
+
+
+.room-line-vertical {
+
+    position:
+        absolute;
+
+    top:
+        0;
+
+    bottom:
+        0;
+
+    left:
+        50%;
+
+    width:
+        1px;
+
+    background:
+        rgba(255,255,255,0.045);
+
+}
+
+
+/* =====================================================
+   OBJECT
+   ===================================================== */
+
+.object {
+
+    position:
+        absolute;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    background:
+        #0b0b0b;
+
+    border:
+        1px solid
+        rgba(255,255,255,0.22);
+
+    color:
+        #777777;
+
+    font-size:
+        12px;
+
+    text-align:
+        center;
+
+    z-index:
+        5;
+
+}
+
+
+/* =====================================================
+   MONITOR
+   ===================================================== */
+
+.monitor {
+
+    left:
+        43.5%;
+
+    top:
+        9%;
+
+    width:
+        13%;
+
+    height:
+        7%;
+
+    background:
+        #050505;
+
+}
+
+
+.monitor::after {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    left:
+        10%;
+
+    right:
+        10%;
+
+    bottom:
+        -10px;
+
+    height:
+        10px;
+
+    border:
+        1px solid #333333;
+
+    background:
+        #080808;
+
+}
 
 
 /* =====================================================
    COMPUTER
    ===================================================== */
 
-.computer {{
-    left: 42%;
-    top: 13%;
+.computer {
 
-    width: 16%;
-    height: 14%;
-}}
+    left:
+        42%;
 
+    top:
+        13%;
 
-/* =====================================================
-   COMPUTER SCREEN
-   ===================================================== */
+    width:
+        16%;
 
-.computer::before {{
-    content: "";
+    height:
+        14%;
 
-    position: absolute;
-
-    left: 14%;
-    right: 14%;
-
-    top: 16%;
-    bottom: 25%;
-
-    border:
-        1px solid
-        rgba(255,255,255,0.30);
-
-    background: #000000;
-}}
+}
 
 
 /* =====================================================
    DESK
    ===================================================== */
 
-.desk {{
-    left: 35%;
-    top: 62%;
+.desk {
 
-    width: 30%;
-    height: 12%;
-}}
+    left:
+        35%;
 
+    top:
+        62%;
 
-/* =====================================================
-   DESK TOP LINE
-   ===================================================== */
+    width:
+        30%;
 
-.desk::before {{
-    content: "";
+    height:
+        12%;
 
-    position: absolute;
+    align-items:
+        flex-start;
 
-    left: 0;
-    right: 0;
+    padding-top:
+        10px;
 
-    top: 0;
-
-    height: 3px;
-
-    background: #222222;
-}}
+}
 
 
-/* =====================================================
-   OBJECT LABEL
-   ===================================================== */
+.desk::after {
 
-.object-label {{
-    position: absolute;
+    content:
+        "";
 
-    bottom: -22px;
+    position:
+        absolute;
 
-    left: 50%;
+    left:
+        8%;
 
-    transform:
-        translateX(-50%);
+    right:
+        8%;
 
-    white-space: nowrap;
+    bottom:
+        -10px;
 
-    font-size: 10px;
-
-    color: #555555;
-}}
-
-
-/* =====================================================
-   ACCESS KEY
-   ===================================================== */
-
-.access-key {{
-    position: absolute;
-
-    width: 30px;
-    height: 11px;
-
-    left: 50%;
-    top: 42%;
-
-    transform:
-        translate(-50%, -50%);
-
-    background: #ffffff;
-
-    display: none;
-
-    z-index: 20;
-
-    box-shadow:
-        0 0 8px
-        rgba(255,255,255,0.35);
-}}
-
-.access-key::after {{
-    content: "";
-
-    position: absolute;
-
-    right: -9px;
-    top: 3px;
-
-    width: 9px;
-    height: 5px;
-
-    background: #ffffff;
-}}
-
-.access-key::before {{
-    content: "";
-
-    position: absolute;
-
-    left: 4px;
-    top: 3px;
-
-    width: 5px;
-    height: 5px;
+    height:
+        10px;
 
     border:
-        1px solid #000000;
+        1px solid #222222;
 
-    border-radius: 50%;
-}}
+    background:
+        #070707;
 
-.access-key.visible {{
-    display: block;
-
-    animation:
-        keyAppear
-        0.45s ease-out;
-}}
-
-@keyframes keyAppear {{
-    0% {{
-        opacity: 0;
-        transform:
-            translate(-50%, -50%)
-            scale(0.5);
-    }}
-
-    100% {{
-        opacity: 1;
-        transform:
-            translate(-50%, -50%)
-            scale(1);
-    }}
-}}
+}
 
 
 /* =====================================================
    EXIT WALL
    ===================================================== */
 
-.exit-wall {{
-    position: absolute;
+.exit-wall {
 
-    right: 0;
-    top: 29%;
+    position:
+        absolute;
 
-    width: 11%;
-    height: 42%;
+    right:
+        0;
+
+    top:
+        35%;
+
+    width:
+        8%;
+
+    height:
+        30%;
 
     background:
-        repeating-linear-gradient(
-            0deg,
-            #0b0b0b,
-            #0b0b0b 8px,
-            #101010 9px,
-            #101010 10px
-        );
+        #090909;
 
     border-left:
-        2px solid #252525;
+        1px solid #444444;
 
-    border-top:
-        1px solid #222222;
+    z-index:
+        5;
 
-    border-bottom:
-        1px solid #222222;
+}
 
-    z-index: 7;
 
-    display: flex;
+.exit-wall::before,
+.exit-wall::after {
 
-    align-items: center;
-    justify-content: center;
-}}
+    content:
+        "";
 
-.exit-wall::before {{
-    content: "";
+    position:
+        absolute;
 
-    position: absolute;
+    left:
+        0;
 
-    left: 8px;
-    right: 8px;
-    top: 8px;
-    bottom: 8px;
+    right:
+        0;
 
-    border:
-        1px solid
-        rgba(255,255,255,0.08);
-}}
+    height:
+        1px;
 
-.exit-label {{
-    position: absolute;
+    background:
+        #333333;
 
-    left: -125px;
+}
 
-    top: 50%;
+
+.exit-wall::before {
+
+    top:
+        20%;
+
+}
+
+
+.exit-wall::after {
+
+    bottom:
+        20%;
+
+}
+
+
+/* =====================================================
+   EXIT SIGN
+   ===================================================== */
+
+.exit-sign {
+
+    position:
+        absolute;
+
+    right:
+        9%;
+
+    top:
+        45%;
 
     transform:
         translateY(-50%);
 
-    white-space: nowrap;
+    font-size:
+        12px;
 
-    color: #555555;
+    letter-spacing:
+        1px;
 
-    font-size: 11px;
-}}
+    color:
+        #666666;
 
-.exit-label span {{
-    color: #ffffff;
-}}
+    text-align:
+        right;
+
+    line-height:
+        1.8;
+
+    z-index:
+        6;
+
+    white-space:
+        nowrap;
+
+}
+
+
+.exit-arrow {
+
+    display:
+        inline-block;
+
+    animation:
+        exitPulse 1.1s ease-in-out infinite;
+
+}
+
+
+@keyframes exitPulse {
+
+    0%,
+    100% {
+
+        transform:
+            translateY(-3px);
+
+        opacity:
+            0.45;
+
+    }
+
+    50% {
+
+        transform:
+            translateY(3px);
+
+        opacity:
+            1;
+
+    }
+
+}
 
 
 /* =====================================================
-   EXIT ARROW
+   OBJECT LABEL
    ===================================================== */
 
-.exit-arrow {{
-    position: absolute;
+.object-label {
 
-    left: -68px;
+    position:
+        absolute;
 
-    top: 38%;
+    bottom:
+        -22px;
 
-    font-size: 24px;
+    left:
+        50%;
 
-    color: #ffffff;
+    transform:
+        translateX(-50%);
 
-    opacity: 0;
+    white-space:
+        nowrap;
 
-    transform: translateY(0);
+    font-size:
+        10px;
 
-    transition:
-        opacity 0.4s ease;
-}}
+    color:
+        #555555;
 
-.exit-arrow.active {{
-    opacity: 1;
+}
+
+
+/* =====================================================
+   ACCESS KEY
+   ===================================================== */
+
+.access-key {
+
+    position:
+        absolute;
+
+    width:
+        34px;
+
+    height:
+        15px;
+
+    left:
+        50%;
+
+    top:
+        45%;
+
+    transform:
+        translate(-50%, -50%);
+
+    background:
+        #ffffff;
+
+    border:
+        1px solid #000000;
+
+    display:
+        none;
+
+    z-index:
+        8;
+
+    box-shadow:
+        0 0 8px
+        rgba(255,255,255,0.18);
+
+}
+
+
+.access-key::before {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    right:
+        -12px;
+
+    top:
+        3px;
+
+    width:
+        12px;
+
+    height:
+        7px;
+
+    background:
+        #ffffff;
+
+    border:
+        1px solid #000000;
+
+}
+
+
+.access-key::after {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    left:
+        4px;
+
+    top:
+        3px;
+
+    width:
+        7px;
+
+    height:
+        7px;
+
+    border:
+        2px solid #000000;
+
+    border-radius:
+        50%;
+
+}
+
+
+.access-key.visible {
+
+    display:
+        block;
 
     animation:
-        exitArrowMove
-        1.1s
-        ease-in-out
-        infinite;
-}}
+        keyAppear 0.35s steps(4);
 
-@keyframes exitArrowMove {{
-    0% {{
-        transform:
-            translateY(-5px);
-    }}
+}
 
-    50% {{
-        transform:
-            translateY(7px);
-    }}
 
-    100% {{
+@keyframes keyAppear {
+
+    0% {
+
+        opacity:
+            0;
+
         transform:
-            translateY(-5px);
-    }}
-}}
+            translate(-50%,-50%)
+            scale(0.6);
+
+    }
+
+    100% {
+
+        opacity:
+            1;
+
+        transform:
+            translate(-50%,-50%)
+            scale(1);
+
+    }
+
+}
 
 
 /* =====================================================
    PLAYER
    ===================================================== */
 
-.player {{
-    position: absolute;
+.player {
 
-    width: 24px;
-    height: 24px;
+    position:
+        absolute;
+
+    width:
+        24px;
+
+    height:
+        24px;
+
+    left:
+        50%;
+
+    top:
+        43%;
 
     transform:
         translate(-50%, -50%);
 
-    background: #ffffff;
+    background:
+        #ffffff;
 
-    z-index: 30;
+    z-index:
+        15;
 
     box-shadow:
         0 0 0 1px #000000;
-}}
 
-.player::after {{
-    content: "";
+}
 
-    position: absolute;
 
-    left: 4px;
-    right: 4px;
+.player::after {
 
-    bottom: -5px;
+    content:
+        "";
 
-    height: 4px;
+    position:
+        absolute;
+
+    left:
+        4px;
+
+    right:
+        4px;
+
+    bottom:
+        -5px;
+
+    height:
+        4px;
 
     background:
         rgba(255,255,255,0.15);
-}}
+
+}
 
 
 /* =====================================================
-   INTERACTION MESSAGE
+   INTERACTION
    ===================================================== */
 
-.interaction-message {{
-    position: absolute;
+.interaction-message {
 
-    left: 50%;
+    position:
+        absolute;
 
-    bottom: 20%;
+    left:
+        50%;
+
+    bottom:
+        19%;
 
     transform:
         translateX(-50%);
 
-    padding: 9px 16px;
+    padding:
+        9px 16px;
 
-    background: #000000;
+    background:
+        #000000;
 
     border:
         1px solid #333333;
 
-    font-size: 12px;
+    font-size:
+        12px;
 
-    color: #ffffff;
+    color:
+        #ffffff;
 
-    opacity: 0;
+    opacity:
+        0;
 
-    pointer-events: none;
+    pointer-events:
+        none;
 
-    transition:
-        opacity 0.1s linear;
+    z-index:
+        40;
 
-    z-index: 45;
+    white-space:
+        nowrap;
 
-    white-space: nowrap;
-}}
+}
 
-.interaction-message.visible {{
-    opacity: 1;
-}}
+
+.interaction-message.visible {
+
+    opacity:
+        1;
+
+}
 
 
 /* =====================================================
    ECHO CHAT
    ===================================================== */
 
-.echo-bar {{
-    position: absolute;
+.echo-bar {
 
-    left: 50%;
+    position:
+        absolute;
 
-    bottom: 3%;
+    left:
+        50%;
+
+    bottom:
+        3%;
 
     transform:
         translateX(-50%);
 
     width:
-        min(760px, 82%);
+        min(760px,82%);
 
-    min-height: 82px;
+    min-height:
+        78px;
 
-    padding: 13px 18px;
+    padding:
+        13px 18px 20px;
 
-    background: #050505;
+    background:
+        #050505;
 
     border:
         1px solid #3a3a3a;
 
-    z-index: 40;
-}}
+    z-index:
+        35;
 
-.echo-name {{
-    font-size: 11px;
+}
 
-    color: #ffffff;
 
-    letter-spacing: 1px;
+.echo-name {
 
-    margin-bottom: 8px;
-}}
+    font-size:
+        11px;
 
-.echo-message {{
-    min-height: 34px;
+    color:
+        #ffffff;
 
-    font-size: 12px;
+    letter-spacing:
+        1px;
 
-    color: #999999;
+    margin-bottom:
+        8px;
 
-    line-height: 1.7;
+}
 
-    padding-right: 20px;
-}}
 
-.echo-next {{
-    position: absolute;
+.echo-message {
 
-    right: 12px;
-    bottom: 8px;
+    font-size:
+        12px;
 
-    font-size: 9px;
+    color:
+        #aaaaaa;
 
-    color: #555555;
+    line-height:
+        1.7;
 
-    opacity: 0;
-}}
+    min-height:
+        38px;
 
-.echo-next.visible {{
-    opacity: 1;
-    color: #888888;
-}}
+    white-space:
+        pre-wrap;
+
+}
+
+
+.echo-next {
+
+    position:
+        absolute;
+
+    right:
+        12px;
+
+    bottom:
+        7px;
+
+    font-size:
+        9px;
+
+    color:
+        #555555;
+
+}
+
+
+.echo-next.ready {
+
+    color:
+        #ffffff;
+
+    animation:
+        blink 0.8s steps(2) infinite;
+
+}
+
+
+@keyframes blink {
+
+    50% {
+
+        opacity:
+            0.35;
+
+    }
+
+}
 
 
 /* =====================================================
    STATUS
    ===================================================== */
 
-.status {{
-    position: absolute;
+.status {
 
-    bottom: 24px;
-    left: 28px;
+    position:
+        absolute;
 
-    font-size: 14px;
+    bottom:
+        24px;
 
-    color: #777777;
+    left:
+        28px;
 
-    z-index: 50;
-}}
+    font-size:
+        14px;
+
+    color:
+        #777777;
+
+    z-index:
+        20;
+
+}
 
 
 /* =====================================================
    COMMON OVERLAY
    ===================================================== */
 
-.overlay {{
-    position: absolute;
+.overlay {
 
-    inset: 0;
+    position:
+        absolute;
 
-    z-index: 100;
+    inset:
+        0;
 
-    display: flex;
+    z-index:
+        100;
 
-    align-items: center;
-    justify-content: center;
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
 
     background:
         rgba(0,0,0,0.92);
-}}
 
-
-/* =====================================================
-   COMPUTER OVERLAY
-   ===================================================== */
-
-.computer-overlay {{
-    position: absolute;
-
-    inset: 0;
-
-    z-index: 120;
-
-    display: none;
-
-    align-items: center;
-    justify-content: center;
-
-    background:
-        rgba(0,0,0,0.95);
-}}
-
-.computer-panel {{
-    width:
-        min(520px, 86vw);
-
-    background: #050505;
-
-    border:
-        1px solid #333333;
-
-    padding: 28px;
-}}
-
-.computer-title {{
-    font-size: 20px;
-
-    margin-bottom: 8px;
-}}
-
-.computer-sub {{
-    color: #666666;
-
-    font-size: 11px;
-
-    line-height: 1.7;
-
-    margin-bottom: 20px;
-}}
-
-.code-display {{
-    padding: 16px;
-
-    margin-bottom: 18px;
-
-    border:
-        1px solid #292929;
-
-    background: #000000;
-
-    text-align: center;
-}}
-
-.code-display-label {{
-    color: #555555;
-
-    font-size: 9px;
-
-    margin-bottom: 8px;
-}}
-
-.code-display-number {{
-    font-size: 28px;
-
-    letter-spacing: 8px;
-
-    color: #ffffff;
-}}
-
-.code-input {{
-    width: 100%;
-
-    height: 48px;
-
-    border:
-        1px solid #444444;
-
-    background: #000000;
-
-    color: #ffffff;
-
-    font-family:
-        'NeoDungGeunMo',
-        monospace;
-
-    font-size: 22px;
-
-    text-align: center;
-
-    letter-spacing: 6px;
-
-    outline: none;
-}}
-
-.code-input:focus {{
-    border-color: #ffffff;
-}}
-
-.code-button {{
-    width: 100%;
-
-    height: 44px;
-
-    margin-top: 10px;
-
-    border: none;
-
-    background: #ffffff;
-
-    color: #000000;
-
-    font-family:
-        'NeoDungGeunMo',
-        monospace;
-
-    cursor: pointer;
-}}
-
-.code-button:hover {{
-    background: #bbbbbb;
-}}
-
-.code-error {{
-    min-height: 20px;
-
-    margin-top: 12px;
-
-    color: #777777;
-
-    font-size: 11px;
-
-    text-align: center;
-}}
-
-
-/* =====================================================
-   CARD SWIPE
-   ===================================================== */
-
-.card-overlay {{
-    position: absolute;
-
-    inset: 0;
-
-    z-index: 180;
-
-    display: none;
-
-    align-items: center;
-    justify-content: center;
-
-    background:
-        rgba(0,0,0,0.94);
-}}
-
-.card-panel {{
-    width:
-        min(600px, 88vw);
-
-    padding: 30px;
-
-    background: #050505;
-
-    border:
-        1px solid #333333;
-
-    text-align: center;
-}}
-
-.card-title {{
-    font-size: 20px;
-
-    margin-bottom: 8px;
-}}
-
-.card-sub {{
-    font-size: 10px;
-
-    color: #666666;
-
-    margin-bottom: 30px;
-}}
-
-.card-reader {{
-    position: relative;
-
-    width: min(460px, 80vw);
-
-    height: 150px;
-
-    margin: 0 auto;
-
-    border:
-        1px solid #222222;
-
-    background: #000000;
-
-    overflow: hidden;
-}}
-
-.card-reader-line {{
-    position: absolute;
-
-    top: 50%;
-
-    left: 30px;
-    right: 30px;
-
-    height: 2px;
-
-    background: #222222;
-}}
-
-.card-reader-slot {{
-    position: absolute;
-
-    top: calc(50% - 12px);
-
-    right: 28px;
-
-    width: 70px;
-    height: 24px;
-
-    border:
-        1px solid #555555;
-
-    background: #0a0a0a;
-}}
-
-.access-card {{
-    position: absolute;
-
-    left: 20px;
-
-    top: calc(50% - 25px);
-
-    width: 95px;
-    height: 50px;
-
-    background: #ffffff;
-
-    color: #000000;
-
-    cursor: grab;
-
-    touch-action: none;
-
-    z-index: 5;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    font-size: 10px;
-
-    letter-spacing: 1px;
-
-    box-shadow:
-        0 0 12px
-        rgba(255,255,255,0.15);
-}}
-
-.access-card:active {{
-    cursor: grabbing;
-}}
-
-.card-reader.success .access-card {{
-    animation:
-        cardSuccess
-        0.6s
-        ease-out
-        forwards;
-}}
-
-@keyframes cardSuccess {{
-    to {{
-        left: calc(100% - 123px);
-    }}
-}}
-
-.card-instruction {{
-    margin-top: 18px;
-
-    font-size: 10px;
-
-    color: #666666;
-}}
-
-.card-close {{
-    margin-top: 18px;
-}}
-
-
-/* =====================================================
-   PAUSE
-   ===================================================== */
-
-.pause-overlay {{
-    position: absolute;
-
-    inset: 0;
-
-    z-index: 160;
-
-    display: none;
-
-    align-items: center;
-    justify-content: center;
-
-    background:
-        rgba(0,0,0,0.94);
-}}
-
-.pause-title {{
-    font-size: 28px;
-
-    text-align: center;
-
-    margin-bottom: 10px;
-}}
-
-.pause-sub {{
-    color: #777777;
-
-    font-size: 12px;
-
-    text-align: center;
-}}
+}
 
 
 /* =====================================================
    INVENTORY
    ===================================================== */
 
-.inventory-panel {{
+.inventory-panel {
+
     width:
-        min(820px, 88vw);
+        min(820px,88vw);
 
-    background: #050505;
+    background:
+        #050505;
 
-    padding: 34px 38px;
-}}
+    padding:
+        34px 38px;
 
-.inventory-header {{
-    display: flex;
+}
 
-    justify-content: space-between;
-    align-items: center;
 
-    padding-bottom: 18px;
+.inventory-header {
 
-    margin-bottom: 22px;
+    display:
+        flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        center;
+
+    padding-bottom:
+        18px;
+
+    margin-bottom:
+        22px;
 
     border-bottom:
         1px solid #333333;
-}}
 
-.inventory-title {{
-    font-size: 24px;
-}}
+}
 
-.inventory-close {{
-    font-size: 12px;
 
-    color: #666666;
-}}
+.inventory-title {
 
-.inventory-grid {{
-    display: grid;
+    font-size:
+        24px;
+
+}
+
+
+.inventory-close {
+
+    font-size:
+        12px;
+
+    color:
+        #666666;
+
+}
+
+
+.inventory-grid {
+
+    display:
+        grid;
 
     grid-template-columns:
-        repeat(4, 1fr);
+        repeat(4,1fr);
 
-    gap: 10px;
-}}
+    gap:
+        10px;
 
-.inventory-slot {{
-    position: relative;
+}
 
-    aspect-ratio: 1 / 1;
 
-    background: #090909;
+.inventory-slot {
+
+    position:
+        relative;
+
+    aspect-ratio:
+        1;
+
+    background:
+        #090909;
 
     border:
         1px solid #292929;
 
-    display: flex;
+    display:
+        flex;
 
-    align-items: center;
-    justify-content: center;
+    align-items:
+        center;
 
-    cursor: pointer;
-}}
+    justify-content:
+        center;
+
+    cursor:
+        pointer;
+
+}
+
 
 .inventory-slot:hover,
-.inventory-slot.selected {{
-    background: #ffffff;
+.inventory-slot.selected {
 
-    color: #000000;
-}}
+    background:
+        #ffffff;
 
-.slot-number {{
-    position: absolute;
+    color:
+        #000000;
 
-    top: 7px;
-    left: 9px;
+}
 
-    font-size: 10px;
 
-    color: #555555;
-}}
+.slot-number {
 
-.item-name {{
-    font-size: 13px;
+    position:
+        absolute;
 
-    text-align: center;
-}}
+    top:
+        7px;
 
-.empty-text {{
-    color: #444444;
+    left:
+        9px;
 
-    font-size: 11px;
-}}
+    font-size:
+        10px;
 
-.item-description {{
-    min-height: 70px;
+    color:
+        #555555;
 
-    margin-top: 20px;
+}
 
-    padding: 15px;
 
-    background: #090909;
+.item-name {
+
+    font-size:
+        13px;
+
+    text-align:
+        center;
+
+}
+
+
+.empty-text {
+
+    color:
+        #444444;
+
+    font-size:
+        11px;
+
+}
+
+
+.item-description {
+
+    min-height:
+        70px;
+
+    margin-top:
+        20px;
+
+    padding:
+        15px;
+
+    background:
+        #090909;
 
     border-top:
         1px solid #292929;
 
-    font-size: 12px;
+    font-size:
+        12px;
 
-    line-height: 1.8;
+    line-height:
+        1.8;
 
-    color: #888888;
-}}
+    color:
+        #888888;
+
+}
 
 
 /* =====================================================
    HELP
    ===================================================== */
 
-.help-panel {{
+.help-panel {
+
     width:
-        min(760px, 86vw);
+        min(760px,86vw);
 
-    max-height: 82vh;
+    max-height:
+        82vh;
 
-    overflow-y: auto;
+    overflow-y:
+        auto;
 
-    background: #050505;
+    background:
+        #050505;
 
-    padding: 36px 40px;
-}}
+    padding:
+        36px 40px;
 
-.help-header {{
-    display: flex;
+}
 
-    justify-content: space-between;
 
-    padding-bottom: 18px;
+.help-header {
 
-    margin-bottom: 20px;
+    display:
+        flex;
+
+    justify-content:
+        space-between;
+
+    padding-bottom:
+        18px;
+
+    margin-bottom:
+        20px;
 
     border-bottom:
         1px solid #333333;
-}}
 
-.help-title {{
-    font-size: 24px;
-}}
+}
 
-.help-close {{
-    font-size: 12px;
 
-    color: #666666;
-}}
+.help-title {
 
-.help-row {{
-    display: flex;
+    font-size:
+        24px;
 
-    gap: 20px;
+}
 
-    padding: 14px 0;
+
+.help-close {
+
+    font-size:
+        12px;
+
+    color:
+        #666666;
+
+}
+
+
+.help-row {
+
+    display:
+        flex;
+
+    gap:
+        20px;
+
+    padding:
+        14px 0;
 
     border-bottom:
         1px solid #1f1f1f;
-}}
 
-.help-number {{
-    width: 30px;
+}
 
-    color: #555555;
-}}
 
-.help-key {{
-    width: 145px;
+.help-number {
 
-    font-size: 14px;
-}}
+    width:
+        30px;
 
-.help-description {{
-    color: #888888;
+    color:
+        #555555;
 
-    font-size: 12px;
+}
 
-    line-height: 1.7;
-}}
+
+.help-key {
+
+    width:
+        145px;
+
+    font-size:
+        14px;
+
+}
+
+
+.help-description {
+
+    color:
+        #888888;
+
+    font-size:
+        12px;
+
+    line-height:
+        1.7;
+
+}
+
+
+/* =====================================================
+   COMPUTER
+   ===================================================== */
+
+.computer-overlay {
+
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    z-index:
+        120;
+
+    display:
+        none;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    background:
+        rgba(0,0,0,0.94);
+
+}
+
+
+.computer-panel {
+
+    width:
+        min(540px,86vw);
+
+    background:
+        #050505;
+
+    border:
+        1px solid #333333;
+
+    padding:
+        28px;
+
+}
+
+
+.computer-title {
+
+    font-size:
+        20px;
+
+    margin-bottom:
+        8px;
+
+}
+
+
+.computer-sub {
+
+    color:
+        #666666;
+
+    font-size:
+        11px;
+
+    margin-bottom:
+        18px;
+
+}
+
+
+.access-sequence {
+
+    padding:
+        15px;
+
+    margin-bottom:
+        16px;
+
+    border:
+        1px solid #292929;
+
+    text-align:
+        center;
+
+    color:
+        #777777;
+
+    font-size:
+        11px;
+
+}
+
+
+.access-number {
+
+    font-size:
+        34px;
+
+    color:
+        #ffffff;
+
+    letter-spacing:
+        8px;
+
+    margin-top:
+        8px;
+
+}
+
+
+.code-input {
+
+    width:
+        100%;
+
+    height:
+        48px;
+
+    border:
+        1px solid #444444;
+
+    background:
+        #000000;
+
+    color:
+        #ffffff;
+
+    font-size:
+        22px;
+
+    text-align:
+        center;
+
+    letter-spacing:
+        6px;
+
+    outline:
+        none;
+
+}
+
+
+.code-input:focus {
+
+    border-color:
+        #ffffff;
+
+}
+
+
+.code-button {
+
+    height:
+        44px;
+
+    margin-top:
+        10px;
+
+    border:
+        none;
+
+    background:
+        #ffffff;
+
+    color:
+        #000000;
+
+    font-size:
+        13px;
+
+    cursor:
+        pointer;
+
+    padding:
+        0 18px;
+
+}
+
+
+.code-button:hover {
+
+    background:
+        #bbbbbb;
+
+}
+
+
+.code-error {
+
+    min-height:
+        20px;
+
+    margin-top:
+        12px;
+
+    color:
+        #777777;
+
+    font-size:
+        11px;
+
+    text-align:
+        center;
+
+}
+
+
+/* =====================================================
+   CARD ACCESS
+   ===================================================== */
+
+.card-overlay {
+
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    z-index:
+        120;
+
+    display:
+        none;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    background:
+        rgba(0,0,0,0.94);
+
+}
+
+
+.card-panel {
+
+    width:
+        min(620px,90vw);
+
+    background:
+        #050505;
+
+    border:
+        1px solid #333333;
+
+    padding:
+        24px;
+
+}
+
+
+.card-header {
+
+    display:
+        flex;
+
+    justify-content:
+        space-between;
+
+    border-bottom:
+        1px solid #292929;
+
+    padding-bottom:
+        14px;
+
+    margin-bottom:
+        18px;
+
+}
+
+
+.card-title {
+
+    font-size:
+        18px;
+
+}
+
+
+.card-help {
+
+    font-size:
+        10px;
+
+    color:
+        #666666;
+
+}
+
+
+.card-stage {
+
+    position:
+        relative;
+
+    height:
+        260px;
+
+    border:
+        1px solid #242424;
+
+    background:
+
+        repeating-linear-gradient(
+            0deg,
+            transparent 0 31px,
+            rgba(255,255,255,0.025) 32px
+        ),
+
+        repeating-linear-gradient(
+            90deg,
+            transparent 0 31px,
+            rgba(255,255,255,0.025) 32px
+        );
+
+    overflow:
+        hidden;
+
+}
+
+
+.reader {
+
+    position:
+        absolute;
+
+    right:
+        12%;
+
+    top:
+        50%;
+
+    transform:
+        translateY(-50%);
+
+    width:
+        120px;
+
+    height:
+        70px;
+
+    border:
+        1px solid #555555;
+
+    background:
+        #0b0b0b;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    color:
+        #777777;
+
+    font-size:
+        10px;
+
+}
+
+
+.reader-slot {
+
+    position:
+        absolute;
+
+    left:
+        10%;
+
+    right:
+        10%;
+
+    top:
+        50%;
+
+    height:
+        3px;
+
+    background:
+        #ffffff;
+
+    box-shadow:
+        0 0 8px
+        rgba(255,255,255,0.3);
+
+}
+
+
+.card {
+
+    position:
+        absolute;
+
+    left:
+        12%;
+
+    top:
+        50%;
+
+    width:
+        130px;
+
+    height:
+        78px;
+
+    transform:
+        translateY(-50%);
+
+    border:
+        1px solid #ffffff;
+
+    background:
+        #111111;
+
+    cursor:
+        grab;
+
+    touch-action:
+        none;
+
+    z-index:
+        3;
+
+    padding:
+        12px;
+
+    color:
+        #ffffff;
+
+    font-size:
+        11px;
+
+}
+
+
+.card:active {
+
+    cursor:
+        grabbing;
+
+}
+
+
+.card-chip {
+
+    width:
+        22px;
+
+    height:
+        15px;
+
+    border:
+        1px solid #aaaaaa;
+
+    margin-bottom:
+        8px;
+
+}
+
+
+.card-status {
+
+    margin-top:
+        14px;
+
+    min-height:
+        18px;
+
+    text-align:
+        center;
+
+    color:
+        #777777;
+
+    font-size:
+        11px;
+
+}
+
+
+.card-arrow {
+
+    position:
+        absolute;
+
+    left:
+        41%;
+
+    top:
+        50%;
+
+    transform:
+        translate(-50%,-50%);
+
+    font-size:
+        22px;
+
+    color:
+        #555555;
+
+    animation:
+        slideArrow 1s ease-in-out infinite;
+
+}
+
+
+@keyframes slideArrow {
+
+    0%,
+    100% {
+
+        opacity:
+            0.25;
+
+        transform:
+            translate(-70%,-50%);
+
+    }
+
+    50% {
+
+        opacity:
+            1;
+
+        transform:
+            translate(-30%,-50%);
+
+    }
+
+}
+
+
+/* =====================================================
+   PAUSE
+   ===================================================== */
+
+.pause-overlay {
+
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    z-index:
+        90;
+
+    display:
+        none;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    background:
+        rgba(0,0,0,0.90);
+
+}
+
+
+.pause-title {
+
+    font-size:
+        28px;
+
+    text-align:
+        center;
+
+    margin-bottom:
+        14px;
+
+}
+
+
+.pause-sub {
+
+    color:
+        #777777;
+
+    font-size:
+        13px;
+
+    text-align:
+        center;
+
+}
+
+
+.pause-actions {
+
+    margin-top:
+        24px;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        8px;
+
+    align-items:
+        center;
+
+}
 
 
 /* =====================================================
    MOBILE CONTROLS
    ===================================================== */
 
-.mobile-controls {{
-    display: none;
+.mobile-controls {
 
-    position: absolute;
+    display:
+        none;
 
-    right: 16px;
-    bottom: 18px;
+    position:
+        absolute;
 
-    width: 150px;
-    height: 150px;
+    right:
+        18px;
 
-    z-index: 300;
+    bottom:
+        18px;
 
-    pointer-events: none;
-}}
+    width:
+        138px;
 
-.control-button {{
-    position: absolute;
+    height:
+        138px;
 
-    width: 46px;
-    height: 46px;
+    z-index:
+        150;
 
-    padding: 0;
+    pointer-events:
+        none;
+
+}
+
+
+.control-button {
+
+    position:
+        absolute;
+
+    width:
+        44px;
+
+    height:
+        44px;
+
+    padding:
+        0;
 
     border:
-        1px solid #555555;
+        1px solid #777777;
 
     background:
         rgba(0,0,0,0.92);
 
-    color: #ffffff;
+    color:
+        #ffffff;
 
-    font-family:
-        'NeoDungGeunMo',
-        monospace;
+    font-size:
+        20px;
 
-    font-size: 20px;
+    display:
+        flex;
 
-    display: flex;
+    align-items:
+        center;
 
-    align-items: center;
-    justify-content: center;
+    justify-content:
+        center;
 
-    touch-action: none;
+    touch-action:
+        none;
 
-    pointer-events: auto;
+    pointer-events:
+        auto;
 
-    -webkit-tap-highlight-color: transparent;
-}}
+    -webkit-tap-highlight-color:
+        transparent;
 
-.control-button:active {{
-    background: #ffffff;
+}
 
-    color: #000000;
-}}
 
-.control-up {{
-    top: 0;
-    left: 52px;
-}}
+.control-button:active {
 
-.control-left {{
-    top: 52px;
-    left: 0;
-}}
+    background:
+        #ffffff;
 
-.control-right {{
-    top: 52px;
-    right: 0;
-}}
+    color:
+        #000000;
 
-.control-down {{
-    bottom: 0;
-    left: 52px;
-}}
+}
+
+
+.control-up {
+
+    top:
+        0;
+
+    left:
+        47px;
+
+}
+
+
+.control-left {
+
+    top:
+        47px;
+
+    left:
+        0;
+
+}
+
+
+.control-right {
+
+    top:
+        47px;
+
+    right:
+        0;
+
+}
+
+
+.control-down {
+
+    bottom:
+        0;
+
+    left:
+        47px;
+
+}
 
 
 /* =====================================================
    MOBILE
    ===================================================== */
 
-@media (max-width: 700px) {{
+@media (max-width:700px) {
 
-    .project-title {{
-        top: 16px;
-        left: 16px;
+    .project-title {
 
-        font-size: 14px;
-    }}
+        top:
+            16px;
 
-    .stage-title {{
-        top: 38px;
-        left: 16px;
+        left:
+            16px;
 
-        font-size: 10px;
-    }}
+        font-size:
+            14px;
 
-    .game-area {{
-        top: 64px;
+    }
 
-        left: 12px;
-        right: 12px;
 
-        bottom: 54px;
+    .stage-title {
 
-        background-size: 28px 28px;
-    }}
+        top:
+            38px;
 
-    .status {{
-        left: 12px;
-        bottom: 14px;
+        left:
+            16px;
 
-        font-size: 10px;
-    }}
+        font-size:
+            10px;
 
-    .echo-bar {{
-        width: 88%;
+    }
 
-        min-height: 90px;
 
-        bottom: 2%;
+    .game-area {
 
-        padding: 11px 13px;
-    }}
+        top:
+            66px;
 
-    .echo-message {{
-        font-size: 10px;
-    }}
+        left:
+            10px;
 
-    .interaction-message {{
-        bottom: 25%;
-    }}
+        right:
+            10px;
 
-    .mobile-controls {{
-        display: block;
-    }}
+        bottom:
+            55px;
 
-    .inventory-panel,
-    .help-panel {{
-        width: 92vw;
+        background-size:
+            30px 30px;
 
-        padding: 24px 20px;
-    }}
+    }
 
-    .inventory-grid {{
-        gap: 6px;
-    }}
 
-    .item-name {{
-        font-size: 10px;
-    }}
+    .status {
 
-    .help-row {{
-        gap: 10px;
-    }}
+        left:
+            12px;
 
-    .help-key {{
-        width: 90px;
+        bottom:
+            14px;
 
-        font-size: 11px;
-    }}
+        font-size:
+            10px;
 
-    .help-description {{
-        font-size: 10px;
-    }}
+    }
 
-    .exit-label {{
-        left: -92px;
 
-        font-size: 8px;
-    }}
+    .echo-bar {
 
-    .exit-arrow {{
-        left: -50px;
+        width:
+            92%;
 
-        font-size: 18px;
-    }}
+        bottom:
+            2%;
 
-}}
+        min-height:
+            82px;
+
+        padding:
+            11px 13px 20px;
+
+    }
+
+
+    .echo-message {
+
+        font-size:
+            11px;
+
+    }
+
+
+    .interaction-message {
+
+        bottom:
+            22%;
+
+        font-size:
+            10px;
+
+    }
+
+
+    .mobile-controls {
+
+        display:
+            block;
+
+    }
+
+
+    .computer-panel {
+
+        padding:
+            20px;
+
+    }
+
+
+    .access-number {
+
+        font-size:
+            27px;
+
+    }
+
+
+    .card-stage {
+
+        height:
+            220px;
+
+    }
+
+
+    .exit-sign {
+
+        right:
+            10%;
+
+        font-size:
+            9px;
+
+    }
+
+}
 
 </style>
 
@@ -1651,598 +2533,657 @@ body {{
 >
 
 
-    <!-- =================================================
-         HEADER
-         ================================================= -->
+<div class="project-title">
+    PROJECT : LOGIC
+</div>
 
-    <div class="project-title">
-        PROJECT : LOGIC
+
+<div class="stage-title">
+    STAGE 01 // CONTROL ROOM
+</div>
+
+
+<div class="game-area">
+
+
+<!-- =====================================================
+     MOBILE CONTROLS
+     ===================================================== -->
+
+<div
+    class="mobile-controls"
+    id="mobileControls"
+>
+
+<button
+    class="control-button control-up"
+    data-direction="w"
+    type="button"
+>
+    ▲
+</button>
+
+
+<button
+    class="control-button control-left"
+    data-direction="a"
+    type="button"
+>
+    ◀
+</button>
+
+
+<button
+    class="control-button control-right"
+    data-direction="d"
+    type="button"
+>
+    ▶
+</button>
+
+
+<button
+    class="control-button control-down"
+    data-direction="s"
+    type="button"
+>
+    ▼
+</button>
+
+</div>
+
+
+<!-- =====================================================
+     ROOM
+     ===================================================== -->
+
+<div class="room">
+
+
+<div class="room-line-horizontal"></div>
+
+<div class="room-line-vertical"></div>
+
+
+<!-- MONITOR -->
+
+<div
+    class="object monitor"
+    id="monitor"
+>
+</div>
+
+
+<!-- COMPUTER -->
+
+<div
+    class="object computer"
+    id="computer"
+>
+
+    COMPUTER
+
+    <div class="object-label">
+        ECHO TERMINAL
     </div>
 
-    <div class="stage-title">
-        STAGE 01 // CONTROL ROOM
+</div>
+
+
+<!-- DESK -->
+
+<div
+    class="object desk"
+    id="desk"
+>
+
+    DESK
+
+    <div class="object-label">
+        RESEARCH DESK
     </div>
 
-
-    <!-- =================================================
-         GAME AREA
-         ================================================= -->
-
-    <div class="game-area">
-
-
-        <div class="room">
-
-
-            <div class="room-line-horizontal"></div>
-
-            <div class="room-line-vertical"></div>
-
-
-            <!-- =================================================
-                 COMPUTER
-                 ================================================= -->
-
-            <div
-                class="object computer"
-                id="computer"
-            >
-
-                COMPUTER
-
-                <div class="object-label">
-                    ECHO TERMINAL
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 DESK
-                 ================================================= -->
-
-            <div
-                class="object desk"
-                id="desk"
-            >
-
-                DESK
-
-                <div class="object-label">
-                    RESEARCH DESK
-                </div>
-
-                <div
-                    class="access-key"
-                    id="accessKey"
-                ></div>
-
-            </div>
-
-
-            <!-- =================================================
-                 EXIT WALL
-                 ================================================= -->
-
-            <div
-                class="exit-wall"
-                id="exitWall"
-            >
-
-                <div class="exit-label">
-                    [<span>EXIT</span>] SECURITY ROOM
-                </div>
-
-                <div
-                    class="exit-arrow"
-                    id="exitArrow"
-                >
-                    ↓
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 PLAYER
-                 ================================================= -->
-
-            <div
-                class="player"
-                id="player"
-            ></div>
-
-
-            <!-- =================================================
-                 INTERACTION
-                 ================================================= -->
-
-            <div
-                class="interaction-message"
-                id="interactionMessage"
-            >
-                PRESS E
-            </div>
-
-
-            <!-- =================================================
-                 ECHO
-                 ================================================= -->
-
-            <div
-                class="echo-bar"
-                id="echoBar"
-            >
-
-                <div class="echo-name">
-                    ECHO // AI SYSTEM
-                </div>
-
-                <div
-                    class="echo-message"
-                    id="echoMessage"
-                ></div>
-
-                <div
-                    class="echo-next"
-                    id="echoNext"
-                >
-                    SPACE // NEXT
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 MOBILE CONTROLS
-                 ================================================= -->
-
-            <div
-                class="mobile-controls"
-                id="mobileControls"
-            >
-
-                <button
-                    class="control-button control-up"
-                    data-direction="w"
-                    type="button"
-                >
-                    ▲
-                </button>
-
-                <button
-                    class="control-button control-left"
-                    data-direction="a"
-                    type="button"
-                >
-                    ◀
-                </button>
-
-                <button
-                    class="control-button control-right"
-                    data-direction="d"
-                    type="button"
-                >
-                    ▶
-                </button>
-
-                <button
-                    class="control-button control-down"
-                    data-direction="s"
-                    type="button"
-                >
-                    ▼
-                </button>
-
-            </div>
-
-
-            <!-- =================================================
-                 INVENTORY
-                 ================================================= -->
-
-            <div
-                class="overlay"
-                id="inventoryOverlay"
-                style="display:none;"
-            >
-
-                <div class="inventory-panel">
-
-                    <div class="inventory-header">
-
-                        <div class="inventory-title">
-                            INVENTORY
-                        </div>
-
-                        <div class="inventory-close">
-                            I / ESC TO CLOSE
-                        </div>
-
-                    </div>
-
-                    <div class="inventory-grid">
-
-                        <div
-                            class="inventory-slot"
-                            data-slot="0"
-                        ></div>
-
-                        <div
-                            class="inventory-slot"
-                            data-slot="1"
-                        ></div>
-
-                        <div
-                            class="inventory-slot"
-                            data-slot="2"
-                        ></div>
-
-                        <div
-                            class="inventory-slot"
-                            data-slot="3"
-                        ></div>
-
-                        <div
-                            class="inventory-slot"
-                            data-slot="4"
-                        ></div>
-
-                        <div
-                            class="inventory-slot"
-                            data-slot="5"
-                        ></div>
-
-                        <div
-                            class="inventory-slot"
-                            data-slot="6"
-                        ></div>
-
-                        <div
-                            class="inventory-slot"
-                            data-slot="7"
-                        ></div>
-
-                    </div>
-
-                    <div
-                        class="item-description"
-                        id="itemDescription"
-                    >
-                        ITEM DESCRIPTION
-
-                        <br><br>
-
-                        아이템을 선택하면 설명이 표시됩니다.
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 HELP
-                 ================================================= -->
-
-            <div
-                class="overlay"
-                id="helpOverlay"
-                style="display:none;"
-            >
-
-                <div class="help-panel">
-
-                    <div class="help-header">
-
-                        <div class="help-title">
-                            HOW TO PLAY
-                        </div>
-
-                        <div class="help-close">
-                            H / ESC TO CLOSE
-                        </div>
-
-                    </div>
-
-
-                    <div class="help-row">
-
-                        <div class="help-number">
-                            01
-                        </div>
-
-                        <div class="help-key">
-                            MOVEMENT<br>
-                            W A S D
-                        </div>
-
-                        <div class="help-description">
-                            시설 내부를 이동합니다.
-                        </div>
-
-                    </div>
-
-
-                    <div class="help-row">
-
-                        <div class="help-number">
-                            02
-                        </div>
-
-                        <div class="help-key">
-                            INTERACTION<br>
-                            E
-                        </div>
-
-                        <div class="help-description">
-                            가까운 물체를 조사하거나
-                            아이템을 획득합니다.
-                        </div>
-
-                    </div>
-
-
-                    <div class="help-row">
-
-                        <div class="help-number">
-                            03
-                        </div>
-
-                        <div class="help-key">
-                            INVENTORY<br>
-                            I
-                        </div>
-
-                        <div class="help-description">
-                            획득한 아이템을 확인합니다.
-                        </div>
-
-                    </div>
-
-
-                    <div class="help-row">
-
-                        <div class="help-number">
-                            04
-                        </div>
-
-                        <div class="help-key">
-                            ECHO<br>
-                            SPACE
-                        </div>
-
-                        <div class="help-description">
-                            현재 채팅을 즉시 완성하거나
-                            다음 채팅으로 넘어갑니다.
-                        </div>
-
-                    </div>
-
-
-                    <div class="help-row">
-
-                        <div class="help-number">
-                            05
-                        </div>
-
-                        <div class="help-key">
-                            CONTROLS<br>
-                            H
-                        </div>
-
-                        <div class="help-description">
-                            조작 방법을 확인합니다.
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 COMPUTER
-                 ================================================= -->
-
-            <div
-                class="computer-overlay"
-                id="computerOverlay"
-            >
-
-                <div class="computer-panel">
-
-                    <div class="computer-title">
-                        ECHO TERMINAL
-                    </div>
-
-                    <div class="computer-sub">
-                        SYSTEM ACCESS REQUIRED.<br>
-                        ECHO HAS GENERATED A TEMPORARY ACCESS SEQUENCE.
-                    </div>
-
-
-                    <div class="code-display">
-
-                        <div class="code-display-label">
-                            ACCESS SEQUENCE
-                        </div>
-
-                        <div
-                            class="code-display-number"
-                            id="codeDisplayNumber"
-                        >
-                            ----
-                        </div>
-
-                    </div>
-
-
-                    <input
-                        class="code-input"
-                        id="codeInput"
-                        type="text"
-                        inputmode="numeric"
-                        autocomplete="off"
-                        maxlength="4"
-                        aria-label="Access code"
-                    >
-
-
-                    <button
-                        class="code-button"
-                        id="codeButton"
-                        type="button"
-                    >
-                        EXECUTE
-                    </button>
-
-
-                    <div
-                        class="code-error"
-                        id="codeError"
-                    ></div>
-
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 CARD SWIPE
-                 ================================================= -->
-
-            <div
-                class="card-overlay"
-                id="cardOverlay"
-            >
-
-                <div class="card-panel">
-
-                    <div class="card-title">
-                        SECURITY ACCESS
-                    </div>
-
-                    <div class="card-sub">
-                        MOVE THE ACCESS KEY ACROSS THE READER.
-                    </div>
-
-
-                    <div
-                        class="card-reader"
-                        id="cardReader"
-                    >
-
-                        <div class="card-reader-line"></div>
-
-                        <div class="card-reader-slot"></div>
-
-                        <div
-                            class="access-card"
-                            id="accessCard"
-                        >
-                            ACCESS KEY
-                        </div>
-
-                    </div>
-
-
-                    <div class="card-instruction">
-                        CLICK / TOUCH AND DRAG
-                    </div>
-
-
-                    <button
-                        class="code-button card-close"
-                        id="cardClose"
-                        type="button"
-                        style="width:170px;"
-                    >
-                        CANCEL
-                    </button>
-
-                </div>
-
-            </div>
-
-
-            <!-- =================================================
-                 PAUSE
-                 ================================================= -->
-
-            <div
-                class="pause-overlay"
-                id="pauseOverlay"
-            >
-
-                <div>
-
-                    <div class="pause-title">
-                        GAME PAUSED
-                    </div>
-
-                    <div class="pause-sub">
-                        PRESS ▶ TO CONTINUE
-                    </div>
-
-
-                    <div
-                        style="
-                        margin-top:24px;
-                        display:flex;
-                        flex-direction:column;
-                        gap:8px;
-                        align-items:center;
-                        "
-                    >
-
-                        <button
-                            class="code-button"
-                            id="restartButton"
-                            type="button"
-                            style="width:170px;"
-                        >
-                            RESTART
-                        </button>
-
-
-                        <button
-                            class="code-button"
-                            id="titleButton"
-                            type="button"
-                            style="
-                            width:170px;
-                            background:#000;
-                            color:#fff;
-                            border:1px solid #333;
-                            "
-                        >
-                            TITLE
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-        </div>
-
-    </div>
-
-
-    <!-- =================================================
-         STATUS
-         ================================================= -->
 
     <div
-        class="status"
-        id="status"
-    >
-        ECHO SYSTEM // ONLINE
+        class="access-key"
+        id="accessKey"
+    ></div>
+
+</div>
+
+
+<!-- EXIT -->
+
+<div
+    class="exit-wall"
+    id="exitDoor"
+>
+</div>
+
+
+<div class="exit-sign">
+
+    <span class="exit-arrow">
+        ↓ ↑
+    </span>
+
+    <br>
+
+    <span>
+        [EXIT] SECURITY ROOM
+    </span>
+
+</div>
+
+
+<!-- PLAYER -->
+
+<div
+    class="player"
+    id="player"
+></div>
+
+
+<!-- INTERACTION -->
+
+<div
+    class="interaction-message"
+    id="interactionMessage"
+>
+    PRESS E
+</div>
+
+
+<!-- ECHO -->
+
+<div class="echo-bar">
+
+    <div class="echo-name">
+        ECHO // AI SYSTEM
     </div>
+
+
+    <div
+        class="echo-message"
+        id="echoMessage"
+    ></div>
+
+
+    <div
+        class="echo-next"
+        id="echoNext"
+    >
+        SPACE // SKIP / NEXT
+    </div>
+
+</div>
+
+
+</div>
+
+
+<!-- =====================================================
+     INVENTORY
+     ===================================================== -->
+
+<div
+    class="overlay"
+    id="inventoryOverlay"
+    style="display:none;"
+>
+
+<div class="inventory-panel">
+
+
+<div class="inventory-header">
+
+    <div class="inventory-title">
+        INVENTORY
+    </div>
+
+    <div class="inventory-close">
+        I / ESC TO CLOSE
+    </div>
+
+</div>
+
+
+<div class="inventory-grid">
+
+<div
+    class="inventory-slot"
+    data-slot="0"
+></div>
+
+<div
+    class="inventory-slot"
+    data-slot="1"
+></div>
+
+<div
+    class="inventory-slot"
+    data-slot="2"
+></div>
+
+<div
+    class="inventory-slot"
+    data-slot="3"
+></div>
+
+<div
+    class="inventory-slot"
+    data-slot="4"
+></div>
+
+<div
+    class="inventory-slot"
+    data-slot="5"
+></div>
+
+<div
+    class="inventory-slot"
+    data-slot="6"
+></div>
+
+<div
+    class="inventory-slot"
+    data-slot="7"
+></div>
+
+</div>
+
+
+<div
+    class="item-description"
+    id="itemDescription"
+>
+
+    ITEM DESCRIPTION
+
+    <br><br>
+
+    아이템을 선택하면 설명이 표시됩니다.
+
+</div>
+
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     HELP
+     ===================================================== -->
+
+<div
+    class="overlay"
+    id="helpOverlay"
+    style="display:none;"
+>
+
+<div class="help-panel">
+
+
+<div class="help-header">
+
+    <div class="help-title">
+        HOW TO PLAY
+    </div>
+
+    <div class="help-close">
+        H / ESC TO CLOSE
+    </div>
+
+</div>
+
+
+<div class="help-row">
+
+    <div class="help-number">
+        01
+    </div>
+
+    <div class="help-key">
+        MOVEMENT<br>
+        W A S D
+    </div>
+
+    <div class="help-description">
+        연구시설 내부를 이동합니다.
+    </div>
+
+</div>
+
+
+<div class="help-row">
+
+    <div class="help-number">
+        02
+    </div>
+
+    <div class="help-key">
+        INTERACTION<br>
+        E
+    </div>
+
+    <div class="help-description">
+        가까운 물체를 조사하거나 아이템을 획득합니다.
+    </div>
+
+</div>
+
+
+<div class="help-row">
+
+    <div class="help-number">
+        03
+    </div>
+
+    <div class="help-key">
+        INVENTORY<br>
+        I
+    </div>
+
+    <div class="help-description">
+        획득한 아이템을 확인합니다.
+    </div>
+
+</div>
+
+
+<div class="help-row">
+
+    <div class="help-number">
+        04
+    </div>
+
+    <div class="help-key">
+        SYSTEM<br>
+        SPACE
+    </div>
+
+    <div class="help-description">
+        ECHO의 채팅을 끝까지 표시하거나 다음 채팅으로 넘어갑니다.
+    </div>
+
+</div>
+
+
+<div class="help-row">
+
+    <div class="help-number">
+        05
+    </div>
+
+    <div class="help-key">
+        CONTROLS<br>
+        H
+    </div>
+
+    <div class="help-description">
+        조작 방법을 다시 확인합니다.
+    </div>
+
+</div>
+
+
+<div
+    style="
+    margin-top:22px;
+    padding:16px;
+    background:#090909;
+    border-left:2px solid #ffffff;
+    "
+>
+
+    <div
+        style="
+        margin-bottom:8px;
+        font-size:13px;
+        "
+    >
+        IMPORTANT
+    </div>
+
+
+    <div
+        style="
+        color:#888888;
+        font-size:11px;
+        line-height:1.8;
+        "
+    >
+
+        시설 내부의 물체와 기록을 자세히 조사하세요.<br>
+
+        ECHO가 제공하는 모든 정보가 사실이라고 가정해서는 안 됩니다.<br>
+
+        서로 모순되는 단서가 발견될 수도 있습니다.
+
+    </div>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     COMPUTER
+     ===================================================== -->
+
+<div
+    class="computer-overlay"
+    id="computerOverlay"
+>
+
+<div class="computer-panel">
+
+
+<div class="computer-title">
+    ECHO TERMINAL
+</div>
+
+
+<div class="computer-sub">
+    ACCESS SEQUENCE // ECHO GENERATED
+</div>
+
+
+<div class="access-sequence">
+
+    ACCESS SEQUENCE
+
+    <div
+        class="access-number"
+        id="accessNumber"
+    >
+        ----
+    </div>
+
+</div>
+
+
+<input
+    class="code-input"
+    id="codeInput"
+    type="text"
+    inputmode="numeric"
+    autocomplete="off"
+    maxlength="4"
+    aria-label="Access code"
+>
+
+
+<button
+    class="code-button"
+    id="codeButton"
+    type="button"
+>
+    EXECUTE
+</button>
+
+
+<div
+    class="code-error"
+    id="codeError"
+></div>
+
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     CARD ACCESS
+     ===================================================== -->
+
+<div
+    class="card-overlay"
+    id="cardOverlay"
+>
+
+<div class="card-panel">
+
+
+<div class="card-header">
+
+    <div class="card-title">
+        SECURITY ROOM // ACCESS
+    </div>
+
+    <div class="card-help">
+        DRAG CARD TO READER
+    </div>
+
+</div>
+
+
+<div
+    class="card-stage"
+    id="cardStage"
+>
+
+
+<div class="reader">
+
+    <div class="reader-slot"></div>
+
+    CARD READER
+
+</div>
+
+
+<div class="card-arrow">
+    →
+</div>
+
+
+<div
+    class="card"
+    id="dragCard"
+>
+
+    <div class="card-chip"></div>
+
+    ACCESS KEY
+
+    <br>
+
+    <span style="color:#666">
+        SECURITY AUTHORIZATION
+    </span>
+
+</div>
+
+
+</div>
+
+
+<div
+    class="card-status"
+    id="cardStatus"
+>
+    카드를 리더기까지 끌어다 놓으십시오.
+</div>
+
+
+</div>
+
+</div>
+
+
+<!-- =====================================================
+     PAUSE
+     ===================================================== -->
+
+<div
+    class="pause-overlay"
+    id="pauseOverlay"
+>
+
+<div>
+
+
+<div class="pause-title">
+    GAME PAUSED
+</div>
+
+
+<div class="pause-sub">
+    PRESS ▶ TO CONTINUE
+</div>
+
+
+<div class="pause-actions">
+
+
+<button
+    class="code-button"
+    id="restartButton"
+    type="button"
+    style="width:170px;"
+>
+    RESTART
+</button>
+
+
+<button
+    class="code-button"
+    id="titleButton"
+    type="button"
+    style="
+    width:170px;
+    background:#000;
+    color:#fff;
+    border:1px solid #333;
+    "
+>
+    TITLE
+</button>
+
+
+</div>
+
+
+</div>
+
+</div>
+
+
+</div>
+
+
+<div
+    class="status"
+    id="status"
+>
+    ECHO SYSTEM // ONLINE
+</div>
 
 
 </div>
@@ -2250,31 +3191,22 @@ body {{
 
 <script>
 
-/* =====================================================
-   STATE
-   ===================================================== */
+(function () {
 
-let paused = {str(paused).lower()};
-
-let tutorialStep = 0;
-
-let inventoryOpen = false;
-let helpOpen = false;
-let computerOpen = false;
-let cardOpen = false;
-
-let accessKeyCreated = false;
-let accessKeyCollected = false;
-
-let chatIndex = 0;
-let chatTyping = false;
-let chatFinished = false;
-let chatTimer = null;
+"use strict";
 
 
 /* =====================================================
-   RANDOM ACCESS CODE
+   GAME STATE
    ===================================================== */
+
+const paused =
+    __PAUSED__;
+
+
+/*
+ * 방이 시작될 때마다 새로운 4자리 암호 생성
+ */
 
 const ACCESS_CODE =
     String(
@@ -2285,85 +3217,304 @@ const ACCESS_CODE =
     );
 
 
+let tutorialStep =
+    0;
+
+
+let inventoryOpen =
+    false;
+
+
+let helpOpen =
+    false;
+
+
+let computerOpen =
+    false;
+
+
+let cardOpen =
+    false;
+
+
+let keyCollected =
+    false;
+
+
+let echoIndex =
+    0;
+
+
+let typingTimer =
+    null;
+
+
+let typingDone =
+    false;
+
+
+let cardDragging =
+    false;
+
+
+let cardOffsetX =
+    0;
+
+
+let cardOffsetY =
+    0;
+
+
 /* =====================================================
    ELEMENTS
    ===================================================== */
 
-const gameRoot =
-    document.getElementById("gameRoot");
+const root =
+    document.getElementById(
+        "gameRoot"
+    );
 
-const player =
-    document.getElementById("player");
 
 const room =
-    document.querySelector(".room");
+    document.querySelector(
+        ".room"
+    );
 
-const inventoryOverlay =
-    document.getElementById("inventoryOverlay");
 
-const helpOverlay =
-    document.getElementById("helpOverlay");
+const player =
+    document.getElementById(
+        "player"
+    );
 
-const computerOverlay =
-    document.getElementById("computerOverlay");
-
-const cardOverlay =
-    document.getElementById("cardOverlay");
-
-const pauseOverlay =
-    document.getElementById("pauseOverlay");
-
-const interactionMessage =
-    document.getElementById("interactionMessage");
 
 const echoMessage =
-    document.getElementById("echoMessage");
+    document.getElementById(
+        "echoMessage"
+    );
+
 
 const echoNext =
-    document.getElementById("echoNext");
+    document.getElementById(
+        "echoNext"
+    );
+
+
+const interactionMessage =
+    document.getElementById(
+        "interactionMessage"
+    );
+
 
 const status =
-    document.getElementById("status");
+    document.getElementById(
+        "status"
+    );
+
 
 const accessKey =
-    document.getElementById("accessKey");
+    document.getElementById(
+        "accessKey"
+    );
 
-const exitArrow =
-    document.getElementById("exitArrow");
+
+const computerOverlay =
+    document.getElementById(
+        "computerOverlay"
+    );
+
+
+const accessNumber =
+    document.getElementById(
+        "accessNumber"
+    );
+
 
 const codeInput =
-    document.getElementById("codeInput");
+    document.getElementById(
+        "codeInput"
+    );
+
 
 const codeButton =
-    document.getElementById("codeButton");
+    document.getElementById(
+        "codeButton"
+    );
+
 
 const codeError =
-    document.getElementById("codeError");
+    document.getElementById(
+        "codeError"
+    );
 
-const codeDisplayNumber =
-    document.getElementById("codeDisplayNumber");
 
-const cardReader =
-    document.getElementById("cardReader");
+const inventoryOverlay =
+    document.getElementById(
+        "inventoryOverlay"
+    );
 
-const accessCard =
-    document.getElementById("accessCard");
 
-const cardClose =
-    document.getElementById("cardClose");
+const helpOverlay =
+    document.getElementById(
+        "helpOverlay"
+    );
+
+
+const cardOverlay =
+    document.getElementById(
+        "cardOverlay"
+    );
+
+
+const cardStage =
+    document.getElementById(
+        "cardStage"
+    );
+
+
+const dragCard =
+    document.getElementById(
+        "dragCard"
+    );
+
+
+const cardStatus =
+    document.getElementById(
+        "cardStatus"
+    );
+
+
+const pauseOverlay =
+    document.getElementById(
+        "pauseOverlay"
+    );
+
 
 const inventorySlots =
-    document.querySelectorAll(".inventory-slot");
+    document.querySelectorAll(
+        ".inventory-slot"
+    );
+
 
 const itemDescription =
-    document.getElementById("itemDescription");
+    document.getElementById(
+        "itemDescription"
+    );
 
 
 /* =====================================================
-   CHAT DATA
+   PLAYER
    ===================================================== */
 
-const tutorialMessages = [
+let playerX =
+    50;
+
+
+let playerY =
+    43;
+
+
+const playerRadius =
+    1.3;
+
+
+const moveSpeed =
+    0.55;
+
+
+const keys = {
+
+    w: false,
+    a: false,
+    s: false,
+    d: false
+
+};
+
+
+function clearKeys() {
+
+    keys.w = false;
+
+    keys.a = false;
+
+    keys.s = false;
+
+    keys.d = false;
+
+}
+
+
+/* =====================================================
+   INVENTORY
+   ===================================================== */
+
+const inventory = [
+
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null
+
+];
+
+
+function renderInventory() {
+
+    inventory.forEach(
+        function (item, index) {
+
+            const slot =
+                inventorySlots[index];
+
+
+            if (item) {
+
+                slot.innerHTML =
+                    `
+                    <div class="slot-number">
+                        ${String(index + 1).padStart(2, "0")}
+                    </div>
+
+                    <div class="item-name">
+                        ${item.name}
+                    </div>
+                    `;
+
+            }
+
+            else {
+
+                slot.innerHTML =
+                    `
+                    <div class="slot-number">
+                        ${String(index + 1).padStart(2, "0")}
+                    </div>
+
+                    <div class="empty-text">
+                        EMPTY
+                    </div>
+                    `;
+
+            }
+
+        }
+    );
+
+}
+
+
+renderInventory();
+
+
+/* =====================================================
+   ECHO CHAT
+   ===================================================== */
+
+const messages = [
 
     "연결이 확인되었습니다. 저는 ECHO입니다. 이 시설에서의 첫 번째 절차를 안내하겠습니다.",
 
@@ -2373,777 +3524,686 @@ const tutorialMessages = [
 
     "확인되었습니다. 이제 COMPUTER 화면에 표시된 접근 코드를 입력하십시오.",
 
-    "코드가 확인되었습니다. DESK를 확인하십시오. ACCESS KEY가 생성되었습니다.",
+    "코드가 확인되었습니다. 책상 위에 ACCESS KEY가 생성되었습니다. 책상으로 이동하여 키를 획득하십시오.",
 
-    "ACCESS KEY를 획득했습니다. 이제 EXIT로 이동하십시오. SECURITY ROOM으로 연결되는 출구입니다.",
-
-    "출구 보안 시스템이 활성화되었습니다. ACCESS KEY를 리더기에 긁어 다음 구역으로 이동하십시오."
+    "ACCESS KEY를 획득했습니다. 이제 EXIT SECURITY ROOM으로 이동하십시오. 출구에서 E를 누르면 보안 인증이 시작됩니다."
 
 ];
 
 
-/* =====================================================
-   CHAT TYPEWRITER
-   ===================================================== */
+function typeEcho(index) {
 
-function startChat(index) {{
+    echoIndex =
+        index;
 
-    if (
-        index < 0 ||
-        index >= tutorialMessages.length
-    ) {{
-        return;
-    }}
 
-    chatIndex = index;
+    clearTimeout(
+        typingTimer
+    );
 
-    chatFinished = false;
-    chatTyping = true;
 
-    echoNext.classList.remove("visible");
+    const text =
+        messages[index] || "";
 
-    echoMessage.textContent = "";
 
-    if (chatTimer) {{
-        clearInterval(chatTimer);
-    }}
+    echoMessage.textContent =
+        "";
 
-    const message =
-        tutorialMessages[index];
 
-    let position = 0;
+    typingDone =
+        false;
 
-    chatTimer =
-        setInterval(
-            function() {{
 
-                if (position >= message.length) {{
+    echoNext.classList.remove(
+        "ready"
+    );
 
-                    clearInterval(chatTimer);
 
-                    chatTimer = null;
+    let i =
+        0;
 
-                    chatTyping = false;
 
-                    chatFinished = true;
+    function tick() {
 
-                    echoNext.classList.add(
-                        "visible"
-                    );
+        if (i < text.length) {
 
-                    return;
-                }}
+            echoMessage.textContent +=
+                text[i];
 
-                echoMessage.textContent +=
-                    message[position];
+            i += 1;
 
-                position++;
 
-            }},
-            28
+            typingTimer =
+                setTimeout(
+                    tick,
+                    25
+                );
+
+        }
+
+        else {
+
+            typingDone =
+                true;
+
+            echoNext.classList.add(
+                "ready"
+            );
+
+        }
+
+    }
+
+
+    tick();
+
+}
+
+
+/*
+ * SPACE
+ *
+ * 1회:
+ * 타이핑 중이면 전체 문장 표시
+ *
+ * 2회:
+ * 다음 채팅
+ */
+
+function nextEcho() {
+
+    if (!typingDone) {
+
+        clearTimeout(
+            typingTimer
         );
-}}
 
-
-/* =====================================================
-   SPACE CHAT
-   ===================================================== */
-
-function handleChatSpace() {{
-
-    /*
-     * 첫 번째 SPACE:
-     * 현재 문장을 끝까지 출력
-     */
-
-    if (chatTyping) {{
-
-        if (chatTimer) {{
-            clearInterval(chatTimer);
-            chatTimer = null;
-        }}
 
         echoMessage.textContent =
-            tutorialMessages[chatIndex];
+            messages[echoIndex];
 
-        chatTyping = false;
-        chatFinished = true;
+
+        typingDone =
+            true;
+
 
         echoNext.classList.add(
-            "visible"
+            "ready"
         );
 
+
         return;
-    }}
+
+    }
 
 
-    /*
-     * 두 번째 SPACE:
-     * 다음 채팅
-     */
-
-    advanceChat();
-
-}}
-
-
-/* =====================================================
-   CHAT ADVANCE
-   ===================================================== */
-
-function advanceChat() {{
-
-    /*
-     * 현재 행동이 완료되지 않았다면
-     * 채팅만 넘어가지 않도록 한다.
-     */
-
-    if (
-        chatIndex === 0 &&
-        tutorialStep === 0
-    ) {{
-        status.textContent =
-            "ECHO SYSTEM // 먼저 이동을 시작하십시오.";
-        return;
-    }}
+    const next =
+        echoIndex + 1;
 
 
     if (
-        chatIndex === 1 &&
-        tutorialStep < 2
-    ) {{
-        status.textContent =
-            "ECHO SYSTEM // COMPUTER로 이동하십시오.";
-        return;
-    }}
+        next <
+        messages.length
+    ) {
 
-
-    if (
-        chatIndex === 2 &&
-        tutorialStep < 2
-    ) {{
-        status.textContent =
-            "ECHO SYSTEM // COMPUTER와 먼저 상호작용하십시오.";
-        return;
-    }}
-
-
-    if (
-        chatIndex === 3 &&
-        tutorialStep < 3
-    ) {{
-        status.textContent =
-            "ECHO SYSTEM // COMPUTER에 접근 코드를 입력하십시오.";
-        return;
-    }}
-
-
-    if (
-        chatIndex === 4 &&
-        tutorialStep < 4
-    ) {{
-        status.textContent =
-            "ECHO SYSTEM // DESK에서 ACCESS KEY를 확인하십시오.";
-        return;
-    }}
-
-
-    if (
-        chatIndex === 5 &&
-        tutorialStep < 5
-    ) {{
-        status.textContent =
-            "ECHO SYSTEM // ACCESS KEY를 획득하십시오.";
-        return;
-    }}
-
-
-    if (
-        chatIndex === 6
-    ) {{
-        return;
-    }}
-
-
-    startChat(
-        chatIndex + 1
-    );
-}}
-
-
-/* =====================================================
-   INITIAL CHAT
-   ===================================================== */
-
-startChat(0);
-
-
-/* =====================================================
-   INVENTORY
-   ===================================================== */
-
-const inventory = [
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null
-];
-
-
-function renderInventory() {{
-
-    inventory.forEach(
-        function(item, index) {{
-
-            const slot =
-                inventorySlots[index];
-
-            if (!item) {{
-
-                slot.innerHTML =
-                    `
-                    <div class="slot-number">
-                        ${{String(index + 1).padStart(2, "0")}}
-                    </div>
-
-                    <div class="empty-text">
-                        EMPTY
-                    </div>
-                    `;
-
-            }} else {{
-
-                slot.innerHTML =
-                    `
-                    <div class="slot-number">
-                        ${{String(index + 1).padStart(2, "0")}}
-                    </div>
-
-                    <div class="item-name">
-                        ${{item.name}}
-                    </div>
-                    `;
-
-            }}
-
-        }}
-    );
-}}
-
-
-renderInventory();
-
-
-/* =====================================================
-   PLAYER
-   ===================================================== */
-
-let playerX = 50;
-let playerY = 43;
-
-const moveSpeed = 0.62;
-
-
-/* =====================================================
-   MOVEMENT
-   ===================================================== */
-
-const keys = {{
-    w: false,
-    a: false,
-    s: false,
-    d: false
-}};
-
-
-function clearMovementKeys() {{
-
-    keys.w = false;
-    keys.a = false;
-    keys.s = false;
-    keys.d = false;
-}}
-
-
-/* =====================================================
-   COLLISION
-   ===================================================== */
-
-function rectanglesOverlap(
-    a,
-    b
-) {{
-
-    return (
-        a.left < b.right &&
-        a.right > b.left &&
-        a.top < b.bottom &&
-        a.bottom > b.top
-    );
-}}
-
-
-function getPlayerRect(
-    x,
-    y
-) {{
-
-    const roomRect =
-        room.getBoundingClientRect();
-
-    const playerWidth = 24;
-    const playerHeight = 24;
-
-    const px =
-        roomRect.left +
-        (x / 100) *
-        roomRect.width;
-
-    const py =
-        roomRect.top +
-        (y / 100) *
-        roomRect.height;
-
-    return {{
-        left:
-            px -
-            playerWidth / 2,
-
-        right:
-            px +
-            playerWidth / 2,
-
-        top:
-            py -
-            playerHeight / 2,
-
-        bottom:
-            py +
-            playerHeight / 2
-    }};
-}}
-
-
-function getObstacleRects() {{
-
-    return [
-        document.getElementById("computer"),
-        document.getElementById("desk"),
-        document.getElementById("exitWall")
-    ].map(
-        function(element) {{
-            return element.getBoundingClientRect();
-        }}
-    );
-}}
-
-
-function canMoveTo(
-    nextX,
-    nextY
-) {{
-
-    const nextRect =
-        getPlayerRect(
-            nextX,
-            nextY
+        typeEcho(
+            next
         );
 
-    const obstacles =
-        getObstacleRects();
+    }
 
-    for (
-        const obstacle
-        of obstacles
-    ) {{
+}
 
-        if (
-            rectanglesOverlap(
-                nextRect,
-                obstacle
-            )
-        ) {{
-            return false;
-        }}
-    }}
 
-    return true;
-}}
+typeEcho(0);
 
 
 /* =====================================================
    OBJECTS
    ===================================================== */
 
-const objects = [
+const obstacles = [
 
-    {{
+    {
+        id: "monitor",
+        x: 43.5,
+        y: 9,
+        w: 13,
+        h: 7
+    },
+
+    {
         id: "computer",
-        name: "ECHO TERMINAL"
-    }},
+        x: 42,
+        y: 13,
+        w: 16,
+        h: 14
+    },
 
-    {{
+    {
         id: "desk",
-        name: "RESEARCH DESK"
-    }},
+        x: 35,
+        y: 62,
+        w: 30,
+        h: 12
+    },
 
-    {{
-        id: "exitWall",
-        name: "SECURITY EXIT"
-    }}
+    {
+        id: "exit",
+        x: 92,
+        y: 35,
+        w: 8,
+        h: 30
+    }
 
 ];
 
 
-let nearbyObject = null;
+const interactables = [
+
+    {
+        id: "computer",
+        name: "ECHO TERMINAL",
+        x: 42,
+        y: 13,
+        w: 16,
+        h: 14
+    },
+
+    {
+        id: "desk",
+        name: "RESEARCH DESK",
+        x: 35,
+        y: 62,
+        w: 30,
+        h: 12
+    },
+
+    {
+        id: "exit",
+        name: "SECURITY ROOM",
+        x: 92,
+        y: 35,
+        w: 8,
+        h: 30
+    }
+
+];
+
+
+let nearby =
+    null;
 
 
 /* =====================================================
-   OBJECT DISTANCE
+   COLLISION
+   ===================================================== */
+
+function circleHitsRect(
+    cx,
+    cy,
+    radius,
+    object
+) {
+
+    const roomWidth =
+        room.clientWidth;
+
+
+    const roomHeight =
+        room.clientHeight;
+
+
+    const left =
+        object.x / 100 *
+        roomWidth;
+
+
+    const top =
+        object.y / 100 *
+        roomHeight;
+
+
+    const right =
+        (object.x + object.w) /
+        100 *
+        roomWidth;
+
+
+    const bottom =
+        (object.y + object.h) /
+        100 *
+        roomHeight;
+
+
+    const px =
+        cx / 100 *
+        roomWidth;
+
+
+    const py =
+        cy / 100 *
+        roomHeight;
+
+
+    const closestX =
+        Math.max(
+            left,
+            Math.min(
+                px,
+                right
+            )
+        );
+
+
+    const closestY =
+        Math.max(
+            top,
+            Math.min(
+                py,
+                bottom
+            )
+        );
+
+
+    const dx =
+        px -
+        closestX;
+
+
+    const dy =
+        py -
+        closestY;
+
+
+    const actualRadius =
+        radius / 100 *
+        roomWidth;
+
+
+    return (
+        dx * dx +
+        dy * dy
+    ) <
+    (
+        actualRadius *
+        actualRadius
+    );
+
+}
+
+
+function blocked(
+    x,
+    y
+) {
+
+    if (
+        x < 3 ||
+        x > 97 ||
+        y < 3 ||
+        y > 97
+    ) {
+
+        return true;
+
+    }
+
+
+    return obstacles.some(
+        function (object) {
+
+            return circleHitsRect(
+                x,
+                y,
+                playerRadius,
+                object
+            );
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   DISTANCE
    ===================================================== */
 
 function distanceToObject(
     object
-) {{
-
-    const element =
-        document.getElementById(
-            object.id
-        );
-
-    if (!element) {{
-        return Infinity;
-    }}
-
-    const roomRect =
-        room.getBoundingClientRect();
-
-    const rect =
-        element.getBoundingClientRect();
+) {
 
     const centerX =
-        (
-            rect.left +
-            rect.right
-        ) / 2;
+        object.x +
+        object.w / 2;
+
 
     const centerY =
-        (
-            rect.top +
-            rect.bottom
-        ) / 2;
+        object.y +
+        object.h / 2;
 
-    const playerRect =
-        getPlayerRect(
-            playerX,
-            playerY
-        );
 
-    const playerCenterX =
-        (
-            playerRect.left +
-            playerRect.right
-        ) / 2;
-
-    const playerCenterY =
-        (
-            playerRect.top +
-            playerRect.bottom
-        ) / 2;
-
-    const dx =
-        playerCenterX -
-        centerX;
-
-    const dy =
-        playerCenterY -
-        centerY;
-
-    return Math.sqrt(
-        dx * dx +
-        dy * dy
+    return Math.hypot(
+        playerX - centerX,
+        playerY - centerY
     );
-}}
+
+}
 
 
 /* =====================================================
-   INTERACTION
+   INTERACTION CHECK
    ===================================================== */
 
-function checkInteraction() {{
+function checkInteraction() {
 
-    nearbyObject = null;
+    nearby =
+        null;
+
 
     let closest =
         Infinity;
 
-    objects.forEach(
-        function(object) {{
+
+    interactables.forEach(
+        function (object) {
 
             const distance =
                 distanceToObject(
                     object
                 );
 
-            if (
-                distance < 90 &&
-                distance < closest
-            ) {{
 
-                nearbyObject =
+            if (
+                distance < 12 &&
+                distance < closest
+            ) {
+
+                nearby =
                     object;
+
 
                 closest =
                     distance;
-            }}
-        }}
+
+            }
+
+        }
     );
 
 
     if (
-        nearbyObject &&
+        nearby &&
         !computerOpen &&
         !inventoryOpen &&
         !helpOpen &&
         !cardOpen
-    ) {{
+    ) {
 
         interactionMessage.textContent =
             "E  //  " +
-            nearbyObject.name;
+            nearby.name;
+
 
         interactionMessage.classList.add(
             "visible"
         );
 
-    }} else {{
+    }
+
+    else {
 
         interactionMessage.classList.remove(
             "visible"
         );
-    }}
-}}
+
+    }
+
+}
 
 
 /* =====================================================
    INACCESSIBLE
    ===================================================== */
 
-function inaccessible() {{
+function inaccessible() {
 
     status.textContent =
         "SYSTEM // 접근할 수 없는 과정입니다.";
-}}
+
+}
 
 
 /* =====================================================
-   INTERACTION
+   MOVEMENT
    ===================================================== */
 
-function interact() {{
+function updateMovement() {
 
     if (
         paused ||
-        computerOpen ||
         inventoryOpen ||
         helpOpen ||
+        computerOpen ||
         cardOpen
-    ) {{
+    ) {
+
         return;
-    }}
 
-    if (!nearbyObject) {{
-        return;
-    }}
+    }
 
 
-    /* =================================================
-       COMPUTER
-       ================================================= */
+    let dx =
+        0;
+
+
+    let dy =
+        0;
+
+
+    if (keys.w) {
+
+        dy -= 1;
+
+    }
+
+
+    if (keys.s) {
+
+        dy += 1;
+
+    }
+
+
+    if (keys.a) {
+
+        dx -= 1;
+
+    }
+
+
+    if (keys.d) {
+
+        dx += 1;
+
+    }
+
 
     if (
-        nearbyObject.id ===
-        "computer"
-    ) {{
-
-        if (
-            tutorialStep === 1
-        ) {{
-
-            tutorialStep = 2;
-
-            startChat(2);
-
-        }} else if (
-            tutorialStep !== 2
-        ) {{
-
-            inaccessible();
-
-            return;
-        }}
-
-        openComputer();
+        dx === 0 &&
+        dy === 0
+    ) {
 
         return;
-    }}
+
+    }
 
 
-    /* =================================================
-       DESK
-       ================================================= */
+    const length =
+        Math.hypot(
+            dx,
+            dy
+        );
+
+
+    dx =
+        dx /
+        length *
+        moveSpeed;
+
+
+    dy =
+        dy /
+        length *
+        moveSpeed;
+
+
+    /*
+     * X/Y를 따로 검사해서
+     * 벽이나 물체에 비스듬히 끼지 않도록 함
+     */
 
     if (
-        nearbyObject.id ===
-        "desk"
-    ) {{
+        !blocked(
+            playerX + dx,
+            playerY
+        )
+    ) {
 
-        if (
-            tutorialStep !== 3 &&
-            tutorialStep !== 4
-        ) {{
+        playerX +=
+            dx;
 
-            inaccessible();
+    }
 
-            return;
-        }}
-
-
-        if (
-            tutorialStep === 3
-        ) {{
-
-            if (
-                !accessKeyCreated
-            ) {{
-                inaccessible();
-                return;
-            }}
-
-            tutorialStep = 4;
-
-            startChat(4);
-
-            status.textContent =
-                "DESK // ACCESS KEY READY";
-
-            return;
-        }}
-
-
-        if (
-            tutorialStep === 4
-        ) {{
-
-            collectAccessKey();
-
-            return;
-        }}
-
-        return;
-    }}
-
-
-    /* =================================================
-       EXIT
-       ================================================= */
 
     if (
-        nearbyObject.id ===
-        "exitWall"
-    ) {{
+        !blocked(
+            playerX,
+            playerY + dy
+        )
+    ) {
 
-        if (
-            tutorialStep !== 5
-        ) {{
+        playerY +=
+            dy;
 
-            inaccessible();
+    }
 
-            return;
-        }}
 
-        if (
-            !accessKeyCollected
-        ) {{
+    player.style.left =
+        playerX + "%";
 
-            inaccessible();
 
-            return;
-        }}
+    player.style.top =
+        playerY + "%";
 
-        openCardSwipe();
 
-        return;
-    }}
-}}
+    /*
+     * 첫 이동
+     */
+
+    if (
+        tutorialStep === 0
+    ) {
+
+        tutorialStep =
+            1;
+
+
+        typeEcho(1);
+
+
+        status.textContent =
+            "TUTORIAL // MOVEMENT ENABLED";
+
+    }
+
+
+    checkInteraction();
+
+}
 
 
 /* =====================================================
    COMPUTER
    ===================================================== */
 
-function openComputer() {{
+function openComputer() {
 
     if (
         tutorialStep !== 2
-    ) {{
+    ) {
 
         inaccessible();
 
         return;
-    }}
+
+    }
 
 
-    computerOpen = true;
+    computerOpen =
+        true;
 
-    clearMovementKeys();
+
+    clearKeys();
+
 
     interactionMessage.classList.remove(
         "visible"
     );
 
-    codeDisplayNumber.textContent =
+
+    accessNumber.textContent =
         ACCESS_CODE;
 
-    codeInput.value = "";
-
-    codeError.textContent = "";
 
     computerOverlay.style.display =
         "flex";
 
 
+    codeInput.value =
+        "";
+
+
+    codeError.textContent =
+        "";
+
+
     setTimeout(
-        function() {{
+        function () {
+
             codeInput.focus();
-        }},
-        80
+
+        },
+        50
     );
-}}
+
+}
 
 
-function closeComputer() {{
+function closeComputer() {
 
-    computerOpen = false;
+    computerOpen =
+        false;
+
 
     computerOverlay.style.display =
         "none";
 
+
     codeInput.blur();
 
-    focusGame();
-}}
+
+    root.focus();
+
+}
 
 
 /* =====================================================
-   CODE SUBMIT
+   CODE
    ===================================================== */
 
-function submitCode() {{
+function submitCode() {
 
     const entered =
         codeInput.value.trim();
@@ -3152,39 +4212,41 @@ function submitCode() {{
     if (
         entered ===
         ACCESS_CODE
-    ) {{
-
-        tutorialStep = 3;
+    ) {
 
         closeComputer();
 
 
         /*
-         * 코드 입력 즉시
+         * 암호 입력 성공 즉시
          * 책상 위에 ACCESS KEY 생성
          */
-
-        accessKeyCreated = true;
 
         accessKey.classList.add(
             "visible"
         );
 
 
+        tutorialStep =
+            3;
+
+
+        typeEcho(4);
+
+
         status.textContent =
-            "ECHO TERMINAL // CODE VERIFIED";
+            "ECHO TERMINAL // CODE VERIFIED // ACCESS KEY GENERATED";
 
+    }
 
-        startChat(4);
-
-    }} else {{
+    else {
 
         codeError.textContent =
-            "ACCESS DENIED // 화면에 표시된 숫자를 그대로 입력하십시오.";
+            "ACCESS DENIED // 화면의 4자리 숫자를 입력하십시오.";
 
-        codeInput.select();
-    }}
-}}
+    }
+
+}
 
 
 codeButton.addEventListener(
@@ -3194,288 +4256,343 @@ codeButton.addEventListener(
 
 
 codeInput.addEventListener(
+    "input",
+    function () {
+
+        codeInput.value =
+            codeInput.value
+                .replace(
+                    /\D/g,
+                    ""
+                )
+                .slice(
+                    0,
+                    4
+                );
+
+    }
+);
+
+
+codeInput.addEventListener(
     "keydown",
-    function(event) {{
+    function (event) {
 
         if (
-            event.key === "Enter"
-        ) {{
+            event.key ===
+            "Enter"
+        ) {
+
+            event.preventDefault();
 
             submitCode();
 
-            event.preventDefault();
-        }}
+        }
+
 
         if (
-            event.key === "Escape"
-        ) {{
+            event.key ===
+            "Escape"
+        ) {
+
+            event.preventDefault();
 
             closeComputer();
 
-            event.preventDefault();
-        }}
-    }}
+        }
+
+    }
 );
 
 
 /* =====================================================
-   ACCESS KEY
+   INTERACTION
    ===================================================== */
 
-function collectAccessKey() {{
+function interact() {
 
     if (
-        !accessKeyCreated
-    ) {{
-        inaccessible();
+        paused ||
+        computerOpen ||
+        inventoryOpen ||
+        helpOpen ||
+        cardOpen
+    ) {
+
         return;
-    }}
+
+    }
 
 
-    accessKeyCreated = false;
+    if (!nearby) {
 
-    accessKeyCollected = true;
+        return;
 
-    accessKey.classList.remove(
-        "visible"
-    );
+    }
 
 
-    inventory[0] = {{
-        name:
-            "ACCESS KEY",
+    /*
+     * 이동 전
+     */
 
-        description:
-            "ECHO TERMINAL에서 인증된 보안구역 접근 키입니다."
-    }};
+    if (
+        tutorialStep === 0
+    ) {
 
+        inaccessible();
 
-    renderInventory();
+        return;
 
-
-    tutorialStep = 5;
-
-
-    exitArrow.classList.add(
-        "active"
-    );
+    }
 
 
-    startChat(5);
+    /*
+     * COMPUTER
+     */
 
-
-    status.textContent =
-        "SYSTEM // ACCESS KEY ACQUIRED";
-}}
-
-
-/* =====================================================
-   CARD SWIPE
-   ===================================================== */
-
-function openCardSwipe() {{
-
-    cardOpen = true;
-
-    clearMovementKeys();
-
-    cardOverlay.style.display =
-        "flex";
-
-    cardReader.classList.remove(
-        "success"
-    );
-
-    accessCard.style.left =
-        "20px";
-}}
-
-
-function closeCardSwipe() {{
-
-    cardOpen = false;
-
-    cardOverlay.style.display =
-        "none";
-
-    focusGame();
-}}
-
-
-cardClose.addEventListener(
-    "click",
-    closeCardSwipe
-);
-
-
-/* =====================================================
-   CARD DRAG
-   ===================================================== */
-
-let draggingCard = false;
-
-let cardPointerOffsetX = 0;
-
-
-accessCard.addEventListener(
-    "pointerdown",
-    function(event) {{
-
-        if (!cardOpen) {{
-            return;
-        }}
-
-        draggingCard = true;
-
-        accessCard.setPointerCapture(
-            event.pointerId
-        );
-
-
-        const cardRect =
-            accessCard.getBoundingClientRect();
-
-        cardPointerOffsetX =
-            event.clientX -
-            cardRect.left;
-
-        event.preventDefault();
-    }}
-);
-
-
-accessCard.addEventListener(
-    "pointermove",
-    function(event) {{
-
-        if (!draggingCard) {{
-            return;
-        }}
-
-
-        const readerRect =
-            cardReader.getBoundingClientRect();
-
-        const cardWidth =
-            accessCard.offsetWidth;
-
-
-        let x =
-            event.clientX -
-            readerRect.left -
-            cardPointerOffsetX;
-
-
-        const minX = 10;
-
-        const maxX =
-            readerRect.width -
-            cardWidth -
-            10;
-
-
-        x =
-            Math.max(
-                minX,
-                Math.min(
-                    maxX,
-                    x
-                )
-            );
-
-
-        accessCard.style.left =
-            x + "px";
-
-
-        /*
-         * 리더기 위치까지 이동하면
-         * 인증 성공
-         */
+    if (
+        tutorialStep === 1
+    ) {
 
         if (
-            x >=
-            maxX - 25
-        ) {{
+            nearby.id !==
+            "computer"
+        ) {
 
-            draggingCard = false;
+            inaccessible();
 
-            cardReader.classList.add(
-                "success"
-            );
+            return;
 
-
-            setTimeout(
-                function() {{
-
-                    closeCardSwipe();
-
-                    status.textContent =
-                        "SECURITY DOOR // ACCESS GRANTED";
-
-                    startChat(6);
-
-                }},
-                650
-            );
-        }}
-
-        event.preventDefault();
-    }}
-);
+        }
 
 
-function stopCardDrag(event) {{
+        tutorialStep =
+            2;
 
-    if (!draggingCard) {{
+
+        typeEcho(3);
+
+
+        status.textContent =
+            "ECHO SYSTEM // TERMINAL CONNECTED";
+
+
+        openComputer();
+
+
         return;
-    }}
 
-    draggingCard = false;
+    }
 
-    try {{
-        accessCard.releasePointerCapture(
-            event.pointerId
+
+    /*
+     * COMPUTER CODE 단계
+     */
+
+    if (
+        tutorialStep === 2
+    ) {
+
+        if (
+            nearby.id !==
+            "computer"
+        ) {
+
+            inaccessible();
+
+            return;
+
+        }
+
+
+        openComputer();
+
+        return;
+
+    }
+
+
+    /*
+     * ACCESS KEY
+     */
+
+    if (
+        tutorialStep === 3
+    ) {
+
+        if (
+            nearby.id !==
+            "desk"
+        ) {
+
+            inaccessible();
+
+            return;
+
+        }
+
+
+        if (
+            !accessKey.classList.contains(
+                "visible"
+            )
+        ) {
+
+            inaccessible();
+
+            return;
+
+        }
+
+
+        accessKey.classList.remove(
+            "visible"
         );
-    }} catch (error) {{}}
-}}
 
 
-accessCard.addEventListener(
-    "pointerup",
-    stopCardDrag
-);
+        inventory[0] = {
 
-accessCard.addEventListener(
-    "pointercancel",
-    stopCardDrag
-);
+            name:
+                "ACCESS KEY",
+
+            description:
+                "ECHO TERMINAL에서 인증된 보안구역 접근 키입니다."
+
+        };
+
+
+        keyCollected =
+            true;
+
+
+        tutorialStep =
+            5;
+
+
+        renderInventory();
+
+
+        typeEcho(5);
+
+
+        status.textContent =
+            "SYSTEM // ACCESS KEY ACQUIRED";
+
+
+        return;
+
+    }
+
+
+    /*
+     * EXIT
+     */
+
+    if (
+        tutorialStep === 5
+    ) {
+
+        if (
+            nearby.id !==
+            "exit"
+        ) {
+
+            inaccessible();
+
+            return;
+
+        }
+
+
+        if (
+            !keyCollected
+        ) {
+
+            inaccessible();
+
+            return;
+
+        }
+
+
+        openCardAccess();
+
+    }
+
+}
 
 
 /* =====================================================
    INVENTORY
    ===================================================== */
 
+function openInventory() {
+
+    if (
+        paused ||
+        computerOpen ||
+        cardOpen
+    ) {
+
+        return;
+
+    }
+
+
+    helpOpen =
+        false;
+
+
+    helpOverlay.style.display =
+        "none";
+
+
+    inventoryOpen =
+        true;
+
+
+    inventoryOverlay.style.display =
+        "flex";
+
+
+    clearKeys();
+
+
+    renderInventory();
+
+}
+
+
+function closeInventory() {
+
+    inventoryOpen =
+        false;
+
+
+    inventoryOverlay.style.display =
+        "none";
+
+
+    root.focus();
+
+}
+
+
 inventorySlots.forEach(
-    function(slot) {{
+    function (slot) {
 
         slot.addEventListener(
             "click",
-            function() {{
-
-                const index =
-                    Number(
-                        slot.dataset.slot
-                    );
-
+            function () {
 
                 inventorySlots.forEach(
-                    function(other) {{
+                    function (other) {
 
                         other.classList.remove(
                             "selected"
                         );
-                    }}
+
+                    }
                 );
 
 
@@ -3485,401 +4602,338 @@ inventorySlots.forEach(
 
 
                 const item =
-                    inventory[index];
+                    inventory[
+                        Number(
+                            slot.dataset.slot
+                        )
+                    ];
 
 
-                if (item) {{
+                if (item) {
 
                     itemDescription.innerHTML =
-                        `${{item.name}}
-                        <br><br>
-                        ${{item.description}}`;
+                        item.name +
+                        "<br><br>" +
+                        item.description;
 
-                }} else {{
+                }
+
+                else {
 
                     itemDescription.innerHTML =
                         "ITEM DESCRIPTION<br><br>비어 있는 슬롯입니다.";
-                }}
-            }}
+
+                }
+
+            }
         );
-    }}
+
+    }
 );
-
-
-/* =====================================================
-   INVENTORY
-   ===================================================== */
-
-function openInventory() {{
-
-    if (
-        paused ||
-        computerOpen ||
-        cardOpen
-    ) {{
-        return;
-    }}
-
-
-    helpOpen = false;
-
-    helpOverlay.style.display =
-        "none";
-
-    inventoryOpen = true;
-
-    inventoryOverlay.style.display =
-        "flex";
-
-    clearMovementKeys();
-}}
-
-
-function closeInventory() {{
-
-    inventoryOpen = false;
-
-    inventoryOverlay.style.display =
-        "none";
-
-    focusGame();
-}}
 
 
 /* =====================================================
    HELP
    ===================================================== */
 
-function openHelp() {{
+function openHelp() {
 
     if (
         paused ||
         computerOpen ||
         cardOpen
-    ) {{
+    ) {
+
         return;
-    }}
+
+    }
 
 
-    inventoryOpen = false;
+    inventoryOpen =
+        false;
+
 
     inventoryOverlay.style.display =
         "none";
 
-    helpOpen = true;
+
+    helpOpen =
+        true;
+
 
     helpOverlay.style.display =
         "flex";
 
-    clearMovementKeys();
-}}
+
+    clearKeys();
+
+}
 
 
-function closeHelp() {{
+function closeHelp() {
 
-    helpOpen = false;
+    helpOpen =
+        false;
+
 
     helpOverlay.style.display =
         "none";
 
-    focusGame();
-}}
 
+    root.focus();
 
-/* =====================================================
-   FOCUS
-   ===================================================== */
-
-function focusGame() {{
-
-    try {{
-
-        gameRoot.focus(
-            {{
-                preventScroll: true
-            }}
-        );
-
-    }} catch (error) {{
-
-        gameRoot.focus();
-    }}
-}}
-
-
-gameRoot.addEventListener(
-    "pointerdown",
-    function() {{
-
-        if (
-            !computerOpen &&
-            !cardOpen
-        ) {{
-            focusGame();
-        }}
-    }}
-);
-
-
-window.addEventListener(
-    "load",
-    function() {{
-
-        setTimeout(
-            focusGame,
-            100
-        );
-    }}
-);
-
-
-window.addEventListener(
-    "blur",
-    clearMovementKeys
-);
+}
 
 
 /* =====================================================
    KEYBOARD
    ===================================================== */
 
-function handleKeyDown(event) {{
+document.addEventListener(
+    "keydown",
+    function (event) {
 
-    const key =
-        event.key.toLowerCase();
-
-
-    /*
-     * 컴퓨터 입력창
-     */
-
-    if (
-        document.activeElement ===
-        codeInput
-    ) {{
+        /*
+         * 암호 입력 중
+         */
 
         if (
-            key === "escape"
-        ) {{
+            document.activeElement ===
+            codeInput
+        ) {
 
-            closeComputer();
+            return;
+
+        }
+
+
+        /*
+         * SPACE
+         */
+
+        if (
+            event.code ===
+            "Space"
+        ) {
 
             event.preventDefault();
-        }}
-
-        return;
-    }
-
-
-    /*
-     * 카드 드래그
-     */
-
-    if (
-        cardOpen
-    ) {{
-        return;
-    }}
-
-
-    /*
-     * SPACE
-     */
-
-    if (
-        key === " "
-    ) {{
-
-        handleChatSpace();
-
-        event.preventDefault();
-
-        return;
-    }}
-
-
-    /*
-     * ESC
-     */
-
-    if (
-        key === "escape"
-    ) {{
-
-        if (computerOpen) {{
-
-            closeComputer();
-
-            event.preventDefault();
-
-            return;
-        }}
-
-        if (helpOpen) {{
-
-            closeHelp();
-
-            event.preventDefault();
-
-            return;
-        }}
-
-        if (inventoryOpen) {{
-
-            closeInventory();
-
-            event.preventDefault();
-
-            return;
-        }}
-    }}
-
-
-    /*
-     * H
-     */
-
-    if (
-        key === "h"
-    ) {{
-
-        if (
-            computerOpen
-        ) {{
-            return;
-        }}
-
-        if (
-            helpOpen
-        ) {{
-            closeHelp();
-        }} else {{
-            openHelp();
-        }}
-
-        event.preventDefault();
-
-        return;
-    }}
-
-
-    /*
-     * I
-     */
-
-    if (
-        key === "i"
-    ) {{
-
-        if (
-            computerOpen ||
-            helpOpen
-        ) {{
-            return;
-        }}
-
-        if (
-            inventoryOpen
-        ) {{
-            closeInventory();
-        }} else {{
-            openInventory();
-        }}
-
-        event.preventDefault();
-
-        return;
-    }}
-
-
-    /*
-     * E
-     */
-
-    if (
-        key === "e"
-    ) {{
-
-        interact();
-
-        event.preventDefault();
-
-        return;
-    }}
-
-
-    /*
-     * WASD
-     */
-
-    if (
-        key === "w" ||
-        key === "a" ||
-        key === "s" ||
-        key === "d"
-    ) {{
-
-        if (
-            !paused &&
-            !helpOpen &&
-            !inventoryOpen &&
-            !computerOpen
-        ) {{
-
-            keys[key] = true;
 
 
             if (
-                tutorialStep === 0
-            ) {{
+                !paused &&
+                !computerOpen &&
+                !cardOpen &&
+                !inventoryOpen &&
+                !helpOpen
+            ) {
 
-                tutorialStep = 1;
+                nextEcho();
 
-                startChat(1);
-
-                status.textContent =
-                    "TUTORIAL // MOVEMENT ENABLED";
-            }}
-        }}
-
-        event.preventDefault();
-
-        return;
-    }}
-}}
+            }
 
 
-function handleKeyUp(event) {{
+            return;
 
-    const key =
-        event.key.toLowerCase();
-
-
-    if (
-        key === "w" ||
-        key === "a" ||
-        key === "s" ||
-        key === "d"
-    ) {{
-
-        keys[key] = false;
-
-        event.preventDefault();
-    }}
-}}
+        }
 
 
-document.addEventListener(
-    "keydown",
-    handleKeyDown,
-    true
+        const key =
+            event.key.toLowerCase();
+
+
+        /*
+         * ESC
+         */
+
+        if (
+            key ===
+            "escape"
+        ) {
+
+            if (
+                computerOpen
+            ) {
+
+                closeComputer();
+
+                return;
+
+            }
+
+
+            if (
+                cardOpen
+            ) {
+
+                closeCardAccess();
+
+                return;
+
+            }
+
+
+            if (
+                helpOpen
+            ) {
+
+                closeHelp();
+
+                return;
+
+            }
+
+
+            if (
+                inventoryOpen
+            ) {
+
+                closeInventory();
+
+                return;
+
+            }
+
+        }
+
+
+        /*
+         * E
+         */
+
+        if (
+            key ===
+            "e"
+        ) {
+
+            event.preventDefault();
+
+            interact();
+
+            return;
+
+        }
+
+
+        /*
+         * H
+         */
+
+        if (
+            key ===
+            "h"
+        ) {
+
+            event.preventDefault();
+
+
+            if (helpOpen) {
+
+                closeHelp();
+
+            }
+
+            else {
+
+                openHelp();
+
+            }
+
+
+            return;
+
+        }
+
+
+        /*
+         * I
+         */
+
+        if (
+            key ===
+            "i"
+        ) {
+
+            event.preventDefault();
+
+
+            if (inventoryOpen) {
+
+                closeInventory();
+
+            }
+
+            else {
+
+                openInventory();
+
+            }
+
+
+            return;
+
+        }
+
+
+        /*
+         * WASD
+         */
+
+        if (
+            key === "w" ||
+            key === "a" ||
+            key === "s" ||
+            key === "d"
+        ) {
+
+            if (
+                !paused &&
+                !computerOpen &&
+                !cardOpen &&
+                !helpOpen &&
+                !inventoryOpen
+            ) {
+
+                keys[key] =
+                    true;
+
+                event.preventDefault();
+
+            }
+
+        }
+
+    }
 );
 
 
+/* =====================================================
+   KEYBOARD RELEASE
+   ===================================================== */
+
 document.addEventListener(
     "keyup",
-    handleKeyUp,
-    true
+    function (event) {
+
+        const key =
+            event.key.toLowerCase();
+
+
+        if (
+            key === "w" ||
+            key === "a" ||
+            key === "s" ||
+            key === "d"
+        ) {
+
+            keys[key] =
+                false;
+
+
+            event.preventDefault();
+
+        }
+
+    }
 );
 
 
@@ -3892,50 +4946,56 @@ document
         ".control-button"
     )
     .forEach(
-        function(button) {{
+        function (button) {
 
             const direction =
                 button.dataset.direction;
 
 
-            function press(event) {{
+            function press(
+                event
+            ) {
 
                 event.preventDefault();
 
-                if (
-                    paused ||
-                    helpOpen ||
-                    inventoryOpen ||
-                    computerOpen ||
-                    cardOpen
-                ) {{
-                    return;
-                }}
-
-
-                keys[direction] = true;
-
 
                 if (
-                    tutorialStep === 0
-                ) {{
+                    !paused &&
+                    !computerOpen &&
+                    !cardOpen &&
+                    !helpOpen &&
+                    !inventoryOpen
+                ) {
 
-                    tutorialStep = 1;
-
-                    startChat(1);
-
-                    status.textContent =
-                        "TUTORIAL // MOVEMENT ENABLED";
-                }}
-            }}
+                    keys[direction] =
+                        true;
 
 
-            function release(event) {{
+                    try {
+
+                        button.setPointerCapture(
+                            event.pointerId
+                        );
+
+                    }
+
+                    catch (error) {}
+
+                }
+
+            }
+
+
+            function release(
+                event
+            ) {
 
                 event.preventDefault();
 
-                keys[direction] = false;
-            }}
+                keys[direction] =
+                    false;
+
+            }
 
 
             button.addEventListener(
@@ -3943,125 +5003,425 @@ document
                 press
             );
 
+
             button.addEventListener(
                 "pointerup",
                 release
             );
+
 
             button.addEventListener(
                 "pointercancel",
                 release
             );
 
+
             button.addEventListener(
-                "pointerleave",
+                "lostpointercapture",
                 release
             );
+
         }
     );
 
 
 /* =====================================================
-   MOVEMENT
+   CARD ACCESS
    ===================================================== */
 
-function updatePlayer() {{
+function openCardAccess() {
 
     if (
-        !paused &&
-        !helpOpen &&
-        !inventoryOpen &&
-        !computerOpen &&
-        !cardOpen
-    ) {{
+        !keyCollected
+    ) {
 
-        let nextX = playerX;
-        let nextY = playerY;
+        inaccessible();
 
+        return;
 
-        if (keys.w) {{
-            nextY -= moveSpeed;
-        }}
-
-        if (keys.s) {{
-            nextY += moveSpeed;
-        }}
-
-        if (keys.a) {{
-            nextX -= moveSpeed;
-        }}
-
-        if (keys.d) {{
-            nextX += moveSpeed;
-        }}
+    }
 
 
-        nextX =
-            Math.max(
-                2,
-                Math.min(
-                    98,
-                    nextX
-                )
-            );
+    cardOpen =
+        true;
 
 
-        nextY =
-            Math.max(
-                2,
-                Math.min(
-                    98,
-                    nextY
-                )
-            );
+    clearKeys();
 
 
-        /*
-         * X와 Y를 각각 검사해서
-         * 벽/물체 모서리에 부딪혀도
-         * 미끄러지듯 움직일 수 있도록 한다.
-         */
-
-        if (
-            canMoveTo(
-                nextX,
-                playerY
-            )
-        ) {{
-            playerX = nextX;
-        }}
-
-
-        if (
-            canMoveTo(
-                playerX,
-                nextY
-            )
-        ) {{
-            playerY = nextY;
-        }}
-
-
-        player.style.left =
-            playerX + "%";
-
-        player.style.top =
-            playerY + "%";
-
-
-        checkInteraction();
-    }}
-
-
-    requestAnimationFrame(
-        updatePlayer
+    interactionMessage.classList.remove(
+        "visible"
     );
-}}
+
+
+    cardOverlay.style.display =
+        "flex";
+
+
+    resetCard();
+
+}
+
+
+function closeCardAccess() {
+
+    cardOpen =
+        false;
+
+
+    cardOverlay.style.display =
+        "none";
+
+
+    resetCard();
+
+
+    root.focus();
+
+}
+
+
+function resetCard() {
+
+    dragCard.style.left =
+        "12%";
+
+
+    dragCard.style.top =
+        "50%";
+
+
+    dragCard.style.transform =
+        "translateY(-50%)";
+
+
+    cardDragging =
+        false;
+
+
+    cardStatus.textContent =
+        "카드를 리더기까지 끌어다 놓으십시오.";
+
+}
+
+
+function getCardStagePoint(
+    event
+) {
+
+    const rect =
+        cardStage.getBoundingClientRect();
+
+
+    return {
+
+        x:
+            event.clientX -
+            rect.left,
+
+        y:
+            event.clientY -
+            rect.top
+
+    };
+
+}
+
+
+function startCardDrag(
+    event
+) {
+
+    if (
+        !cardOpen
+    ) {
+
+        return;
+
+    }
+
+
+    event.preventDefault();
+
+
+    const rect =
+        dragCard.getBoundingClientRect();
+
+
+    cardOffsetX =
+        event.clientX -
+        rect.left;
+
+
+    cardOffsetY =
+        event.clientY -
+        rect.top;
+
+
+    cardDragging =
+        true;
+
+
+    try {
+
+        dragCard.setPointerCapture(
+            event.pointerId
+        );
+
+    }
+
+    catch (error) {}
+
+}
+
+
+function dragCardMove(
+    event
+) {
+
+    if (
+        !cardDragging
+    ) {
+
+        return;
+
+    }
+
+
+    event.preventDefault();
+
+
+    const point =
+        getCardStagePoint(
+            event
+        );
+
+
+    const stage =
+        cardStage.getBoundingClientRect();
+
+
+    let x =
+        point.x -
+        cardOffsetX;
+
+
+    let y =
+        point.y -
+        cardOffsetY;
+
+
+    x =
+        Math.max(
+            0,
+            Math.min(
+                stage.width -
+                dragCard.offsetWidth,
+                x
+            )
+        );
+
+
+    y =
+        Math.max(
+            0,
+            Math.min(
+                stage.height -
+                dragCard.offsetHeight,
+                y
+            )
+        );
+
+
+    dragCard.style.left =
+        x + "px";
+
+
+    dragCard.style.top =
+        y + "px";
+
+
+    dragCard.style.transform =
+        "none";
+
+}
+
+
+function finishCardDrag(
+    event
+) {
+
+    if (
+        !cardDragging
+    ) {
+
+        return;
+
+    }
+
+
+    cardDragging =
+        false;
+
+
+    const cardRect =
+        dragCard.getBoundingClientRect();
+
+
+    const reader =
+        document.querySelector(
+            ".reader"
+        );
+
+
+    const readerRect =
+        reader.getBoundingClientRect();
+
+
+    const correctPosition =
+        cardRect.right >
+        readerRect.left + 25 &&
+
+        cardRect.left <
+        readerRect.right - 25 &&
+
+        cardRect.bottom >
+        readerRect.top + 18 &&
+
+        cardRect.top <
+        readerRect.bottom - 18;
+
+
+    if (
+        correctPosition
+    ) {
+
+        dragCard.style.left =
+            "72%";
+
+
+        dragCard.style.top =
+            "50%";
+
+
+        cardStatus.textContent =
+            "SECURITY ACCESS // VERIFIED";
+
+
+        status.textContent =
+            "SECURITY ROOM // ACCESS GRANTED";
+
+
+        setTimeout(
+            function () {
+
+                closeCardAccess();
+
+            },
+            650
+        );
+
+    }
+
+    else {
+
+        cardStatus.textContent =
+            "CARD NOT DETECTED // READER에 정확히 맞춰주세요.";
+
+    }
+
+}
+
+
+dragCard.addEventListener(
+    "pointerdown",
+    startCardDrag
+);
+
+
+dragCard.addEventListener(
+    "pointermove",
+    dragCardMove
+);
+
+
+dragCard.addEventListener(
+    "pointerup",
+    finishCardDrag
+);
+
+
+dragCard.addEventListener(
+    "pointercancel",
+    finishCardDrag
+);
 
 
 /* =====================================================
-   RESTART
+   RESTART / TITLE
    ===================================================== */
+
+function parentAction(
+    action
+) {
+
+    let target =
+        null;
+
+
+    /*
+     * iframe에서 부모 Streamlit 주소를
+     * 읽을 수 있는 경우 사용
+     */
+
+    try {
+
+        if (
+            document.referrer
+        ) {
+
+            target =
+                new URL(
+                    document.referrer
+                );
+
+
+            target.searchParams.set(
+                "action",
+                action
+            );
+
+        }
+
+    }
+
+    catch (error) {
+
+        target =
+            null;
+
+    }
+
+
+    if (target) {
+
+        window.top.location.href =
+            target.toString();
+
+    }
+
+    else {
+
+        window.parent.location.href =
+            "?action=" +
+            encodeURIComponent(
+                action
+            );
+
+    }
+
+}
+
 
 document
     .getElementById(
@@ -4069,35 +5429,15 @@ document
     )
     .addEventListener(
         "click",
-        function(event) {{
+        function () {
 
-            event.preventDefault();
+            parentAction(
+                "restart"
+            );
 
-            event.stopPropagation();
-
-
-            /*
-             * iframe에서 부모 URL을 읽지 않고
-             * 직접 Streamlit 페이지에 action 전달
-             */
-
-            try {{
-
-                window.top.location.href =
-                    "?action=restart";
-
-            }} catch (error) {{
-
-                window.parent.location.href =
-                    "?action=restart";
-            }}
-        }}
+        }
     );
 
-
-/* =====================================================
-   TITLE
-   ===================================================== */
 
 document
     .getElementById(
@@ -4105,74 +5445,134 @@ document
     )
     .addEventListener(
         "click",
-        function(event) {{
+        function () {
 
-            event.preventDefault();
+            parentAction(
+                "title"
+            );
 
-            event.stopPropagation();
-
-
-            try {{
-
-                window.top.location.href =
-                    "?action=title";
-
-            }} catch (error) {{
-
-                window.parent.location.href =
-                    "?action=title";
-            }}
-        }}
+        }
     );
 
 
 /* =====================================================
-   PAUSE INITIAL
+   FOCUS
    ===================================================== */
 
-if (
-    paused
-) {{
+function focusGame() {
 
-    pauseOverlay.style.display =
-        "flex";
-}}
+    try {
+
+        root.focus(
+            {
+                preventScroll:
+                    true
+            }
+        );
+
+    }
+
+    catch (error) {
+
+        root.focus();
+
+    }
+
+}
+
+
+root.addEventListener(
+    "pointerdown",
+    function () {
+
+        if (
+            !computerOpen &&
+            !cardOpen
+        ) {
+
+            focusGame();
+
+        }
+
+    }
+);
+
+
+window.addEventListener(
+    "blur",
+    clearKeys
+);
 
 
 /* =====================================================
-   INITIAL POSITION
+   PAUSE INITIAL STATE
    ===================================================== */
+
+if (paused) {
+
+    pauseOverlay.style.display =
+        "flex";
+
+}
+
+
+/* =====================================================
+   GAME LOOP
+   ===================================================== */
+
+function gameLoop() {
+
+    updateMovement();
+
+    requestAnimationFrame(
+        gameLoop
+    );
+
+}
+
 
 player.style.left =
     playerX + "%";
+
 
 player.style.top =
     playerY + "%";
 
 
-/* =====================================================
-   INITIAL
-   ===================================================== */
-
 checkInteraction();
 
 focusGame();
 
+gameLoop();
 
-/* =====================================================
-   MOVEMENT LOOP
-   ===================================================== */
 
-requestAnimationFrame(
-    updatePlayer
-);
+})();
 
 </script>
+
 
 </body>
 
 </html>
 """
+
+
+# =========================================================
+# SAFE PLACEHOLDER REPLACEMENT
+# =========================================================
+
+html = html.replace(
+    "__FONT_BASE64__",
+    font_base64,
+)
+
+
+html = html.replace(
+    "__PAUSED__",
+    "true"
+    if paused
+    else "false",
+)
 
 
 # =========================================================
