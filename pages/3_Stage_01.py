@@ -50,7 +50,14 @@ html, body, [class*="css"] {{ font-family:Neo,monospace !important; }}
 .stage-frame {{ border:1px solid #383838; padding:14px; background-color:#050505;
  background-image:linear-gradient(#ffffff0b 1px,transparent 1px),linear-gradient(90deg,#ffffff0b 1px,transparent 1px);
  background-size:36px 36px; }}
-.stage-title {{ letter-spacing:2px; font-size:22px; }}
+.stage-title {{ letter-spacing:2px; font-size:22px; line-height:1.65; white-space:pre-line; animation:stageSignFlicker 5.2s infinite steps(1,end); text-shadow:0 0 3px #fff,0 0 8px #888; }}
+@keyframes stageSignFlicker {{
+  0%,7%,9%,11%,44%,46%,48%,100% {{ opacity:1; filter:brightness(1); text-shadow:0 0 3px #fff,0 0 8px #888; }}
+  8%,10% {{ opacity:.35; filter:brightness(.65); text-shadow:none; }}
+  45%,47% {{ opacity:.65; filter:brightness(.8); text-shadow:0 0 2px #fff; }}
+  72% {{ opacity:.92; }} 73% {{ opacity:.55; }} 74% {{ opacity:1; }}
+}}
+@media(prefers-reduced-motion:reduce) {{ .stage-title {{ animation:none; }} }}
 .stage-sub {{ color:#777; font-size:11px; letter-spacing:1px; }}
 .object {{ min-height:84px; border:1px solid #555; background:#080808; padding:14px 6px; text-align:center; color:#aaa; }}
 .object-name {{ color:#bbb; font-size:12px; }}
@@ -98,7 +105,7 @@ def close_pause():
     st.session_state.s1_paused = False
 
 
-st.markdown('<div class="stage-title">PROJECT : LOGIC</div><div class="stage-sub">STAGE 01 // ARCHIVE ACCESS</div>', unsafe_allow_html=True)
+st.markdown('<div class="stage-title">STAGE 01<br>:ARCHIVE ACCESS</div>', unsafe_allow_html=True)
 head_left, head_mid, head_right = st.columns([1, 2, 1])
 with head_mid:
     mins, secs = divmod(max(0, st.session_state.s1_seconds), 60)
