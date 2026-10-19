@@ -26,7 +26,7 @@ action = st.query_params.get("action")
 if action == "restart":
 
     st.session_state.game_paused = False
-    # New tutorial run starts cleanly; saved progress is intentionally cleared by JS action.
+
     st.query_params.clear()
 
     st.rerun()
@@ -35,7 +35,7 @@ if action == "restart":
 elif action == "title":
 
     st.session_state.game_paused = False
-    st.session_state.show_continue_warning = True
+    st.session_state.show_title_warning = True
     st.query_params.clear()
     st.switch_page("main.py")
 
@@ -2014,12 +2014,6 @@ input {
     transition: opacity 1.5s linear;
 }
 .fade-screen.active { opacity: 1; }
-.stage-transition-title { position:absolute; inset:0; z-index:310; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#000; color:#eee; opacity:0; pointer-events:none; font-family:inherit; text-align:center; letter-spacing:3px; }
-.stage-transition-title.visible { opacity:1; }
-.stage-transition-title .stage-name { font-size:clamp(22px,4vw,42px); animation: stageBlink .65s steps(2,end) infinite; }
-.stage-transition-title .room-name { margin-top:18px; font-size:clamp(12px,2vw,18px); color:#999; animation: stageBlink 1.1s steps(2,end) infinite; }
-@keyframes stageBlink { 50% { opacity:.15; } }
-@keyframes titleFlicker { 0%,100% { opacity:1 } 3% { opacity:.75 } 4% { opacity:1 } 8% { opacity:.9 } 9% { opacity:1 } }
 
 .reader-slot {
 
@@ -3225,9 +3219,6 @@ input {
 </div>
 
 <div class="fade-screen" id="fadeScreen" aria-hidden="true"></div>
-<div id="restartConfirm" style="display:none;position:absolute;inset:0;z-index:500;background:#000e;align-items:center;justify-content:center"><div style="width:min(420px,88%);padding:28px;background:#050505;border:1px solid #666;text-align:center"><div style="font-size:18px;margin-bottom:24px">다시 시작하겠습니까?</div><button id="restartYes" class="code-button" type="button" style="width:120px;margin:6px">YES</button><button id="restartNo" class="code-button" type="button" style="width:120px;margin:6px;background:#000;color:#fff;border:1px solid #555">NO</button></div></div>
-<div id="roomIntro" style="position:absolute;inset:0;z-index:450;background:#000;color:#eee;display:flex;flex-direction:column;align-items:center;justify-content:center;letter-spacing:3px;text-align:center"><div style="font-size:clamp(22px,4vw,42px);animation:titleFlicker 4s infinite">TUTORIAL</div><div style="font-size:clamp(12px,2vw,18px);color:#777;margin-top:18px;animation:titleFlicker 4s infinite">PROJECT : LOGIC</div></div>
-<div class="stage-transition-title" id="stageTransitionTitle" aria-hidden="true"><div class="stage-name">STAGE 01</div><div class="room-name">:( ARCHIVE WING )</div></div>
 
 <script>
 
@@ -3576,32 +3567,73 @@ const messages = [
 ];
 
 
-let echoRunToken = 0;
-
 function typeEcho(index) {
-    // Each new line invalidates every pending callback from the previous line.
-    const runToken = ++echoRunToken;
-    clearTimeout(typingTimer);
-    echoIndex = index;
-    const text = messages[index] || "";
-    echoMessage.textContent = "";
-    typingDone = false;
-    echoNext.classList.remove("ready");
-    let i = 0;
+
+    echoIndex =
+        index;
+
+
+    clearTimeout(
+        typingTimer
+    );
+
+
+    const text =
+        messages[index] || "";
+
+
+    echoMessage.textContent =
+        "";
+
+
+    typingDone =
+        false;
+
+
+    echoNext.classList.remove(
+        "ready"
+    );
+
+
+    let i =
+        0;
+
 
     function tick() {
-        if (runToken !== echoRunToken) return;
-        // Assign the exact current prefix instead of appending to potentially stale text.
-        echoMessage.textContent = text.slice(0, i);
+
         if (i < text.length) {
+
+            echoMessage.textContent +=
+                text[i];
+
             i += 1;
-            typingTimer = setTimeout(tick, 25);
-        } else {
-            typingDone = true;
-            echoNext.classList.add("ready");
+
+
+            typingTimer =
+                setTimeout(
+                    tick,
+                    25
+                );
+
         }
+
+        else {
+
+            typingDone =
+                true;
+
+            echoNext.classList.add(
+                "ready"
+            );
+            saveTutorialState();
+
+        }
+
     }
+
+
     tick();
+
 }
 
 
@@ -3616,24 +3648,62 @@ function typeEcho(index) {
  */
 
 function nextEcho() {
-    // SPACE 첫 입력은 현재 문장을 완성한다.
-    // 다음 대사는 이동/조사/암호 입력 등 실제 행동이 완료될 때만
-    // 해당 상호작용 함수에서 typeEcho()로 시작한다.
+    // 첫 SPACE는 타이핑을 완료하고, 두 번째 SPACE는 첫 이동 안내를 연다.
     if (!typingDone) {
-        ++echoRunToken;
         clearTimeout(typingTimer);
         echoMessage.textContent = messages[echoIndex] || "";
         typingDone = true;
         echoNext.classList.add("ready");
+        saveTutorialState();
         return;
     }
 
-    // 행동 조건을 건너뛰어 다음 대사로 진행하지 않도록 한다.
+    if (echoIndex === 0 && tutorialStep === 0) {
+        typeEcho(1);
+        status.textContent = "TUTORIAL // W A S D TO MOVE";
+        saveTutorialState();
+        return;
+    }
+
+    // 이후 대사는 이동·조사 등 실제 행동을 완료했을 때만 바뀐다.
     status.textContent = "ECHO SYSTEM // 안내된 행동을 먼저 완료하십시오.";
+    saveTutorialState();
 }
 
+const TUTORIAL_SAVE_KEY = "project_logic_tutorial_save_v3";
+function saveTutorialState() {
+    try {
+        localStorage.setItem(TUTORIAL_SAVE_KEY, JSON.stringify({
+            tutorialStep, echoIndex, echoText: echoMessage.textContent,
+            typingDone, playerX, playerY, keyCollected, cardConsumed,
+            accessCode: ACCESS_CODE, inventory: Array.from(inventorySlots).map(el => el.classList.contains("has-item"))
+        }));
+    } catch (e) {}
+}
+function restoreTutorialState() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(TUTORIAL_SAVE_KEY) || "null");
+        if (!saved) return false;
+        if (Number.isFinite(saved.tutorialStep)) tutorialStep = saved.tutorialStep;
+        if (Number.isFinite(saved.echoIndex)) echoIndex = Math.max(0, Math.min(messages.length - 1, saved.echoIndex));
+        if (Number.isFinite(saved.playerX)) playerX = saved.playerX;
+        if (Number.isFinite(saved.playerY)) playerY = saved.playerY;
+        keyCollected = !!saved.keyCollected;
+        cardConsumed = !!saved.cardConsumed;
+        if (typeof saved.accessCode === "string" && /^\d{4}$/.test(saved.accessCode)) ACCESS_CODE = saved.accessCode;
+        player.style.left = playerX + "%";
+        player.style.top = playerY + "%";
+        echoMessage.textContent = typeof saved.echoText === "string" ? saved.echoText : (messages[echoIndex] || "");
+        typingDone = true; // iframe 재생성 후에는 현재 문장을 보존하고 타이핑 완료 상태로 복구
+        echoNext.classList.add("ready");
+        return true;
+    } catch (e) { return false; }
+}
 
-typeEcho(0);
+const tutorialWasRestored = restoreTutorialState();
+if (!tutorialWasRestored) typeEcho(0);
+setInterval(saveTutorialState, 250);
+window.addEventListener("beforeunload", saveTutorialState);
 
 
 /* =====================================================
@@ -5327,9 +5397,7 @@ function finishCardDrag(
             echoNext.classList.add("ready");
             setTimeout(function () {
                 if (fadeScreen) fadeScreen.classList.add("active");
-                var transitionTitle = document.getElementById("stageTransitionTitle");
-                if (transitionTitle) transitionTitle.classList.add("visible");
-                setTimeout(function () { parentAction("stage01"); }, 3000);
+                setTimeout(function () { parentAction("stage01"); }, 1550);
             }, 1000);
         }, 700);
 
@@ -5374,36 +5442,41 @@ dragCard.addEventListener(
    ===================================================== */
 
 function parentAction(action) {
-    // components.html runs inside an iframe. Reading parent.location can throw on
-    // cross-origin checks, so derive the app URL from document.referrer and only
-    // assign the parent location (which browsers permit).
-    let target;
+    // components.html() runs in an iframe; navigate the Streamlit page itself.
     try {
-        target = new URL(document.referrer || window.location.href);
-        target.search = "";
-        target.hash = "";
-        target.searchParams.set("action", action);
+        const parentUrl = new URL(window.parent.location.href);
+        parentUrl.search = "";
+        parentUrl.hash = "";
+        parentUrl.searchParams.set("action", action);
+        window.parent.location.assign(parentUrl.toString());
     } catch (error) {
-        target = new URL(window.location.href);
-        target.search = "";
-        target.searchParams.set("action", action);
+        // document.referrer is a fallback only; never append to the iframe URL.
+        try {
+            const target = new URL(document.referrer);
+            target.search = "";
+            target.hash = "";
+            target.searchParams.set("action", action);
+            window.top.location.assign(target.toString());
+        } catch (_) {
+            status.textContent = "NAVIGATION ERROR // 페이지를 새로고침해 주세요.";
+        }
     }
-    try { window.parent.location.assign(target.toString()); }
-    catch (error) { window.location.href = target.toString(); }
 }
 
 
-document.getElementById("restartButton").addEventListener("click", function () { document.getElementById("restartConfirm").style.display = "flex"; });
-document.getElementById("restartNo").addEventListener("click", function () { document.getElementById("restartConfirm").style.display = "none"; });
-document.getElementById("restartYes").addEventListener("click", function () {
-    try {
-        localStorage.removeItem("project_logic_tutorial_save_v2");
-        localStorage.removeItem("project_logic_stage01_save_v2");
-        sessionStorage.removeItem("project_logic_stage00_intro_seen");
-        sessionStorage.removeItem("project_logic_stage01_intro_seen");
-    } catch (e) {}
-    parentAction("restart");
-});
+document
+    .getElementById(
+        "restartButton"
+    )
+    .addEventListener(
+        "click",
+        function () {
+
+            try { localStorage.removeItem("project_logic_tutorial_save_v3"); } catch (e) {}
+            parentAction("restart");
+
+        }
+    );
 
 
 document
@@ -5474,43 +5547,6 @@ window.addEventListener(
 /* =====================================================
    PAUSE INITIAL STATE
    ===================================================== */
-
-// Persist tutorial progress across Streamlit reruns (pause/resume and title navigation).
-const TUTORIAL_SAVE_KEY = "project_logic_tutorial_save_v2";
-function saveTutorialProgress() {
-    try {
-        localStorage.setItem(TUTORIAL_SAVE_KEY, JSON.stringify({
-            tutorialStep, playerX, playerY, ACCESS_CODE, inventory, keyCollected, cardConsumed, echoIndex, echoText: echoMessage.textContent, typingDone
-        }));
-    } catch (e) {}
-}
-function restoreTutorialProgress() {
-    try {
-        const raw = localStorage.getItem(TUTORIAL_SAVE_KEY);
-        if (!raw) return;
-        const saved = JSON.parse(raw);
-        if (Number.isFinite(saved.tutorialStep)) tutorialStep = saved.tutorialStep;
-        if (Number.isFinite(saved.playerX)) playerX = saved.playerX;
-        if (Number.isFinite(saved.playerY)) playerY = saved.playerY;
-        if (typeof saved.ACCESS_CODE === "string") ACCESS_CODE = saved.ACCESS_CODE;
-        if (Array.isArray(saved.inventory) && saved.inventory.length === inventory.length) {
-            saved.inventory.forEach((item, i) => inventory[i] = item);
-        }
-        if (typeof saved.keyCollected === "boolean") keyCollected = saved.keyCollected;
-        if (typeof saved.cardConsumed === "boolean") cardConsumed = saved.cardConsumed;
-        if (Number.isFinite(saved.echoIndex)) echoIndex = saved.echoIndex;
-        if (typeof saved.echoText === "string" && saved.echoText) echoMessage.textContent = saved.echoText;
-        if (typeof saved.typingDone === "boolean") typingDone = saved.typingDone;
-        if (typingDone) echoNext.classList.add("ready");
-        renderInventory();
-    } catch (e) {}
-}
-restoreTutorialProgress();
-const roomIntro = document.getElementById("roomIntro");
-try { if (sessionStorage.getItem("project_logic_stage00_intro_seen")) roomIntro.style.display = "none"; else { sessionStorage.setItem("project_logic_stage00_intro_seen", "1"); setTimeout(() => { roomIntro.style.opacity = "0"; roomIntro.style.transition = "opacity .35s"; setTimeout(() => roomIntro.remove(), 380); }, 3000); } } catch(e) { setTimeout(() => roomIntro.remove(), 3000); }
-
-setInterval(saveTutorialProgress, 500);
-window.addEventListener("beforeunload", saveTutorialProgress);
 
 if (paused) {
 
