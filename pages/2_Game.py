@@ -25,12 +25,18 @@ action = st.query_params.get("action")
 
 if action == "restart":
 
-    st.session_state.tutorial_reset_save = True
-    st.session_state.game_paused = False
-
     st.query_params.clear()
-
-    st.rerun()
+    for _key in list(st.session_state.keys()):
+        if _key.startswith(("s1_", "tutorial_", "stage01_")):
+            del st.session_state[_key]
+    st.session_state.tutorial_reset_save = True
+    st.session_state.game_started = True
+    st.session_state.game_paused = False
+    st.session_state.game_finished = False
+    st.session_state.tutorial_complete = False
+    st.session_state.stage01_started = False
+    st.session_state.remaining_seconds = 15 * 60
+    st.switch_page("pages/2_Game.py")
 
 
 elif action == "title":
@@ -43,7 +49,9 @@ elif action == "title":
 elif action == "stage01":
 
     st.session_state.game_paused = False
+    st.session_state.game_started = True
     st.session_state.stage01_started = True
+    st.session_state.start_open = False
     st.query_params.clear()
     st.switch_page("pages/3_Stage_01.py")
 
@@ -370,20 +378,9 @@ input {
     letter-spacing: 1px;
     z-index: 20;
     color: #f4f4f4;
-    text-shadow: 0 0 3px #fff, 0 0 8px #888;
-    animation: signFlicker 5.2s infinite steps(1, end);
+    text-shadow: none;
 
 }
-
-@keyframes signFlicker {
-    0%, 7%, 9%, 11%, 44%, 46%, 48%, 100% { opacity: 1; filter: brightness(1); text-shadow: 0 0 3px #fff, 0 0 8px #888; }
-    8%, 10% { opacity: .35; filter: brightness(.65); text-shadow: none; }
-    45%, 47% { opacity: .65; filter: brightness(.8); text-shadow: 0 0 2px #fff; }
-    72% { opacity: .92; }
-    73% { opacity: .55; }
-    74% { opacity: 1; }
-}
-@media (prefers-reduced-motion: reduce) { .project-title { animation: none; } }
 
 
 .stage-title {
@@ -2019,10 +2016,11 @@ input {
     pointer-events: none;
     transition: opacity 1.5s linear;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
 }
-.fade-screen.active { opacity: 1; }
+.fade-screen.active { opacity: 1; pointer-events: auto; }
 .fade-message {
     color: #e8e8e8;
     font-family: 'NeoDungGeunMo', monospace;
@@ -2033,6 +2031,19 @@ input {
     opacity: 0;
     text-shadow: 0 0 4px #fff, 0 0 12px #777;
 }
+.fade-continue {
+    display:none;
+    margin-top:28px;
+    color:#fff;
+    border:1px solid #777;
+    padding:12px 20px;
+    font-family:'NeoDungGeunMo',monospace;
+    font-size:13px;
+    letter-spacing:2px;
+    text-decoration:none;
+}
+.fade-continue:hover { background:#fff; color:#000; }
+.fade-screen.active .fade-continue { display:inline-block; }
 .fade-screen.active .fade-message {
     animation: blackoutText 1.5s steps(1, end) forwards;
 }
@@ -3252,7 +3263,7 @@ input {
 
 </div>
 
-<div class="fade-screen" id="fadeScreen" aria-hidden="true"><div class="fade-message" id="fadeMessage">SIGNAL LOST</div></div>
+<div class="fade-screen" id="fadeScreen" aria-hidden="true"><div class="fade-message" id="fadeMessage">SIGNAL LOST</div><a class="fade-continue" id="fadeContinue" href="?action=stage01" target="_top" rel="noopener">ENTER STAGE 01</a></div>
 
 <script>
 
@@ -5479,24 +5490,24 @@ dragCard.addEventListener(
    ===================================================== */
 
 function parentAction(action) {
-    // components.html() runs in an iframe; navigate the Streamlit page itself.
+    // components.html runs in a sandboxed iframe. Direct top navigation can be
+    // blocked after a timer, so use the parent URL when permitted and leave a
+    // real target=_top link available as a user-activated fallback.
     try {
         const parentUrl = new URL(window.parent.location.href);
         parentUrl.search = "";
         parentUrl.hash = "";
         parentUrl.searchParams.set("action", action);
-        window.parent.location.assign(parentUrl.toString());
-    } catch (error) {
-        // document.referrer is a fallback only; never append to the iframe URL.
-        try {
-            const target = new URL(document.referrer);
-            target.search = "";
-            target.hash = "";
-            target.searchParams.set("action", action);
-            window.top.location.assign(target.toString());
-        } catch (_) {
-            status.textContent = "NAVIGATION ERROR // 페이지를 새로고침해 주세요.";
-        }
+        window.parent.location.href = parentUrl.toString();
+        return;
+    } catch (error) {}
+    const fallback = document.getElementById("fadeContinue");
+    if (fallback && action === "stage01") {
+        fallback.href = "?action=stage01";
+        fallback.style.display = "inline-block";
+        fallback.textContent = "ENTER STAGE 01";
+    } else {
+        status.textContent = "NAVIGATION BLOCKED // use the Streamlit page controls.";
     }
 }
 
