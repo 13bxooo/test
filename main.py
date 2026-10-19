@@ -10,7 +10,7 @@ if _page_action == "title":
     st.query_params.clear()
     st.session_state.game_paused = False
     st.session_state.start_open = True
-    st.session_state.show_title_warning = True
+    st.session_state.show_title_warning = False
     st.rerun()
 elif _page_action == "stage01":
     # The tutorial iframe requests the next Streamlit page via ?action=stage01.
@@ -69,6 +69,11 @@ st.markdown(f"""
 .st-key-start_button button,.st-key-how_to_play_button button{{width:100%!important;height:55px!important;border:0!important;border-radius:0!important;background:#000!important;color:#fff!important;font-family:NeoDungGeunMo,monospace!important;font-size:19px!important;box-shadow:none!important}}
 .st-key-start_button button:hover,.st-key-how_to_play_button button:hover{{background:#fff!important;color:#000!important}}
 .st-key-popup{{position:fixed!important;top:calc(51vh - 3px)!important;left:calc(50% + 105px)!important;width:190px!important;margin:0!important;padding:6px!important;background:#000!important;border:1px solid #555!important;z-index:200!important}}
+.st-key-confirm_modal{{position:fixed!important;inset:0!important;z-index:9999!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:18px!important;background:rgba(0,0,0,.78)!important}}
+.st-key-confirm_modal [data-testid="stVerticalBlockBorderWrapper"]{{width:min(430px,92vw)!important;max-width:430px!important;border:1px solid #aaa!important;background:#050505!important;box-shadow:0 0 0 1px #333,0 12px 40px #000!important;padding:22px 24px!important}}
+.st-key-confirm_modal [data-testid="stMarkdownContainer"] p{{font-family:NeoDungGeunMo,monospace!important;font-size:13px!important;line-height:1.8!important;color:#ddd!important}}
+.st-key-confirm_modal [data-testid="stButton"] button{{height:40px!important;border:1px solid #666!important;background:#050505!important;color:#fff!important;font-family:NeoDungGeunMo,monospace!important;border-radius:0!important}}
+.st-key-confirm_modal [data-testid="stButton"] button:hover{{background:#fff!important;color:#000!important}}
 .st-key-popup button{{width:100%!important;height:42px!important;margin:0 0 6px!important;padding:0!important;border:0!important;border-radius:0!important;background:#000!important;color:#fff!important;font-family:NeoDungGeunMo,monospace!important;font-size:14px!important}}
 .st-key-popup button:last-child{{margin-bottom:0!important}}
 .st-key-popup button:hover{{background:#fff!important;color:#000!important}}
@@ -77,9 +82,8 @@ st.markdown(f"""
 </style>
 """, unsafe_allow_html=True)
 
-# Returning from a game always lands on the original title screen.
-if st.session_state.pop("show_title_warning", False):
-    st.info("타이틀 화면으로 돌아왔습니다. CONTINUE는 저장된 진행 상황을 불러오고, NEW GAME은 새로 시작합니다.")
+# Returning from a game lands on the clean title screen; no overlapping banner is shown.
+st.session_state.show_title_warning = False
 
 st.markdown('<div class="project-title">PROJECT : LOGIC</div><div class="project-subtitle">FACILITY CONTROL SYSTEM</div>', unsafe_allow_html=True)
 with st.container(key="start_button"):
@@ -135,25 +139,30 @@ if st.session_state.start_open:
             st.switch_page("pages/2_Game.py")
 
 if st.session_state.get("new_game_confirm", False):
-    st.warning("이전 플레이 기록이 존재합니다. 새롭게 시작하시겠습니까?")
-    yes_col, no_col = st.columns(2)
-    with yes_col:
-        if st.button("YES — 새 게임 시작", key="confirm_new_game_yes", use_container_width=True):
-            # Overwrite the old in-session save by clearing every tutorial/stage key.
-            for _key in list(st.session_state.keys()):
-                if _key.startswith(("s1_", "tutorial_", "stage01_")):
-                    del st.session_state[_key]
-            st.session_state.tutorial_reset_save = True
-            st.session_state.game_started = True
-            st.session_state.game_paused = False
-            st.session_state.game_finished = False
-            st.session_state.remaining_seconds = 15 * 60
-            st.session_state.tutorial_complete = False
-            st.session_state.stage01_started = False
-            st.session_state.new_game_confirm = False
-            st.session_state.start_open = False
-            st.switch_page("pages/2_Game.py")
-    with no_col:
-        if st.button("NO — 취소", key="confirm_new_game_no", use_container_width=True):
-            st.session_state.new_game_confirm = False
-            st.rerun()
+    # Centered, compact system-dialog-style confirmation window.
+    with st.container(key="confirm_modal", border=False):
+        st.markdown("### SYSTEM CONFIRMATION")
+        st.markdown("이전 플레이 기록이 존재합니다.\n\n기록을 초기화하고 새 게임을 시작하시겠습니까?")
+        yes_col, no_col = st.columns(2, gap="small")
+        with yes_col:
+            yes_new_game = st.button("YES", key="confirm_new_game_yes", use_container_width=True)
+        with no_col:
+            no_new_game = st.button("NO", key="confirm_new_game_no", use_container_width=True)
+
+    if yes_new_game:
+        for _key in list(st.session_state.keys()):
+            if _key.startswith(("s1_", "tutorial_", "stage01_")):
+                del st.session_state[_key]
+        st.session_state.tutorial_reset_save = True
+        st.session_state.game_started = True
+        st.session_state.game_paused = False
+        st.session_state.game_finished = False
+        st.session_state.remaining_seconds = 15 * 60
+        st.session_state.tutorial_complete = False
+        st.session_state.stage01_started = False
+        st.session_state.new_game_confirm = False
+        st.session_state.start_open = False
+        st.switch_page("pages/2_Game.py")
+    if no_new_game:
+        st.session_state.new_game_confirm = False
+        st.rerun()
