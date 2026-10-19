@@ -26,7 +26,7 @@ action = st.query_params.get("action")
 if action == "restart":
 
     st.session_state.game_paused = False
-
+    # New tutorial run starts cleanly; saved progress is intentionally cleared by JS action.
     st.query_params.clear()
 
     st.rerun()
@@ -35,13 +35,16 @@ if action == "restart":
 elif action == "title":
 
     st.session_state.game_paused = False
-
-    # main.py에서 사용할 Continue 경고 플래그
     st.session_state.show_continue_warning = True
-
     st.query_params.clear()
-
     st.switch_page("main.py")
+
+elif action == "stage01":
+
+    st.session_state.game_paused = False
+    st.session_state.stage01_started = True
+    st.query_params.clear()
+    st.switch_page("pages/3_Stage_01.py")
 
 
 # =========================================================
@@ -243,6 +246,7 @@ html = r"""
 <head>
 
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 
 <style>
@@ -1986,6 +1990,36 @@ input {
 }
 
 
+.reader-light {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #ff3333;
+    box-shadow: 0 0 8px #ff3333;
+}
+.reader-light.green {
+    background: #36ff76;
+    box-shadow: 0 0 12px #36ff76;
+}
+.fade-screen {
+    position: absolute;
+    inset: 0;
+    z-index: 300;
+    background: #000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 1.5s linear;
+}
+.fade-screen.active { opacity: 1; }
+.stage-transition-title { position:absolute; inset:0; z-index:310; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#000; color:#eee; opacity:0; pointer-events:none; font-family:inherit; text-align:center; letter-spacing:3px; }
+.stage-transition-title.visible { opacity:1; }
+.stage-transition-title .stage-name { font-size:clamp(22px,4vw,42px); animation: stageBlink .65s steps(2,end) infinite; }
+.stage-transition-title .room-name { margin-top:18px; font-size:clamp(12px,2vw,18px); color:#999; animation: stageBlink 1.1s steps(2,end) infinite; }
+@keyframes stageBlink { 50% { opacity:.15; } }
+
 .reader-slot {
 
     position:
@@ -2539,7 +2573,7 @@ input {
 
 
 <div class="stage-title">
-    STAGE 01 // CONTROL ROOM
+    STAGE 00 // TUTORIAL
 </div>
 
 
@@ -3069,8 +3103,9 @@ input {
 >
 
 
-<div class="reader">
+<div class="reader" id="cardReader">
 
+    <div class="reader-light" id="readerLight"></div>
     <div class="reader-slot"></div>
 
     CARD READER
@@ -3188,6 +3223,10 @@ input {
 
 </div>
 
+<div class="fade-screen" id="fadeScreen" aria-hidden="true"></div>
+<div id="restartConfirm" style="display:none;position:absolute;inset:0;z-index:500;background:#000e;align-items:center;justify-content:center"><div style="width:min(420px,88%);padding:28px;background:#050505;border:1px solid #666;text-align:center"><div style="font-size:18px;margin-bottom:24px">다시 시작하겠습니까?</div><button id="restartYes" class="code-button" type="button" style="width:120px;margin:6px">YES</button><button id="restartNo" class="code-button" type="button" style="width:120px;margin:6px;background:#000;color:#fff;border:1px solid #555">NO</button></div></div>
+<div id="roomIntro" style="position:absolute;inset:0;z-index:450;background:#000;color:#ddd;display:flex;flex-direction:column;align-items:center;justify-content:center;letter-spacing:3px;text-align:center"><div style="font-size:clamp(22px,4vw,42px);animation:stageBlink .45s steps(2,end) infinite">STAGE 00</div><div style="font-size:clamp(12px,2vw,18px);color:#999;margin-top:18px;animation:stageBlink .7s steps(2,end) infinite">: TUTORIAL</div></div>
+<div class="stage-transition-title" id="stageTransitionTitle" aria-hidden="true"><div class="stage-name">STAGE 01</div><div class="room-name">:( ARCHIVE WING )</div></div>
 
 <script>
 
@@ -3208,7 +3247,7 @@ const paused =
  * 방이 시작될 때마다 새로운 4자리 암호 생성
  */
 
-const ACCESS_CODE =
+let ACCESS_CODE =
     String(
         Math.floor(
             1000 +
@@ -3239,6 +3278,8 @@ let cardOpen =
 
 let keyCollected =
     false;
+
+let cardConsumed = false;
 
 
 let echoIndex =
@@ -3381,6 +3422,9 @@ const cardStatus =
     document.getElementById(
         "cardStatus"
     );
+
+const readerLight = document.getElementById("readerLight");
+const fadeScreen = document.getElementById("fadeScreen");
 
 
 const pauseOverlay =
@@ -3611,47 +3655,19 @@ function typeEcho(index) {
  */
 
 function nextEcho() {
-
+    // SPACE 첫 입력은 현재 문장을 완성한다.
+    // 다음 대사는 이동/조사/암호 입력 등 실제 행동이 완료될 때만
+    // 해당 상호작용 함수에서 typeEcho()로 시작한다.
     if (!typingDone) {
-
-        clearTimeout(
-            typingTimer
-        );
-
-
-        echoMessage.textContent =
-            messages[echoIndex];
-
-
-        typingDone =
-            true;
-
-
-        echoNext.classList.add(
-            "ready"
-        );
-
-
+        clearTimeout(typingTimer);
+        echoMessage.textContent = messages[echoIndex] || "";
+        typingDone = true;
+        echoNext.classList.add("ready");
         return;
-
     }
 
-
-    const next =
-        echoIndex + 1;
-
-
-    if (
-        next <
-        messages.length
-    ) {
-
-        typeEcho(
-            next
-        );
-
-    }
-
+    // 행동 조건을 건너뛰어 다음 대사로 진행하지 않도록 한다.
+    status.textContent = "ECHO SYSTEM // 안내된 행동을 먼저 완료하십시오.";
 }
 
 
@@ -5032,7 +5048,7 @@ document
 function openCardAccess() {
 
     if (
-        !keyCollected
+        !keyCollected || cardConsumed
     ) {
 
         inaccessible();
@@ -5307,19 +5323,53 @@ function finishCardDrag(
         cardStatus.textContent =
             "SECURITY ACCESS // VERIFIED";
 
-
         status.textContent =
             "SECURITY ROOM // ACCESS GRANTED";
 
+        // 카드키는 일회용: 인벤토리에서 제거하고 리더기를 녹색으로 변경한다.
+        inventory[0] = null;
+        keyCollected = false;
+        cardConsumed = true;
+        renderInventory();
+        if (readerLight) readerLight.classList.add("green");
+        cardStatus.textContent = "ACCESS GRANTED // CARD CONSUMED";
 
-        setTimeout(
-            function () {
+        // 짧은 문 개방 효과음(Web Audio, 별도 파일 불필요)
+        try {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (AudioContextClass) {
+                const audio = new AudioContextClass();
+                const now = audio.currentTime;
+                [440, 660, 880].forEach((frequency, index) => {
+                    const oscillator = audio.createOscillator();
+                    const gain = audio.createGain();
+                    oscillator.type = "square";
+                    oscillator.frequency.value = frequency;
+                    gain.gain.setValueAtTime(0.0001, now + index * 0.12);
+                    gain.gain.exponentialRampToValueAtTime(0.08, now + index * 0.12 + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + index * 0.12 + 0.18);
+                    oscillator.connect(gain);
+                    gain.connect(audio.destination);
+                    oscillator.start(now + index * 0.12);
+                    oscillator.stop(now + index * 0.12 + 0.2);
+                });
+                setTimeout(() => audio.close(), 900);
+            }
+        } catch (error) {}
 
-                closeCardAccess();
-
-            },
-            650
-        );
+        setTimeout(function () {
+            closeCardAccess();
+            clearTimeout(typingTimer);
+            echoMessage.textContent = "이제 다음 스테이지로 넘어가도록 합시다.";
+            typingDone = true;
+            echoNext.classList.add("ready");
+            setTimeout(function () {
+                if (fadeScreen) fadeScreen.classList.add("active");
+                var transitionTitle = document.getElementById("stageTransitionTitle");
+                if (transitionTitle) transitionTitle.classList.add("visible");
+                setTimeout(function () { parentAction("stage01"); }, 3000);
+            }, 1000);
+        }, 700);
 
     }
 
@@ -5423,20 +5473,12 @@ function parentAction(
 }
 
 
-document
-    .getElementById(
-        "restartButton"
-    )
-    .addEventListener(
-        "click",
-        function () {
-
-            parentAction(
-                "restart"
-            );
-
-        }
-    );
+document.getElementById("restartButton").addEventListener("click", function () { document.getElementById("restartConfirm").style.display = "flex"; });
+document.getElementById("restartNo").addEventListener("click", function () { document.getElementById("restartConfirm").style.display = "none"; });
+document.getElementById("restartYes").addEventListener("click", function () {
+    try { localStorage.removeItem("project_logic_tutorial_save_v2"); } catch (e) {}
+    parentAction("restart");
+});
 
 
 document
@@ -5507,6 +5549,43 @@ window.addEventListener(
 /* =====================================================
    PAUSE INITIAL STATE
    ===================================================== */
+
+// Persist tutorial progress across Streamlit reruns (pause/resume and title navigation).
+const TUTORIAL_SAVE_KEY = "project_logic_tutorial_save_v2";
+function saveTutorialProgress() {
+    try {
+        localStorage.setItem(TUTORIAL_SAVE_KEY, JSON.stringify({
+            tutorialStep, playerX, playerY, ACCESS_CODE, inventory, keyCollected, cardConsumed, echoIndex, echoText: echoMessage.textContent, typingDone
+        }));
+    } catch (e) {}
+}
+function restoreTutorialProgress() {
+    try {
+        const raw = localStorage.getItem(TUTORIAL_SAVE_KEY);
+        if (!raw) return;
+        const saved = JSON.parse(raw);
+        if (Number.isFinite(saved.tutorialStep)) tutorialStep = saved.tutorialStep;
+        if (Number.isFinite(saved.playerX)) playerX = saved.playerX;
+        if (Number.isFinite(saved.playerY)) playerY = saved.playerY;
+        if (typeof saved.ACCESS_CODE === "string") ACCESS_CODE = saved.ACCESS_CODE;
+        if (Array.isArray(saved.inventory) && saved.inventory.length === inventory.length) {
+            saved.inventory.forEach((item, i) => inventory[i] = item);
+        }
+        if (typeof saved.keyCollected === "boolean") keyCollected = saved.keyCollected;
+        if (typeof saved.cardConsumed === "boolean") cardConsumed = saved.cardConsumed;
+        if (Number.isFinite(saved.echoIndex)) echoIndex = saved.echoIndex;
+        if (typeof saved.echoText === "string" && saved.echoText) echoMessage.textContent = saved.echoText;
+        if (typeof saved.typingDone === "boolean") typingDone = saved.typingDone;
+        if (typingDone) echoNext.classList.add("ready");
+        renderInventory();
+    } catch (e) {}
+}
+restoreTutorialProgress();
+const roomIntro = document.getElementById("roomIntro");
+try { if (sessionStorage.getItem("project_logic_stage00_intro_seen")) roomIntro.style.display = "none"; else { sessionStorage.setItem("project_logic_stage00_intro_seen", "1"); setTimeout(() => { roomIntro.style.opacity = "0"; roomIntro.style.transition = "opacity .35s"; setTimeout(() => roomIntro.remove(), 380); }, 3000); } } catch(e) { setTimeout(() => roomIntro.remove(), 3000); }
+
+setInterval(saveTutorialProgress, 500);
+window.addEventListener("beforeunload", saveTutorialProgress);
 
 if (paused) {
 
