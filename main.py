@@ -108,30 +108,29 @@ if st.session_state.start_open:
             st.switch_page("pages/2_Game.py")
 
     if new_game_clicked:
-        _found_state = st.session_state.get("s1_found", {})
-        _any_stage_record = any(_found_state.values()) if isinstance(_found_state, dict) else False
-        has_progress = (
-            bool(st.session_state.get("game_started", False))
-            or bool(st.session_state.get("stage01_started", False))
-            or bool(st.session_state.get("tutorial_complete", False))
-            or bool(st.session_state.get("tutorial_save_exists", False))
-            or bool(st.session_state.get("s1_message_index", 0))
-            or _any_stage_record
-            or bool(st.session_state.get("s1_archive_read", False))
-            or bool(st.session_state.get("s1_unlocked", False))
-        )
+        # A run exists if the tutorial/stage has ever been entered or any progress
+        # marker has been set in this Streamlit session.
+        progress_prefixes = ("s1_", "tutorial_", "stage01_")
+        has_progress = bool(st.session_state.get("game_started", False)) or any(
+            key.startswith(progress_prefixes) and bool(value)
+            for key, value in st.session_state.items()
+        ) or bool(st.session_state.get("stage01_started", False))
+
         if has_progress:
             st.session_state.new_game_confirm = True
+            st.rerun()
         else:
-            # No existing run: start immediately.
             for _key in list(st.session_state.keys()):
-                if _key.startswith(("s1_", "tutorial_", "stage01_")):
+                if _key.startswith(progress_prefixes):
                     del st.session_state[_key]
             st.session_state.tutorial_reset_save = True
             st.session_state.game_started = True
             st.session_state.game_paused = False
             st.session_state.game_finished = False
+            st.session_state.tutorial_complete = False
+            st.session_state.stage01_started = False
             st.session_state.remaining_seconds = 15 * 60
+            st.session_state.new_game_confirm = False
             st.session_state.start_open = False
             st.switch_page("pages/2_Game.py")
 
