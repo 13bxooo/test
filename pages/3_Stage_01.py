@@ -1,246 +1,68 @@
 import base64
 from pathlib import Path
 import streamlit as st
+import streamlit.components.v1 as components
 
-st.set_page_config(
-    page_title="PROJECT : LOGIC // STAGE 01",
-    page_icon="◈",
-    layout="wide",
-    initial_sidebar_state="collapsed",
-)
+st.set_page_config(page_title="PROJECT : LOGIC // STAGE 01", page_icon="◈", layout="wide", initial_sidebar_state="collapsed")
 
-# Native Streamlit state/navigation: no components.html, embedded JavaScript, or iframe.
-DEFAULTS = {
-    "s1_paused": False,
-    "s1_confirm_restart": False,
-    "s1_seconds": 720,
-    "s1_message_index": 0,
-    "s1_message_complete": False,
-    "s1_found": {"A": False, "B": False, "C": False},
-    "s1_archive_read": False,
-    "s1_unlocked": False,
-    "s1_finished": False,
-    "s1_code": "",
-    "s1_error": "",
-    "s1_status": "ECHO SYSTEM // 안내된 행동을 먼저 완료하십시오.",
-}
-for key, value in DEFAULTS.items():
-    if key not in st.session_state:
-        st.session_state[key] = value.copy() if isinstance(value, dict) else value
-
-# The page is reached from the tutorial through st.switch_page. Navigation buttons
-# below also use Streamlit's own page navigation, not parent-window URL manipulation.
 font_data = ""
 for candidate in (Path("neodgm.ttf"), Path("neodgm(2).ttf"), Path(__file__).resolve().parents[1] / "neodgm(2).ttf"):
     if candidate.exists():
         font_data = base64.b64encode(candidate.read_bytes()).decode("ascii")
         break
 
-st.markdown(f"""
+# Stage 01 uses the same full-screen game surface and keyboard interaction model as the tutorial.
+# H toggles Help, I toggles Inventory, E interacts, WASD moves, SPACE advances ECHO, ESC closes overlays.
+html = r"""
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <style>
-@font-face {{ font-family: Neo; src: url(data:font/ttf;base64,{font_data}) format('truetype'); }}
-#MainMenu, header, footer, [data-testid="stSidebar"] {{ display:none; visibility:hidden; }}
-.stApp {{ background:#000; color:#eee; font-family:Neo,monospace; }}
-.block-container {{ padding:1.2rem 2rem 2rem; max-width:1200px; }}
-html, body, [class*="css"] {{ font-family:Neo,monospace !important; }}
-.stButton button, .stTextInput input {{ font-family:Neo,monospace !important; border-radius:0 !important; }}
-.stButton button {{ background:#050505; color:#eee; border:1px solid #555; min-height:42px; }}
-.stButton button:hover {{ background:#eee; color:#000; border-color:#eee; }}
-[data-testid="stTextInput"] input {{ background:#000; color:#fff; border:1px solid #666; }}
-.stage-frame {{ border:1px solid #383838; padding:14px; background-color:#050505;
- background-image:linear-gradient(#ffffff0b 1px,transparent 1px),linear-gradient(90deg,#ffffff0b 1px,transparent 1px);
- background-size:36px 36px; }}
-.stage-title {{ letter-spacing:2px; font-size:22px; line-height:1.65; white-space:pre-line; color:#fff; text-shadow:none; animation:none; }}
-@keyframes stageSignFlicker {{
-  0%,7%,9%,11%,44%,46%,48%,100% {{ opacity:1; filter:brightness(1); text-shadow:0 0 3px #fff,0 0 8px #888; }}
-  8%,10% {{ opacity:.35; filter:brightness(.65); text-shadow:none; }}
-  45%,47% {{ opacity:.65; filter:brightness(.8); text-shadow:0 0 2px #fff; }}
-  72% {{ opacity:.92; }} 73% {{ opacity:.55; }} 74% {{ opacity:1; }}
-}}
-@media(prefers-reduced-motion:reduce) {{ .stage-title {{ animation:none; }} }}
-.stage-sub {{ color:#777; font-size:11px; letter-spacing:1px; }}
-.object {{ min-height:84px; border:1px solid #555; background:#080808; padding:14px 6px; text-align:center; color:#aaa; }}
-.object-name {{ color:#bbb; font-size:12px; }}
-.object-state {{ color:#666; font-size:10px; margin-top:7px; }}
-.echo-box {{ border:1px solid #444; background:#050505; padding:14px 16px; min-height:100px; }}
-.echo-name {{ font-size:11px; color:#fff; margin-bottom:8px; }}
-.echo-copy {{ font-size:12px; color:#bbb; line-height:1.8; }}
-.small-note {{ font-size:10px; color:#666; }}
-</style>
-""", unsafe_allow_html=True)
-
-MESSAGES = [
-    "연결이 확인되었습니다. 저는 ECHO입니다. 이 시설에서의 첫 번째 절차를 안내하겠습니다.",
-    "이 구역에는 제한 시간이 적용됩니다. 주변의 단말기와 보관 기록을 조사하십시오.",
-    "각 단말기에서 숫자를 하나씩 확보하십시오. 기록을 확보하면 보안 패널에 표시됩니다.",
-    "ARCHIVE NOTE에는 숫자를 조합할 순서가 기록되어 있습니다. 단말기의 숫자와 기록의 순서를 함께 확인하십시오.",
-    "세 구역의 기록과 보관 기록을 모두 확인했다면 SECURITY PANEL에서 세 자리 코드를 입력하십시오.",
-    "인증이 완료되면 출구로 이동하십시오. 이동은 아래 방향 버튼으로 진행할 수 있습니다.",
-]
-DIGITS = {"A": "4", "B": "1", "C": "7"}
-
-
-def reset_stage():
-    for key, value in DEFAULTS.items():
-        st.session_state[key] = value.copy() if isinstance(value, dict) else value
-
-
-def navigate_title():
-    st.session_state.s1_paused = False
-    st.session_state.s1_confirm_restart = False
-    st.session_state.show_title_warning = True
-    st.switch_page("main.py")
-
-
-def navigate_restart():
-    st.session_state.tutorial_reset_save = True
-    reset_stage()
-    st.session_state.game_paused = False
-    st.session_state.tutorial_complete = False
-    st.session_state.stage01_started = False
-    st.switch_page("pages/2_Game.py")
-
-
-def close_pause():
-    st.session_state.s1_paused = False
-
-
-st.markdown('<div class="stage-title">STAGE 01<br>:ARCHIVE ACCESS</div>', unsafe_allow_html=True)
-head_left, head_mid, head_right = st.columns([1, 2, 1])
-with head_mid:
-    mins, secs = divmod(max(0, st.session_state.s1_seconds), 60)
-    st.markdown(f"<div style='text-align:center;font-size:20px;letter-spacing:2px'>{mins:02d}:{secs:02d}</div>", unsafe_allow_html=True)
-with head_right:
-    if st.button("Ⅱ  PAUSE", key="s1_pause_button", use_container_width=True, disabled=st.session_state.s1_finished):
-        st.session_state.s1_paused = True
-        st.rerun()
-
-if st.session_state.s1_paused:
-    st.markdown("---")
-    st.subheader("GAME PAUSED")
-    st.caption("일시정지 상태입니다. 현재 대사와 진행 기록은 유지됩니다.")
-    p1, p2, p3 = st.columns(3)
-    with p1:
-        if st.button("RESUME", key="s1_resume", use_container_width=True):
-            close_pause()
-            st.rerun()
-    with p2:
-        if st.button("RESTART", key="s1_restart", use_container_width=True):
-            st.session_state.s1_confirm_restart = True
-            st.rerun()
-    with p3:
-        if st.button("TITLE", key="s1_title", use_container_width=True):
-            navigate_title()
-    if st.session_state.s1_confirm_restart:
-        st.warning("처음부터 다시 시작할까요? 현재 스테이지 진행 기록은 초기화됩니다.")
-        yes, no = st.columns(2)
-        with yes:
-            if st.button("YES — RESTART FROM TUTORIAL", key="s1_restart_yes", use_container_width=True):
-                navigate_restart()
-        with no:
-            if st.button("NO — CANCEL", key="s1_restart_no", use_container_width=True):
-                st.session_state.s1_confirm_restart = False
-                st.rerun()
-    st.stop()
-
-# Draw the room with Streamlit columns and native buttons, not an HTML/JS game embedded in an iframe.
-st.markdown('<div class="stage-frame">', unsafe_allow_html=True)
-a, gap, b, gap2, c = st.columns([1, .25, 1, .25, 1])
-with a:
-    st.markdown(f'<div class="object"><div class="object-name">SECTOR A</div><div class="object-state">{"DATA FOUND" if st.session_state.s1_found["A"] else "DATA LOCKED"}</div></div>', unsafe_allow_html=True)
-    if st.button("INSPECT A", key="s1_inspect_a", use_container_width=True, disabled=st.session_state.s1_paused or st.session_state.s1_finished):
-        st.session_state.s1_found["A"] = True
-        st.session_state.s1_status = "SECTOR A // 인증 숫자 4를 확보했습니다."
-        st.session_state.s1_seconds = max(0, st.session_state.s1_seconds - 1)
-        st.rerun()
-with b:
-    st.markdown(f'<div class="object"><div class="object-name">COMPUTER / SECTOR B</div><div class="object-state">{"DATA FOUND" if st.session_state.s1_found["B"] else "DATA LOCKED"}</div></div>', unsafe_allow_html=True)
-    if st.button("INSPECT B", key="s1_inspect_b", use_container_width=True, disabled=st.session_state.s1_paused or st.session_state.s1_finished):
-        st.session_state.s1_found["B"] = True
-        st.session_state.s1_status = "SECTOR B // 인증 숫자 1을 확보했습니다."
-        st.session_state.s1_seconds = max(0, st.session_state.s1_seconds - 1)
-        st.rerun()
-with c:
-    st.markdown(f'<div class="object"><div class="object-name">SECTOR C</div><div class="object-state">{"DATA FOUND" if st.session_state.s1_found["C"] else "DATA LOCKED"}</div></div>', unsafe_allow_html=True)
-    if st.button("INSPECT C", key="s1_inspect_c", use_container_width=True, disabled=st.session_state.s1_paused or st.session_state.s1_finished):
-        st.session_state.s1_found["C"] = True
-        st.session_state.s1_status = "SECTOR C // 인증 숫자 7을 확보했습니다."
-        st.session_state.s1_seconds = max(0, st.session_state.s1_seconds - 1)
-        st.rerun()
-
-st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
-left, center, right = st.columns([1, 1.2, 1])
-with left:
-    st.markdown(f'<div class="object"><div class="object-name">ARCHIVE NOTE</div><div class="object-state">{"ORDER RECORDED" if st.session_state.s1_archive_read else "UNREAD"}</div></div>', unsafe_allow_html=True)
-    if st.button("READ ARCHIVE NOTE", key="s1_archive", use_container_width=True, disabled=st.session_state.s1_finished):
-        st.session_state.s1_archive_read = True
-        st.session_state.s1_status = "ARCHIVE NOTE // 코드 입력 순서: C → A → B"
-        st.session_state.s1_seconds = max(0, st.session_state.s1_seconds - 1)
-        st.rerun()
-with center:
-    st.markdown('<div class="object"><div class="object-name">ECHO TERMINAL</div><div class="object-state">FACILITY SYSTEM</div></div>', unsafe_allow_html=True)
-    st.markdown('<div class="small-note" style="text-align:center;margin-top:8px">SYSTEM MESSAGE // INTERACTION LOG</div>', unsafe_allow_html=True)
-with right:
-    st.markdown(f'<div class="object"><div class="object-name">SECURITY PANEL</div><div class="object-state">{"UNLOCKED" if st.session_state.s1_unlocked else "LOCKED"}</div></div>', unsafe_allow_html=True)
-    st.text_input("3자리 코드", key="s1_code", max_chars=3, placeholder="예: 741", label_visibility="collapsed", disabled=st.session_state.s1_finished)
-    if st.button("VERIFY CODE", key="s1_verify", use_container_width=True, disabled=st.session_state.s1_finished):
-        if not all(st.session_state.s1_found.values()) or not st.session_state.s1_archive_read:
-            st.session_state.s1_error = "먼저 A·B·C 단말기와 ARCHIVE NOTE를 모두 확인하십시오."
-        elif st.session_state.s1_code.strip() == "741":
-            st.session_state.s1_unlocked = True
-            st.session_state.s1_error = ""
-            st.session_state.s1_status = "SECURITY PANEL // 인증 완료. 출구로 이동하십시오."
-        else:
-            st.session_state.s1_error = "CODE INVALID // 기록의 순서를 다시 확인하십시오."
-        st.session_state.s1_seconds = max(0, st.session_state.s1_seconds - 1)
-        st.rerun()
-
-st.markdown('</div>', unsafe_allow_html=True)
-
-st.markdown("### MOVEMENT / EXIT")
-move_left, move_mid, move_right = st.columns([1, 1, 1])
-with move_left:
-    if st.button("← MOVE", key="s1_move_left", use_container_width=True, disabled=st.session_state.s1_finished):
-        st.session_state.s1_status = "이동했습니다. 주변 단말기와 기록을 조사하십시오."
-        st.session_state.s1_seconds = max(0, st.session_state.s1_seconds - 1)
-        st.rerun()
-with move_mid:
-    if st.button("↑ MOVE / EXIT", key="s1_move_exit", use_container_width=True, disabled=st.session_state.s1_finished):
-        if st.session_state.s1_unlocked:
-            st.session_state.s1_finished = True
-            st.session_state.s1_status = "STAGE 01 CLEAR // 다음 구역의 신호가 감지되었습니다."
-        else:
-            st.session_state.s1_status = "EXIT SEALED // 먼저 SECURITY PANEL 인증을 완료하십시오."
-        st.session_state.s1_seconds = max(0, st.session_state.s1_seconds - 1)
-        st.rerun()
-with move_right:
-    if st.button("MOVE →", key="s1_move_right", use_container_width=True, disabled=st.session_state.s1_finished):
-        st.session_state.s1_status = "이동했습니다. 주변 단말기와 기록을 조사하십시오."
-        st.session_state.s1_seconds = max(0, st.session_state.s1_seconds - 1)
-        st.rerun()
-
-if st.session_state.s1_seconds <= 0 and not st.session_state.s1_finished:
-    st.session_state.s1_finished = True
-    st.session_state.s1_status = "TIME EXPIRED // RESTART를 선택해 다시 도전하십시오."
-
-if st.session_state.s1_finished:
-    st.success(st.session_state.s1_status)
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("RESTART STAGE", key="s1_finish_restart", use_container_width=True):
-            reset_stage()
-            st.rerun()
-    with col2:
-        if st.button("TITLE", key="s1_finish_title", use_container_width=True):
-            navigate_title()
-else:
-    st.markdown(f'<div class="echo-box"><div class="echo-name">ECHO // SYSTEM AI</div><div class="echo-copy">{MESSAGES[min(st.session_state.s1_message_index, len(MESSAGES)-1)]}</div></div>', unsafe_allow_html=True)
-    st.caption(st.session_state.s1_status)
-    if st.session_state.s1_error:
-        st.error(st.session_state.s1_error)
-    if st.button("NEXT / CONTINUE", key="s1_next_message", use_container_width=True):
-        st.session_state.s1_message_index = (st.session_state.s1_message_index + 1) % len(MESSAGES)
-        st.session_state.s1_seconds = max(0, st.session_state.s1_seconds - 1)
-        st.rerun()
-
-st.caption("조작: 각 구역의 INSPECT 버튼으로 기록을 확보하고, ARCHIVE NOTE를 읽은 뒤 코드 741을 입력하세요. 인증 후 MOVE / EXIT를 누르면 스테이지가 완료됩니다.")
+@font-face{font-family:Neo;src:url(data:font/ttf;base64,__FONT__) format('truetype')}
+*{box-sizing:border-box;user-select:none}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;color:#eee;font-family:Neo,monospace}button,input{font:inherit}button{background:#050505;color:#eee;border:1px solid #555;border-radius:0;padding:10px 14px;cursor:pointer}button:hover{background:#eee;color:#000}button:disabled{opacity:.3;cursor:default}.game{position:relative;width:100vw;height:100vh;min-height:580px;background:#000;overflow:hidden}.top{position:absolute;top:18px;left:22px;right:22px;display:flex;justify-content:space-between;align-items:flex-start;z-index:10}.brand{font-size:18px;letter-spacing:1px}.stage{font-size:12px;color:#777;margin-top:7px;letter-spacing:1px}.timer{text-align:center;font-size:18px;letter-spacing:2px;padding-top:8px}.pause{min-width:116px}.area{position:absolute;left:22px;right:22px;top:88px;bottom:116px;border:1px solid #383838;background:#070707;background-image:linear-gradient(#ffffff0b 1px,transparent 1px),linear-gradient(90deg,#ffffff0b 1px,transparent 1px);background-size:36px 36px;overflow:hidden}.room{position:absolute;inset:7% 7% 8%;border:1px solid #282828;background:#050505aa}.wall{position:absolute;background:#333}.wall.v{width:1px;top:0;bottom:0;left:50%}.wall.h{height:1px;left:0;right:0;top:50%}.door{position:absolute;right:0;top:40%;height:20%;width:7%;border-left:1px solid #555;background:#090909;display:flex;align-items:center;justify-content:center;color:#777;font-size:10px;writing-mode:vertical-rl;letter-spacing:2px}.obj{position:absolute;border:1px solid #555;background:#090909;color:#999;min-width:92px;padding:10px 12px;text-align:center;font-size:11px;line-height:1.6}.obj b{display:block;color:#ddd;font-weight:normal;font-size:12px}.obj small{color:#666}.obj.near{border-color:#eee;color:#fff;box-shadow:0 0 0 1px #fff2}.obj.a{left:12%;top:18%}.obj.b{left:42%;top:16%}.obj.c{right:13%;top:19%}.obj.archive{left:17%;bottom:17%}.obj.panel{right:13%;bottom:17%}.obj.exit{right:1%;top:42%;min-width:0;padding:8px 4px}.player{position:absolute;width:16px;height:20px;background:#eee;border:2px solid #777;left:49%;top:55%;transform:translate(-50%,-50%);box-shadow:0 0 10px #ffffff22;z-index:4}.player:after{content:'';position:absolute;width:4px;height:4px;background:#000;left:4px;top:4px}.hint{position:absolute;left:14px;bottom:12px;color:#777;font-size:11px;line-height:1.8}.hud{position:absolute;left:22px;right:22px;bottom:14px;min-height:86px;border:1px solid #444;background:#050505;padding:12px 15px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}.echo-title{font-size:11px;color:#fff;margin-bottom:7px}.echo-text{font-size:12px;color:#bbb;line-height:1.7}.hud-actions{display:flex;gap:8px}.overlay{display:none;position:absolute;inset:0;z-index:30;background:#000e;align-items:center;justify-content:center;padding:20px}.overlay.show{display:flex}.window{width:min(620px,94vw);max-height:85%;overflow:auto;border:1px solid #aaa;background:#030303;padding:20px;box-shadow:0 0 0 1px #333}.window h2{font-size:16px;font-weight:normal;letter-spacing:2px;margin:0 0 16px}.window p,.window li{font-size:12px;line-height:1.9;color:#bbb}.window .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.evidence{border:1px solid #444;padding:12px;margin:8px 0;color:#bbb;font-size:12px;line-height:1.8}.evidence strong{font-weight:normal;color:#fff}.code-entry{background:#000;color:#fff;border:1px solid #777;padding:10px;width:130px;letter-spacing:5px}.status{color:#aaa;font-size:11px;margin-top:8px;min-height:18px}.mobile-controls{display:none;position:absolute;right:12px;bottom:12px;z-index:12;grid-template-columns:repeat(3,42px);grid-template-rows:repeat(2,38px);gap:3px}.mobile-controls button{padding:0}.mobile-controls .up{grid-column:2}.mobile-controls .left{grid-column:1;grid-row:2}.mobile-controls .down{grid-column:2;grid-row:2}.mobile-controls .right{grid-column:3;grid-row:2}
+@media(max-width:700px){.top{left:12px;right:12px;top:10px}.brand{font-size:14px}.stage{font-size:10px}.timer{font-size:15px}.pause{min-width:76px;padding:8px 5px;font-size:11px}.area{left:10px;right:10px;top:78px;bottom:150px}.room{inset:6% 3% 7%}.obj{min-width:62px;padding:6px 3px;font-size:9px}.obj b{font-size:10px}.obj.a{left:4%;top:16%}.obj.b{left:36%;top:13%}.obj.c{right:4%;top:17%}.obj.archive{left:4%;bottom:14%}.obj.panel{right:4%;bottom:14%}.hud{left:10px;right:10px;bottom:10px;min-height:125px;padding:10px;display:block}.hud-actions{margin-top:8px}.hint{display:none}.mobile-controls{display:grid}.echo-text{font-size:11px}.window{padding:14px}}
+</style></head><body><main class="game" id="game" tabindex="0">
+<div class="top"><div><div class="brand">PROJECT : LOGIC</div><div class="stage">STAGE 01 // ARCHIVE ACCESS</div></div><div class="timer" id="timer">12:00</div><button class="pause" id="pauseBtn">Ⅱ PAUSE</button></div>
+<div class="area" id="area"><div class="room"><div class="wall v"></div><div class="wall h"></div><div class="obj a" data-id="A"><b>SECTOR A</b><small id="stateA">DATA LOCKED</small></div><div class="obj b" data-id="B"><b>COMPUTER / B</b><small id="stateB">DATA LOCKED</small></div><div class="obj c" data-id="C"><b>SECTOR C</b><small id="stateC">DATA LOCKED</small></div><div class="obj archive" data-id="ARCHIVE"><b>ARCHIVE NOTE</b><small id="stateArchive">UNREAD</small></div><div class="obj panel" data-id="PANEL"><b>SECURITY PANEL</b><small id="statePanel">LOCKED</small></div><div class="door" data-id="EXIT">EXIT</div><div class="player" id="player"></div></div><div class="hint">W A S D : MOVE　 E : INTERACT　 SPACE : ECHO<br>H : HELP　 I : INVENTORY　 ESC : CLOSE</div><div class="mobile-controls"><button class="up" data-move="w">↑</button><button class="left" data-move="a">←</button><button class="down" data-move="s">↓</button><button class="right" data-move="d">→</button></div></div>
+<div class="hud"><div><div class="echo-title">ECHO // SYSTEM AI</div><div class="echo-text" id="echoText">신호가 연결되었습니다. 주변 장치를 조사해 보안 패널의 논리 순서를 복원하십시오.</div><div class="status" id="status">SYSTEM READY // 접근 가능한 장치 가까이 이동하십시오.</div></div><div class="hud-actions"><button id="interactBtn">E / INTERACT</button><button id="helpBtn">H</button><button id="inventoryBtn">I</button></div></div>
+<div class="overlay" id="overlay"><section class="window"><h2 id="windowTitle">SYSTEM</h2><div id="windowBody"></div><div class="row"><button id="closeOverlay">CLOSE / ESC</button></div></section></div>
+</main><script>
+const $=id=>document.getElementById(id);const game=$('game'),player=$('player'),overlay=$('overlay');
+let pos={x:50,y:56},seconds=720,paused=false,finished=false,near=null,echoIndex=0,helpOpen=false,inventoryOpen=false;
+let timerLast=Date.now();
+const found={A:false,B:false,C:false,ARCHIVE:false};const inventory=[];let statusText='SYSTEM READY // 접근 가능한 장치 가까이 이동하십시오.';
+const echoLines=['신호가 연결되었습니다. 주변 장치를 조사해 보안 패널의 논리 순서를 복원하십시오.','각 구역에는 서로 다른 종류의 기록이 남아 있습니다. 숫자만 모으지 말고 기록의 의미도 비교하십시오.','ARCHIVE NOTE는 코드의 순서를 직접 알려주지 않습니다. 문장 속 조건을 해석해야 합니다.','H는 도움말, I는 인벤토리입니다. E로 가까운 장치를 조사하고 SPACE로 ECHO의 다음 안내를 확인하십시오.'];
+// Generate a new valid A/B/C combination for every fresh stage run. The archive formulas
+// always yield three single digits: A-B, C-A, and A+B-C.
+const puzzleCandidates=[];
+for(let a=2;a<=9;a++)for(let b=1;b<a;b++)for(let c=a+1;c<=Math.min(9,a+b);c++)puzzleCandidates.push({A:a,B:b,C:c});
+const puzzle=puzzleCandidates[Math.floor(Math.random()*puzzleCandidates.length)];
+const expectedCode=String(puzzle.A-puzzle.B)+String(puzzle.C-puzzle.A)+String(puzzle.A+puzzle.B-puzzle.C);
+window.codeSolved=false;
+const clues={
+ A:{title:'SECTOR A // ACCESS LOG',body:`출입 기록 04-A\n\n“A의 기록값은 ${puzzle.A}이다. 코드를 만들 때 이 숫자를 그대로 입력하지 말 것.”\n\nRECOVERED VALUE: ${puzzle.A}`,value:puzzle.A},
+ B:{title:'COMPUTER / SECTOR B',body:`시스템 진단 로그\n\n“B의 기록값은 ${puzzle.B}이다. A와 C의 기록을 확보한 뒤 보관 기록의 식에 대입할 것.”\n\nRECOVERED VALUE: ${puzzle.B}`,value:puzzle.B},
+ C:{title:'SECTOR C // MAINTENANCE',body:`정비 기록 17-C\n\n“C의 기록값은 ${puzzle.C}이다. 이 값 역시 코드 계산에 사용된다.”\n\nRECOVERED VALUE: ${puzzle.C}`,value:puzzle.C}
+};
+function say(t){$('status').textContent=t}function updateTimer(){let m=Math.floor(seconds/60),s=seconds%60;$('timer').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')}
+function move(k){if(paused||finished||overlay.classList.contains('show'))return;let dx=0,dy=0;if(k==='w')dy=-4;if(k==='s')dy=4;if(k==='a')dx=-4;if(k==='d')dx=4;pos.x=Math.max(4,Math.min(96,pos.x+dx));pos.y=Math.max(5,Math.min(95,pos.y+dy));player.style.left=pos.x+'%';player.style.top=pos.y+'%';findNear()}
+function getObjects(){return [...document.querySelectorAll('[data-id]')]}
+function findNear(){let best=null,dist=999;getObjects().forEach(el=>{let r=el.getBoundingClientRect(),g=$('area').getBoundingClientRect();let x=((r.left+r.width/2-g.left)/g.width)*100,y=((r.top+r.height/2-g.top)/g.height)*100;let d=Math.hypot((pos.x-x)*.8,pos.y-y);el.classList.remove('near');if(d<dist){dist=d;best=el}});near=dist<20?best:null;if(near)near.classList.add('near')}
+function openWindow(title,body){$('windowTitle').textContent=title;$('windowBody').innerHTML=body;overlay.classList.add('show')}
+function expireGame(){if(finished)return;finished=true;say('TIME EXPIRED // RESTART를 선택하십시오.');openWindow('TIME EXPIRED','<p>제한 시간이 종료되었습니다.</p><p>기록은 이번 도전에서 더 이상 확보할 수 없습니다.</p><div class="row"><button onclick="restartStage()">RESTART</button><button onclick="goTitle()">TITLE</button></div>')}
+function syncTimer(){const now=Date.now();if(paused||finished){timerLast=now;return}const elapsed=Math.floor((now-timerLast)/1000);if(elapsed>0){seconds=Math.max(0,seconds-elapsed);timerLast+=elapsed*1000;updateTimer();if(seconds===0)expireGame()}}
+function closeWindow(){overlay.classList.remove('show');helpOpen=false;inventoryOpen=false;game.focus()}
+function help(){if(overlay.classList.contains('show')){closeWindow();return}helpOpen=true;openWindow('FIELD MANUAL',`<p><strong>W A S D</strong> — 이동</p><p><strong>E</strong> — 가까운 장치 조사 / 상호작용</p><p><strong>SPACE</strong> — ECHO 안내 진행</p><p><strong>H</strong> — 도움말 열기/닫기</p><p><strong>I</strong> — 인벤토리 열기/닫기</p><p><strong>ESC</strong> — 열린 창 닫기</p><p>세 구역의 기록과 보관 기록을 함께 해석해 3자리 코드를 복원하십시오.</p>`)}
+function inventoryView(){if(overlay.classList.contains('show')){closeWindow();return}inventoryOpen=true;let html=inventory.length?inventory.map(x=>`<div class="evidence">${x}</div>`).join(''):'<p>아직 확보한 기록이 없습니다. 장치 가까이 이동해 E를 누르십시오.</p>';openWindow('INVENTORY // RECOVERED DATA',html)}
+function interact(){if(paused||finished||overlay.classList.contains('show'))return;if(!near){say('NO TARGET // 조사할 장치 가까이 이동하십시오.');return}let id=near.dataset.id;if(clues[id]){if(!found[id]){found[id]=true;inventory.push(`<strong>${clues[id].title}</strong><br>${clues[id].body.replaceAll('\n','<br>')}`);$('state'+id).textContent='DATA RECOVERED';say(id+' 기록을 인벤토리에 저장했습니다.');}openWindow(clues[id].title,clues[id].body.replaceAll('\n','<br>'));return}
+if(id==='ARCHIVE'){found.ARCHIVE=true;$('stateArchive').textContent='READ';if(!inventory.some(x=>x.includes('ARCHIVE NOTE')))inventory.push('<strong>ARCHIVE NOTE</strong><br>“첫째 자리 = A − B. 둘째 자리 = C − A. 셋째 자리 = A + B − C.”');openWindow('ARCHIVE NOTE // FRAGMENT 04',`<div class="evidence">“첫째 자리 = A − B.<br>둘째 자리 = C − A.<br>셋째 자리 = A + B − C.”</div><p>모든 숫자는 기록에 나타난 값이며, 코드는 세 규칙을 순서대로 적용해 계산해야 합니다.</p>`);say('ARCHIVE NOTE 확보 // 숫자와 규칙을 대조하십시오.');return}
+if(id==='PANEL'){if(!['A','B','C','ARCHIVE'].every(k=>found[k])){openWindow('SECURITY PANEL // LOCKED','<p>ACCESS DENIED</p><p>A·B·C 구역 기록과 ARCHIVE NOTE가 모두 필요합니다.</p>');return}openWindow('SECURITY PANEL // AUTHENTICATION',`<p>증거를 조합해 세 자리 코드를 입력하십시오.</p><p>각 구역의 숫자 A, B, C를 ARCHIVE NOTE의 세 식에 각각 대입하십시오. 숫자를 발견한 순서대로 입력하면 인증되지 않습니다.</p><input class="code-entry" id="codeInput" maxlength="3" inputmode="numeric" placeholder="___"><button id="verifyBtn">VERIFY</button><div id="codeResult" class="status"></div>`);setTimeout(()=>{let b=$('verifyBtn');if(b)b.onclick=verify},0);return}
+if(id==='EXIT'){if(!window.codeSolved){say('EXIT SEALED // SECURITY PANEL 인증이 필요합니다.');return}finished=true;openWindow('STAGE 01 CLEAR','<p>ACCESS GRANTED</p><p>ARCHIVE ACCESS가 완료되었습니다.</p><div class="row"><button onclick="goTitle()">TITLE</button><button onclick="restartStage()">RESTART</button></div>');return}}
+function verify(){let input=$('codeInput').value.trim();let result=$('codeResult');if(input===expectedCode){window.codeSolved=true;$('statePanel').textContent='UNLOCKED';result.textContent='ACCESS GRANTED // 출구로 이동하십시오.';say('인증 완료. EXIT로 이동해 스테이지를 마무리하십시오.')}else{result.textContent='INVALID CODE // 기록의 규칙을 다시 확인하십시오.';say('인증 실패 // 기록을 다시 대조하십시오.')}}
+function togglePause(){if(!paused){syncTimer();if(finished)return;paused=true;timerLast=Date.now();openWindow('SYSTEM PAUSED','<p>현재 위치와 확보한 기록은 유지됩니다.</p><div class="row"><button onclick="resumeGame()">RESUME</button><button onclick="restartStage()">RESTART</button><button onclick="goTitle()">TITLE</button></div>')}else resumeGame()}
+function resumeGame(){paused=false;timerLast=Date.now();closeWindow()}function goTitle(){window.location.href='/?action=title'}function restartStage(){window.location.href='/?action=restart'}
+$('pauseBtn').onclick=togglePause;$('interactBtn').onclick=interact;$('helpBtn').onclick=help;$('inventoryBtn').onclick=inventoryView;$('closeOverlay').onclick=()=>{if(paused)resumeGame();else if(!finished)closeWindow()};document.querySelectorAll('[data-move]').forEach(b=>b.onclick=()=>move(b.dataset.move));
+document.addEventListener('keydown',e=>{let k=e.key.toLowerCase();if(k==='escape'){if(paused){resumeGame();return}if(overlay.classList.contains('show')&&!finished)closeWindow();return}if(['INPUT','TEXTAREA'].includes(document.activeElement.tagName))return;if(k==='h'){if(overlay.classList.contains('show')&&!helpOpen)return;e.preventDefault();help();return}if(k==='i'){if(overlay.classList.contains('show')&&!inventoryOpen)return;e.preventDefault();inventoryView();return}if(overlay.classList.contains('show'))return;if(k==='e'){e.preventDefault();interact();return}if(e.code==='Space'){e.preventDefault();if(!paused&&!overlay.classList.contains('show')){$('echoText').textContent=echoLines[Math.min(echoIndex,echoLines.length-1)];echoIndex=Math.min(echoIndex+1,echoLines.length-1)}return}if(['w','a','s','d'].includes(k)){e.preventDefault();move(k)}});
+updateTimer();setInterval(syncTimer,250);setTimeout(findNear,100);
+</script></body></html>
+""".replace("__FONT__", "__FONT_BASE64__")
+html = html.replace("__FONT_BASE64__", font_data)
+components.html(html, height=1000, scrolling=False)
