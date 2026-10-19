@@ -2031,19 +2031,6 @@ input {
     opacity: 0;
     text-shadow: 0 0 4px #fff, 0 0 12px #777;
 }
-.fade-continue {
-    display:none;
-    margin-top:28px;
-    color:#fff;
-    border:1px solid #777;
-    padding:12px 20px;
-    font-family:'NeoDungGeunMo',monospace;
-    font-size:13px;
-    letter-spacing:2px;
-    text-decoration:none;
-}
-.fade-continue:hover { background:#fff; color:#000; }
-.fade-screen.active .fade-continue { display:inline-block; }
 .fade-screen.active .fade-message {
     animation: blackoutText 1.5s steps(1, end) forwards;
 }
@@ -3217,29 +3204,24 @@ input {
 <div class="pause-actions">
 
 
-<button
-    class="code-button"
+<a
+    class="code-button pause-nav-link"
     id="restartButton"
-    type="button"
-    style="width:170px;"
->
-    RESTART
-</button>
+    href="?action=restart"
+    target="_top"
+    rel="noopener"
+    style="width:170px;display:flex;align-items:center;justify-content:center;box-sizing:border-box;text-decoration:none;"
+>RESTART</a>
 
 
-<button
-    class="code-button"
+<a
+    class="code-button pause-nav-link"
     id="titleButton"
-    type="button"
-    style="
-    width:170px;
-    background:#000;
-    color:#fff;
-    border:1px solid #333;
-    "
->
-    TITLE
-</button>
+    href="?action=title"
+    target="_top"
+    rel="noopener"
+    style="width:170px;display:flex;align-items:center;justify-content:center;box-sizing:border-box;text-decoration:none;background:#000;color:#fff;border:1px solid #333;"
+>TITLE</a>
 
 
 </div>
@@ -3263,7 +3245,7 @@ input {
 
 </div>
 
-<div class="fade-screen" id="fadeScreen" aria-hidden="true"><div class="fade-message" id="fadeMessage">SIGNAL LOST</div><a class="fade-continue" id="fadeContinue" href="?action=stage01" target="_top" rel="noopener">ENTER STAGE 01</a></div>
+<div class="fade-screen" id="fadeScreen" aria-hidden="true"><div class="fade-message" id="fadeMessage">STAGE 01<br>:ARCHIVE ACCESS</div></div>
 
 <script>
 
@@ -5443,9 +5425,10 @@ function finishCardDrag(
             echoNext.classList.add("ready");
             setTimeout(function () {
                 const fadeMessage = document.getElementById("fadeMessage");
-                if (fadeMessage) fadeMessage.textContent = "SIGNAL LOST // STAGE 01 LOADING";
+                if (fadeMessage) fadeMessage.innerHTML = "STAGE 01<br>:ARCHIVE ACCESS";
                 if (fadeScreen) fadeScreen.classList.add("active");
-                setTimeout(function () { parentAction("stage01"); }, 1550);
+                // Leave the black screen and flickering stage sign visible for 3 seconds.
+                setTimeout(function () { parentAction("stage01"); }, 3000);
             }, 1000);
         }, 700);
 
@@ -5490,57 +5473,31 @@ dragCard.addEventListener(
    ===================================================== */
 
 function parentAction(action) {
-    // components.html runs in a sandboxed iframe. Direct top navigation can be
-    // blocked after a timer, so use the parent URL when permitted and leave a
-    // real target=_top link available as a user-activated fallback.
+    // components.html is sandboxed: top-level navigation can be rejected after a timer.
+    // If same-origin access is available, update the Streamlit page URL and reload it;
+    // the page's Python action handler then performs st.switch_page().
     try {
-        const parentUrl = new URL(window.parent.location.href);
-        parentUrl.search = "";
-        parentUrl.hash = "";
-        parentUrl.searchParams.set("action", action);
-        window.parent.location.href = parentUrl.toString();
+        const parentWindow = window.parent;
+        const targetUrl = new URL(parentWindow.location.href);
+        targetUrl.search = "";
+        targetUrl.hash = "";
+        targetUrl.searchParams.set("action", action);
+        parentWindow.history.replaceState({}, "", targetUrl.toString());
+        parentWindow.location.reload();
         return;
     } catch (error) {}
-    const fallback = document.getElementById("fadeContinue");
-    if (fallback && action === "stage01") {
-        fallback.href = "?action=stage01";
-        fallback.style.display = "inline-block";
-        fallback.textContent = "ENTER STAGE 01";
-    } else {
-        status.textContent = "NAVIGATION BLOCKED // use the Streamlit page controls.";
+
+    // User-triggered pause actions are also real target=_top links, so this fallback
+    // is only reached if the timed transition is blocked by the iframe sandbox.
+    const statusNode = document.getElementById("status");
+    if (statusNode) {
+        statusNode.textContent = "NAVIGATION BLOCKED // browser sandbox prevented automatic transition.";
     }
 }
 
 
-document
-    .getElementById(
-        "restartButton"
-    )
-    .addEventListener(
-        "click",
-        function () {
-
-            try { localStorage.removeItem("project_logic_tutorial_save_v3"); } catch (e) {}
-            parentAction("restart");
-
-        }
-    );
-
-
-document
-    .getElementById(
-        "titleButton"
-    )
-    .addEventListener(
-        "click",
-        function () {
-
-            parentAction(
-                "title"
-            );
-
-        }
-    );
+// RESTART and TITLE are target=_top links so their user-activated navigation
+// does not depend on JavaScript being allowed to navigate the sandbox's parent.
 
 
 /* =====================================================
