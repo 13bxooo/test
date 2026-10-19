@@ -98,17 +98,14 @@ if st.session_state.start_open:
 
     if continue_clicked:
         st.session_state.start_open = False
+        st.session_state.game_started = True
+        st.session_state.game_paused = False
+        # Session-state progress determines the page. If there is no progress flag
+        # (e.g. a fresh session), CONTINUE opens the tutorial instead of doing nothing.
         if st.session_state.get("stage01_started", False):
-            st.session_state.game_started = True
             st.switch_page("pages/3_Stage_01.py")
-        elif (st.session_state.get("game_started", False)
-              or st.session_state.get("tutorial_complete", False)
-              or st.session_state.get("tutorial_save_exists", False)):
-            st.session_state.game_started = True
-            st.session_state.game_paused = False
-            st.switch_page("pages/2_Game.py")
         else:
-            st.warning("이전 플레이 기록이 존재하지 않습니다. NEW GAME을 선택해 주세요.")
+            st.switch_page("pages/2_Game.py")
 
     if new_game_clicked:
         _found_state = st.session_state.get("s1_found", {})
