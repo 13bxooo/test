@@ -86,6 +86,7 @@ def navigate_title():
 
 
 def navigate_restart():
+    st.session_state.tutorial_reset_save = True
     reset_stage()
     st.session_state.game_paused = False
     st.session_state.tutorial_complete = False
