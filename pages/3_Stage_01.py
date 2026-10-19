@@ -65,7 +65,7 @@ __TUTORIAL_CSS__
 .stage01-b{left:42%;top:13%;width:16%;height:13%}
 .stage01-c{right:12%;top:18%}
 .stage01-archive{left:15%;bottom:17%;width:18%;height:10%}
-.stage01-panel{right:13%;bottom:17%;width:18%;height:10%}
+.stage01-panel{display:none!important}
 .stage01-object .object-label{bottom:-22px}
 .stage01-window-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;align-items:center}
 .stage01-window-actions button,.stage01-window-actions a{min-width:150px;text-align:center;justify-content:center}
@@ -82,7 +82,7 @@ __TUTORIAL_CSS__
  .stage01-b{left:36%;top:13%;width:20%;height:12%}
  .stage01-c{right:3%;top:17%}
  .stage01-archive{left:3%;bottom:16%;width:22%;height:10%}
- .stage01-panel{right:3%;bottom:16%;width:22%;height:10%}
+ .stage01-panel{display:none!important}
  .stage01-window-actions button,.stage01-window-actions a{min-width:120px}
  .pin-panel{width:min(390px,90vw);padding:20px}
  .pin-slots{gap:7px}
@@ -109,6 +109,8 @@ __TUTORIAL_CSS__
 .stage01-panel .reader-light{top:8px;right:8px}
 .stage01-panel{position:absolute}
 #exitLight{top:8px;right:8px}
+.exit-reader-label{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:9px;line-height:1.8;letter-spacing:1px;color:#666;text-align:center;white-space:nowrap}
+#exitDoor.near .exit-reader-label{color:#fff}
 </style></head><body>
 <div class="game" id="gameRoot" tabindex="0">
   <div class="project-title">PROJECT : LOGIC</div>
@@ -132,9 +134,9 @@ __TUTORIAL_CSS__
       <div class="object stage01-object stage01-b" id="objectB" data-id="B"><span class="main-label">COMPUTER / B</span><span class="sub-label" id="stateB">DATA SEALED</span></div>
       <div class="object stage01-object stage01-c" id="objectC" data-id="C"><span class="main-label">SECTOR C</span><span class="sub-label" id="stateC">DATA SEALED</span></div>
       <div class="object stage01-object stage01-archive" id="objectArchive" data-id="ARCHIVE"><span class="main-label">ARCHIVE NOTE</span><span class="sub-label" id="stateArchive">UNREAD</span></div>
-      <div class="object stage01-object stage01-panel" id="objectPanel" data-id="PANEL"><span class="reader-light" id="panelLight" aria-label="Locked indicator"></span><span class="main-label">SECURITY PANEL</span><span class="sub-label" id="statePanel">LOCKED</span></div>
+      <div class="object stage01-object stage01-panel" id="objectPanel" aria-hidden="true"><span class="reader-light" id="panelLight"></span><span class="main-label">EXIT ACCESS</span><span class="sub-label" id="statePanel">LOCKED</span></div>
 
-      <div class="exit-wall" id="exitDoor" data-id="EXIT"><span class="reader-light" id="exitLight" aria-label="Exit access indicator"></span></div>
+      <div class="exit-wall" id="exitDoor" data-id="EXIT"><span class="reader-light" id="exitLight" aria-label="Exit access indicator"></span><span class="exit-reader-label">E<br>ACCESS</span></div>
       <div class="exit-sign"><span class="exit-arrow">↓ ↑</span><br><span>[EXIT] ARCHIVE ACCESS</span></div>
       <div class="player" id="player"></div>
       <div class="interaction-message" id="interactionMessage">PRESS E</div>
@@ -178,7 +180,7 @@ __TUTORIAL_CSS__
 
   <div class="computer-overlay" id="codeOverlay">
     <div class="computer-panel pin-panel">
-      <div class="computer-title">SECURITY PANEL</div>
+      <div class="computer-title" id="codeTitle">EXIT ACCESS READER</div>
       <div class="computer-sub">AUTHENTICATION // FOUR DIGITS</div>
       <div class="pin-status-line"><span class="reader-light" id="pinLight" aria-label="Authentication status"></span><span id="pinStatus">ACCESS LOCKED // ENTER CODE</span></div>
       <div class="pin-slots" id="pinSlots" aria-label="입력한 네 자리 코드"><div class="pin-slot">—</div><div class="pin-slot">—</div><div class="pin-slot">—</div><div class="pin-slot">—</div></div>
@@ -217,7 +219,7 @@ const messages=[
  '사고 직전, 관리자는 세 구역의 로그를 따로 저장했습니다. 누군가 기록을 지우려 했기 때문에 하나의 파일로 보관하지 않았습니다.',
  '복구된 숫자는 접근 코드 자체가 아닙니다. ARCHIVE NOTE의 규칙으로 숫자를 변환해야 보안 시스템이 이를 받아들입니다.',
  '마지막 로그에는 이상한 명령이 남아 있습니다. “기록을 복구하지 말 것.” 발신자 식별란은 ECHO의 내부 인증값으로 덮여 있습니다.',
- '보안 패널을 인증하면 출구 잠금이 해제됩니다. 제한 시간은 12분입니다. 남은 기록을 대조하고 사고 당시의 명령을 확인하십시오.'
+ '출구의 인증 장치에 네 자리 코드를 입력하면 잠금이 해제됩니다. 제한 시간은 12분입니다. 남은 기록을 대조하고 사고 당시의 명령을 확인하십시오.'
 ];
 const puzzleCandidates=[];
 for(let a=2;a<=9;a++)for(let b=1;b<a;b++)for(let c=a+1;c<=Math.min(9,a+b-1);c++)puzzleCandidates.push({A:a,B:b,C:c});
@@ -237,7 +239,6 @@ const objects=[
  {id:'B',name:'COMPUTER / SECTOR B',x:42,y:13,w:16,h:13,el:$('objectB')},
  {id:'C',name:'SECTOR C',x:77,y:18,w:15,h:10,el:$('objectC')},
  {id:'ARCHIVE',name:'ARCHIVE NOTE',x:15,y:73,w:18,h:10,el:$('objectArchive')},
- {id:'PANEL',name:'SECURITY PANEL',x:69,y:73,w:18,h:10,el:$('objectPanel')},
  {id:'EXIT',name:'EXIT',x:92,y:35,w:8,h:30,el:$('exitDoor')}
 ];
 const obstacles=objects.map(o=>({x:o.x,y:o.y,w:o.w,h:o.h}));
@@ -251,14 +252,14 @@ function renderPin(){const slots=$('pinSlots').querySelectorAll('.pin-slot');slo
 function appendPinDigit(digit){if(!codeOpen||pinBuffer.length>=4)return;pinBuffer+=digit;renderPin();$('codeError').textContent='';$('pinStatus').textContent='AUTHENTICATION // '+pinBuffer.length+'/4'}
 function clearPin(){pinBuffer='';renderPin();$('codeError').textContent='';$('pinStatus').textContent='ACCESS LOCKED // ENTER CODE'}
 function backspacePin(){if(!codeOpen)return;pinBuffer=pinBuffer.slice(0,-1);renderPin();$('pinStatus').textContent='AUTHENTICATION // '+pinBuffer.length+'/4'}
-function showCode(){if(!['A','B','C','ARCHIVE'].every(k=>found[k])){showRecord('SECURITY PANEL // LOCKED','ACCESS DENIED\n\nA·B·C 구역 기록과 ARCHIVE NOTE를 모두 확보해야 합니다.');return}codeOpen=true;pinBuffer='';renderPin();codeOverlay.style.display='flex';$('codeError').textContent='';$('pinStatus').textContent='ACCESS LOCKED // ENTER CODE';$('pinLight').classList.remove('green');clearKeys()}
+function showCode(){if(!['A','B','C','ARCHIVE'].every(k=>found[k])){showRecord('EXIT // ACCESS LOCKED','ACCESS DENIED\n\n출구 인증을 시작하려면 A·B·C 구역 기록과 ARCHIVE NOTE를 먼저 모두 확보하십시오.');return}codeOpen=true;pinBuffer='';renderPin();codeOverlay.style.display='flex';$('codeTitle').textContent='EXIT ACCESS READER';$('codeError').textContent='';$('pinStatus').textContent='ACCESS LOCKED // ENTER CODE';$('pinLight').classList.remove('green');clearKeys()}
 function closeCode(){codeOpen=false;codeOverlay.style.display='none';root.focus()}
 function renderInventory(){document.querySelectorAll('.inventory-slot').forEach((slot,i)=>{const item=inventory[i];slot.innerHTML=item?`<div class="slot-number">${String(i+1).padStart(2,'0')}</div><div class="item-name">${item.name}</div>`:`<div class="slot-number">${String(i+1).padStart(2,'0')}</div><div class="empty-text">EMPTY</div>`;slot.classList.remove('selected')})}
 function openInventory(){if(dataOpen||codeOpen||paused||finished)return;if(inventoryOpen){inventoryOpen=false;inventoryOverlay.style.display='none';root.focus();return}helpOpen=false;helpOverlay.style.display='none';inventoryOpen=true;inventoryOverlay.style.display='flex';$('itemDescription').innerHTML='ITEM DESCRIPTION<br><br>기록을 선택하면 설명이 표시됩니다.';renderInventory();clearKeys()}
 function openHelp(){if(dataOpen||codeOpen||paused||finished)return;if(helpOpen){helpOpen=false;helpOverlay.style.display='none';root.focus();return}inventoryOpen=false;inventoryOverlay.style.display='none';helpOpen=true;helpOverlay.style.display='flex';clearKeys()}
 function addItem(id){if(items.some(item=>item.id===id))return;let item;if(id==='ARCHIVE'){item={id,name:'ARCHIVE NOTE',body:'ARCHIVE INCIDENT // FRAGMENT 04\n\n첫째 자리 = A − B.\n둘째 자리 = C − A.\n셋째 자리 = A + B − C.\n넷째 자리 = A + B + C를 9로 나눈 나머지. 나머지가 0이면 9로 기록한다.\n\n“ECHO에게 묻지 말 것. 이 명령은 기록을 삭제하라는 지시와 함께 저장되었다.”'}}else item={id,name:clues[id].title,body:clues[id].body};items.push(item);const slot=items.length-1;if(slot<inventory.length)inventory[slot]=item;renderInventory()}
-function interact(){if(paused||finished||isOverlayOpen())return;if(!nearby){say('NO TARGET // 가까운 장치로 이동하십시오.');return}const id=nearby.id;if(clues[id]){if(!found[id]){found[id]=true;addItem(id);$('state'+id).textContent='DATA FOUND';say(id+' 기록을 확보했습니다. INVENTORY에서 다시 확인할 수 있습니다.')}showRecord(clues[id].title,clues[id].body);return}if(id==='ARCHIVE'){found.ARCHIVE=true;$('stateArchive').textContent='READ';addItem('ARCHIVE');say('ARCHIVE NOTE 확보 // 네 자리 인증식을 확인하십시오.');showRecord('ARCHIVE NOTE // FRAGMENT 04','ARCHIVE INCIDENT // PERSONAL NOTE\n\n첫째 자리 = A − B.\n둘째 자리 = C − A.\n셋째 자리 = A + B − C.\n넷째 자리 = A + B + C를 9로 나눈 나머지. 나머지가 0이면 9로 기록한다.\n\n“ECHO에게 묻지 말 것. 기록 삭제 명령은 사고 직전 ECHO의 내부 인증값으로 전송되었다.”');return}if(id==='PANEL'){showCode();return}if(id==='EXIT'){if(!codeSolved){say('EXIT SEALED // SECURITY PANEL 인증이 필요합니다.');return}finishStage();return}}
-function verify(){if(pinBuffer.length!==4){$('codeError').textContent='FOUR DIGITS REQUIRED // 네 자리 모두 입력하십시오.';return}if(pinBuffer===expectedCode){codeSolved=true;$('statePanel').textContent='UNLOCKED';$('panelLight').classList.add('green');$('exitLight').classList.add('green');$('pinLight').classList.add('green');$('pinStatus').textContent='ACCESS GRANTED // GREEN';$('codeError').textContent='ACCESS GRANTED // 출구 잠금 해제';say('인증 완료. 출구 표시등이 초록색으로 바뀌었습니다. EXIT로 이동하십시오.');setTimeout(()=>{if(codeOpen)closeCode()},900)}else{$('pinLight').classList.remove('green');$('codeError').textContent='INVALID CODE // 기록의 규칙을 다시 확인하십시오.';$('pinStatus').textContent='ACCESS DENIED // RED';say('인증 실패 // 보안 표시등이 빨간색입니다. 기록과 계산 순서를 다시 대조하십시오.')}}
+function interact(){if(paused||finished||isOverlayOpen())return;if(!nearby){say('NO TARGET // 가까운 장치로 이동하십시오.');return}const id=nearby.id;if(clues[id]){if(!found[id]){found[id]=true;addItem(id);$('state'+id).textContent='DATA FOUND';say(id+' 기록을 확보했습니다. INVENTORY에서 다시 확인할 수 있습니다.')}showRecord(clues[id].title,clues[id].body);return}if(id==='ARCHIVE'){found.ARCHIVE=true;$('stateArchive').textContent='READ';addItem('ARCHIVE');say('ARCHIVE NOTE 확보 // 네 자리 인증식을 확인하십시오.');showRecord('ARCHIVE NOTE // FRAGMENT 04','ARCHIVE INCIDENT // PERSONAL NOTE\n\n첫째 자리 = A − B.\n둘째 자리 = C − A.\n셋째 자리 = A + B − C.\n넷째 자리 = A + B + C를 9로 나눈 나머지. 나머지가 0이면 9로 기록한다.\n\n“ECHO에게 묻지 말 것. 기록 삭제 명령은 사고 직전 ECHO의 내부 인증값으로 전송되었다.”');return}if(id==='EXIT'){if(!codeSolved){showCode();return}finishStage();return}}
+function verify(){if(pinBuffer.length!==4){$('codeError').textContent='FOUR DIGITS REQUIRED // 네 자리 모두 입력하십시오.';return}if(pinBuffer===expectedCode){codeSolved=true;$('statePanel').textContent='UNLOCKED';$('panelLight').classList.add('green');$('exitLight').classList.add('green');$('pinLight').classList.add('green');$('pinStatus').textContent='ACCESS GRANTED // GREEN';$('codeError').textContent='ACCESS GRANTED // 출구 잠금 해제';say('인증 완료. 출구 표시등이 초록색으로 바뀌었습니다. 출구에서 E를 눌러 진입하십시오.');setTimeout(()=>{if(codeOpen)closeCode()},900)}else{$('pinLight').classList.remove('green');$('codeError').textContent='INVALID CODE // 기록의 규칙을 다시 확인하십시오.';$('pinStatus').textContent='ACCESS DENIED // RED';say('인증 실패 // 보안 표시등이 빨간색입니다. 기록과 계산 순서를 다시 대조하십시오.')}}
 function addRestartAndTitleButtons(title,sub,copy){helpOpen=false;inventoryOpen=false;dataOpen=true;codeOpen=false;helpOverlay.style.display='none';inventoryOverlay.style.display='none';codeOverlay.style.display='none';pauseOverlay.style.display='none';$('closeRecord').style.display='none';$('windowTitle').textContent=title;$('windowSub').textContent=sub;$('windowBody').innerHTML=copy+'<div class="stage01-window-actions"><button class="code-button" id="clearRestart" type="button">RESTART</button><a class="code-button" href="?action=title" target="_top" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none">TITLE</a></div>';const b=$('clearRestart');if(b)b.onclick=restartStage;dataOpen=true;dataOverlay.style.display='flex'}
 function finishStage(){finished=true;clearKeys();pauseOverlay.style.display='none';addRestartAndTitleButtons('STAGE 01 CLEAR','ARCHIVE ACCESS // COMPLETE','<p>ACCESS GRANTED</p><p>ARCHIVE ACCESS가 완료되었습니다.</p>');say('STAGE 01 CLEAR // 다음 구역의 신호가 감지되었습니다.')}
 function expireGame(){if(finished)return;finished=true;clearKeys();addRestartAndTitleButtons('TIME EXPIRED','SYSTEM LOCKDOWN','<p>제한 시간이 종료되었습니다.</p>');say('TIME EXPIRED // RESTART를 선택하십시오.')}
