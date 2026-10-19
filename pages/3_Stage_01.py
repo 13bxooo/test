@@ -50,7 +50,7 @@ html, body, [class*="css"] {{ font-family:Neo,monospace !important; }}
 .stage-frame {{ border:1px solid #383838; padding:14px; background-color:#050505;
  background-image:linear-gradient(#ffffff0b 1px,transparent 1px),linear-gradient(90deg,#ffffff0b 1px,transparent 1px);
  background-size:36px 36px; }}
-.stage-title {{ letter-spacing:2px; font-size:22px; line-height:1.65; white-space:pre-line; animation:stageSignFlicker 5.2s infinite steps(1,end); text-shadow:0 0 3px #fff,0 0 8px #888; }}
+.stage-title {{ letter-spacing:2px; font-size:22px; line-height:1.65; white-space:pre-line; color:#fff; text-shadow:none; animation:none; }}
 @keyframes stageSignFlicker {{
   0%,7%,9%,11%,44%,46%,48%,100% {{ opacity:1; filter:brightness(1); text-shadow:0 0 3px #fff,0 0 8px #888; }}
   8%,10% {{ opacity:.35; filter:brightness(.65); text-shadow:none; }}
