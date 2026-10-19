@@ -2019,6 +2019,7 @@ input {
 .stage-transition-title .stage-name { font-size:clamp(22px,4vw,42px); animation: stageBlink .65s steps(2,end) infinite; }
 .stage-transition-title .room-name { margin-top:18px; font-size:clamp(12px,2vw,18px); color:#999; animation: stageBlink 1.1s steps(2,end) infinite; }
 @keyframes stageBlink { 50% { opacity:.15; } }
+@keyframes titleFlicker { 0%,100% { opacity:1 } 3% { opacity:.75 } 4% { opacity:1 } 8% { opacity:.9 } 9% { opacity:1 } }
 
 .reader-slot {
 
@@ -3225,7 +3226,7 @@ input {
 
 <div class="fade-screen" id="fadeScreen" aria-hidden="true"></div>
 <div id="restartConfirm" style="display:none;position:absolute;inset:0;z-index:500;background:#000e;align-items:center;justify-content:center"><div style="width:min(420px,88%);padding:28px;background:#050505;border:1px solid #666;text-align:center"><div style="font-size:18px;margin-bottom:24px">다시 시작하겠습니까?</div><button id="restartYes" class="code-button" type="button" style="width:120px;margin:6px">YES</button><button id="restartNo" class="code-button" type="button" style="width:120px;margin:6px;background:#000;color:#fff;border:1px solid #555">NO</button></div></div>
-<div id="roomIntro" style="position:absolute;inset:0;z-index:450;background:#000;color:#ddd;display:flex;flex-direction:column;align-items:center;justify-content:center;letter-spacing:3px;text-align:center"><div style="font-size:clamp(22px,4vw,42px);animation:stageBlink .45s steps(2,end) infinite">STAGE 00</div><div style="font-size:clamp(12px,2vw,18px);color:#999;margin-top:18px;animation:stageBlink .7s steps(2,end) infinite">: TUTORIAL</div></div>
+<div id="roomIntro" style="position:absolute;inset:0;z-index:450;background:#000;color:#eee;display:flex;flex-direction:column;align-items:center;justify-content:center;letter-spacing:3px;text-align:center"><div style="font-size:clamp(22px,4vw,42px);animation:titleFlicker 4s infinite">TUTORIAL</div><div style="font-size:clamp(12px,2vw,18px);color:#777;margin-top:18px;animation:titleFlicker 4s infinite">PROJECT : LOGIC</div></div>
 <div class="stage-transition-title" id="stageTransitionTitle" aria-hidden="true"><div class="stage-name">STAGE 01</div><div class="room-name">:( ARCHIVE WING )</div></div>
 
 <script>
@@ -3575,72 +3576,32 @@ const messages = [
 ];
 
 
+let echoRunToken = 0;
+
 function typeEcho(index) {
-
-    echoIndex =
-        index;
-
-
-    clearTimeout(
-        typingTimer
-    );
-
-
-    const text =
-        messages[index] || "";
-
-
-    echoMessage.textContent =
-        "";
-
-
-    typingDone =
-        false;
-
-
-    echoNext.classList.remove(
-        "ready"
-    );
-
-
-    let i =
-        0;
-
+    // Each new line invalidates every pending callback from the previous line.
+    const runToken = ++echoRunToken;
+    clearTimeout(typingTimer);
+    echoIndex = index;
+    const text = messages[index] || "";
+    echoMessage.textContent = "";
+    typingDone = false;
+    echoNext.classList.remove("ready");
+    let i = 0;
 
     function tick() {
-
+        if (runToken !== echoRunToken) return;
+        // Assign the exact current prefix instead of appending to potentially stale text.
+        echoMessage.textContent = text.slice(0, i);
         if (i < text.length) {
-
-            echoMessage.textContent +=
-                text[i];
-
             i += 1;
-
-
-            typingTimer =
-                setTimeout(
-                    tick,
-                    25
-                );
-
+            typingTimer = setTimeout(tick, 25);
+        } else {
+            typingDone = true;
+            echoNext.classList.add("ready");
         }
-
-        else {
-
-            typingDone =
-                true;
-
-            echoNext.classList.add(
-                "ready"
-            );
-
-        }
-
     }
-
-
     tick();
-
 }
 
 
@@ -3659,6 +3620,7 @@ function nextEcho() {
     // 다음 대사는 이동/조사/암호 입력 등 실제 행동이 완료될 때만
     // 해당 상호작용 함수에서 typeEcho()로 시작한다.
     if (!typingDone) {
+        ++echoRunToken;
         clearTimeout(typingTimer);
         echoMessage.textContent = messages[echoIndex] || "";
         typingDone = true;
@@ -5411,72 +5373,35 @@ dragCard.addEventListener(
    RESTART / TITLE
    ===================================================== */
 
-function parentAction(
-    action
-) {
-
-    let target =
-        null;
-
-
-    /*
-     * iframe에서 부모 Streamlit 주소를
-     * 읽을 수 있는 경우 사용
-     */
-
+function parentAction(action) {
+    // components.html runs inside an iframe. Reading parent.location can throw on
+    // cross-origin checks, so derive the app URL from document.referrer and only
+    // assign the parent location (which browsers permit).
+    let target;
     try {
-
-        if (
-            document.referrer
-        ) {
-
-            target =
-                new URL(
-                    document.referrer
-                );
-
-
-            target.searchParams.set(
-                "action",
-                action
-            );
-
-        }
-
+        target = new URL(document.referrer || window.location.href);
+        target.search = "";
+        target.hash = "";
+        target.searchParams.set("action", action);
+    } catch (error) {
+        target = new URL(window.location.href);
+        target.search = "";
+        target.searchParams.set("action", action);
     }
-
-    catch (error) {
-
-        target =
-            null;
-
-    }
-
-
-    if (target) {
-
-        window.top.location.href =
-            target.toString();
-
-    }
-
-    else {
-
-        window.parent.location.href =
-            "?action=" +
-            encodeURIComponent(
-                action
-            );
-
-    }
-
+    try { window.parent.location.assign(target.toString()); }
+    catch (error) { window.location.href = target.toString(); }
 }
 
 
 document.getElementById("restartButton").addEventListener("click", function () { document.getElementById("restartConfirm").style.display = "flex"; });
 document.getElementById("restartNo").addEventListener("click", function () { document.getElementById("restartConfirm").style.display = "none"; });
 document.getElementById("restartYes").addEventListener("click", function () {
-    try { localStorage.removeItem("project_logic_tutorial_save_v2"); } catch (e) {}
+    try {
+        localStorage.removeItem("project_logic_tutorial_save_v2");
+        localStorage.removeItem("project_logic_stage01_save_v2");
+        sessionStorage.removeItem("project_logic_stage00_intro_seen");
+        sessionStorage.removeItem("project_logic_stage01_intro_seen");
+    } catch (e) {}
     parentAction("restart");
 });
 
