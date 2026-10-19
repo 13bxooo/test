@@ -12,15 +12,25 @@ if _page_action == "title":
     st.session_state.start_open = True
     st.session_state.show_title_warning = True
     st.rerun()
+elif _page_action == "stage01":
+    # The tutorial iframe requests the next Streamlit page via ?action=stage01.
+    st.query_params.clear()
+    st.session_state.stage01_started = True
+    st.session_state.game_started = True
+    st.session_state.game_paused = False
+    st.session_state.start_open = False
+    st.switch_page("pages/3_Stage_01.py")
 elif _page_action == "restart":
     st.query_params.clear()
-    # A restart always clears the complete run and begins from the tutorial.
     for _key in list(st.session_state.keys()):
         if _key.startswith(("s1_", "tutorial_", "stage01_")):
             del st.session_state[_key]
+    st.session_state.tutorial_reset_save = True
     st.session_state.game_started = True
     st.session_state.game_paused = False
     st.session_state.game_finished = False
+    st.session_state.tutorial_complete = False
+    st.session_state.stage01_started = False
     st.session_state.remaining_seconds = 15 * 60
     st.session_state.start_open = False
     st.switch_page("pages/2_Game.py")
@@ -49,9 +59,10 @@ st.markdown(f"""
 #MainMenu,header,footer,[data-testid="stSidebar"]{{visibility:hidden;display:none}}
 .stApp{{background:#000;color:#fff;font-family:NeoDungGeunMo,monospace}}
 .block-container{{padding:0!important;max-width:100%!important}}
-.project-title{{position:fixed;top:12vh;left:0;width:100%;text-align:center;color:#fff;font-family:NeoDungGeunMo,monospace;font-size:42px;letter-spacing:3px;z-index:10;animation:titleFlicker 4s infinite}}
+.project-title{{position:fixed;top:12vh;left:0;width:100%;text-align:center;color:#fff;font-family:NeoDungGeunMo,monospace;font-size:42px;letter-spacing:3px;z-index:10;text-shadow:0 0 3px #fff,0 0 10px #aaa;animation:titleFlicker 5.2s infinite steps(1,end)}}
 .project-subtitle{{position:fixed;top:22vh;left:0;width:100%;text-align:center;color:#555;font-family:NeoDungGeunMo,monospace;font-size:13px;letter-spacing:2px;z-index:10}}
-@keyframes titleFlicker{{0%,100%{{opacity:1}}3%{{opacity:.75}}4%{{opacity:1}}8%{{opacity:.9}}9%{{opacity:1}}}}
+@keyframes titleFlicker{{0%,7%,9%,11%,44%,46%,48%,100%{{opacity:1;filter:brightness(1);text-shadow:0 0 3px #fff,0 0 10px #aaa}}8%,10%{{opacity:.35;filter:brightness(.65);text-shadow:none}}45%,47%{{opacity:.65;filter:brightness(.8);text-shadow:0 0 2px #fff}}72%{{opacity:.92}}73%{{opacity:.55}}74%{{opacity:1}}}}
+@media(prefers-reduced-motion:reduce){{.project-title{{animation:none}}}}
 .st-key-start_button,.st-key-how_to_play_button{{position:fixed!important;left:50%!important;transform:translateX(-50%)!important;margin:0!important;padding:0!important;z-index:100!important}}
 .st-key-start_button{{top:51vh!important;width:170px!important;height:55px!important}}
 .st-key-how_to_play_button{{top:65vh!important;width:220px!important;height:55px!important}}
@@ -88,19 +99,29 @@ if st.session_state.start_open:
     if continue_clicked:
         st.session_state.start_open = False
         if st.session_state.get("stage01_started", False):
+            st.session_state.game_started = True
             st.switch_page("pages/3_Stage_01.py")
-        elif st.session_state.get("game_started", False):
+        elif (st.session_state.get("game_started", False)
+              or st.session_state.get("tutorial_complete", False)
+              or st.session_state.get("tutorial_save_exists", False)):
+            st.session_state.game_started = True
+            st.session_state.game_paused = False
             st.switch_page("pages/2_Game.py")
         else:
             st.warning("이전 플레이 기록이 존재하지 않습니다. NEW GAME을 선택해 주세요.")
 
     if new_game_clicked:
+        _found_state = st.session_state.get("s1_found", {})
+        _any_stage_record = any(_found_state.values()) if isinstance(_found_state, dict) else False
         has_progress = (
             bool(st.session_state.get("game_started", False))
             or bool(st.session_state.get("stage01_started", False))
             or bool(st.session_state.get("tutorial_complete", False))
+            or bool(st.session_state.get("tutorial_save_exists", False))
             or bool(st.session_state.get("s1_message_index", 0))
-            or any(st.session_state.get("s1_found", {}).values())
+            or _any_stage_record
+            or bool(st.session_state.get("s1_archive_read", False))
+            or bool(st.session_state.get("s1_unlocked", False))
         )
         if has_progress:
             st.session_state.new_game_confirm = True
