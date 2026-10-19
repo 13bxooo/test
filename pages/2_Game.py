@@ -25,6 +25,7 @@ action = st.query_params.get("action")
 
 if action == "restart":
 
+    st.session_state.tutorial_reset_save = True
     st.session_state.game_paused = False
 
     st.query_params.clear()
@@ -3671,6 +3672,7 @@ function nextEcho() {
 }
 
 const TUTORIAL_SAVE_KEY = "project_logic_tutorial_save_v3";
+if (__RESET_TUTORIAL_SAVE__) { try { localStorage.removeItem(TUTORIAL_SAVE_KEY); } catch (e) {} }
 function saveTutorialState() {
     try {
         localStorage.setItem(TUTORIAL_SAVE_KEY, JSON.stringify({
@@ -5613,6 +5615,8 @@ html = html.replace(
     if paused
     else "false",
 )
+
+html = html.replace("__RESET_TUTORIAL_SAVE__", "true" if st.session_state.pop("tutorial_reset_save", False) else "false")
 
 
 # =========================================================
