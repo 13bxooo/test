@@ -56,6 +56,9 @@ if "game_paused" not in st.session_state:
 
     st.session_state.game_paused = False
 
+# The tutorial page represents an active run, so CONTINUE can return here.
+st.session_state.game_started = True
+
 
 # =========================================================
 # FONT
@@ -360,25 +363,27 @@ input {
 
 .project-title {
 
-    position:
-        absolute;
-
-    top:
-        24px;
-
-    left:
-        28px;
-
-    font-size:
-        18px;
-
-    letter-spacing:
-        1px;
-
-    z-index:
-        20;
+    position: absolute;
+    top: 24px;
+    left: 28px;
+    font-size: 18px;
+    letter-spacing: 1px;
+    z-index: 20;
+    color: #f4f4f4;
+    text-shadow: 0 0 3px #fff, 0 0 8px #888;
+    animation: signFlicker 5.2s infinite steps(1, end);
 
 }
+
+@keyframes signFlicker {
+    0%, 7%, 9%, 11%, 44%, 46%, 48%, 100% { opacity: 1; filter: brightness(1); text-shadow: 0 0 3px #fff, 0 0 8px #888; }
+    8%, 10% { opacity: .35; filter: brightness(.65); text-shadow: none; }
+    45%, 47% { opacity: .65; filter: brightness(.8); text-shadow: 0 0 2px #fff; }
+    72% { opacity: .92; }
+    73% { opacity: .55; }
+    74% { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) { .project-title { animation: none; } }
 
 
 .stage-title {
@@ -2013,8 +2018,36 @@ input {
     opacity: 0;
     pointer-events: none;
     transition: opacity 1.5s linear;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .fade-screen.active { opacity: 1; }
+.fade-message {
+    color: #e8e8e8;
+    font-family: 'NeoDungGeunMo', monospace;
+    font-size: clamp(15px, 2.2vw, 26px);
+    letter-spacing: 3px;
+    text-align: center;
+    padding: 0 18px;
+    opacity: 0;
+    text-shadow: 0 0 4px #fff, 0 0 12px #777;
+}
+.fade-screen.active .fade-message {
+    animation: blackoutText 1.5s steps(1, end) forwards;
+}
+@keyframes blackoutText {
+    0% { opacity: 0; }
+    18% { opacity: .95; }
+    24% { opacity: .2; }
+    31% { opacity: 1; }
+    42% { opacity: .45; }
+    50%, 100% { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .fade-screen { transition: none; }
+    .fade-screen.active .fade-message { animation: none; opacity: 1; }
+}
 
 .reader-slot {
 
@@ -3219,7 +3252,7 @@ input {
 
 </div>
 
-<div class="fade-screen" id="fadeScreen" aria-hidden="true"></div>
+<div class="fade-screen" id="fadeScreen" aria-hidden="true"><div class="fade-message" id="fadeMessage">SIGNAL LOST</div></div>
 
 <script>
 
@@ -5398,6 +5431,8 @@ function finishCardDrag(
             typingDone = true;
             echoNext.classList.add("ready");
             setTimeout(function () {
+                const fadeMessage = document.getElementById("fadeMessage");
+                if (fadeMessage) fadeMessage.textContent = "SIGNAL LOST // STAGE 01 LOADING";
                 if (fadeScreen) fadeScreen.classList.add("active");
                 setTimeout(function () { parentAction("stage01"); }, 1550);
             }, 1000);
