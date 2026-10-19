@@ -161,6 +161,36 @@ footer {{
 }}
 
 
+.st-key-tutorial_restart_native,
+.st-key-tutorial_title_native {{
+    position: fixed !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 170px !important;
+    height: 42px !important;
+    z-index: 1000001 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}}
+.st-key-tutorial_restart_native {{ top: calc(50vh + 58px) !important; }}
+.st-key-tutorial_title_native {{ top: calc(50vh + 106px) !important; }}
+.st-key-tutorial_restart_native button,
+.st-key-tutorial_title_native button {{
+    width: 170px !important;
+    height: 42px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: #000 !important;
+    color: #fff !important;
+    font-family: 'NeoDungGeunMo', monospace !important;
+    font-size: 15px !important;
+}}
+.st-key-tutorial_restart_native button:hover,
+.st-key-tutorial_title_native button:hover {{
+    background: #fff !important;
+    color: #000 !important;
+}}
+
 .st-key-pause_game_button button {{
 
     width: 45px !important;
@@ -244,6 +274,30 @@ if pause_clicked:
 
 
 paused = st.session_state.game_paused
+
+# RESTART / TITLE are native Streamlit buttons, not links inside components.html.
+# Their fixed positions match the original pause-menu button positions.
+if paused:
+    restart_clicked = st.button("RESTART", key="tutorial_restart_native")
+    title_clicked = st.button("TITLE", key="tutorial_title_native")
+
+    if restart_clicked:
+        for _key in list(st.session_state.keys()):
+            if _key.startswith(("s1_", "tutorial_", "stage01_")):
+                del st.session_state[_key]
+        st.session_state.tutorial_reset_save = True
+        st.session_state.game_started = True
+        st.session_state.game_paused = False
+        st.session_state.game_finished = False
+        st.session_state.tutorial_complete = False
+        st.session_state.stage01_started = False
+        st.session_state.remaining_seconds = 15 * 60
+        st.switch_page("pages/2_Game.py")
+
+    if title_clicked:
+        st.session_state.game_paused = False
+        st.session_state.show_title_warning = True
+        st.switch_page("main.py")
 
 
 # =========================================================
@@ -2024,14 +2078,29 @@ input {
 .fade-message {
     color: #e8e8e8;
     font-family: 'NeoDungGeunMo', monospace;
-    font-size: clamp(15px, 2.2vw, 26px);
     letter-spacing: 3px;
     text-align: center;
     padding: 0 18px;
     opacity: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-shadow: none;
+}
+.fade-stage {
+    font-size: clamp(22px, 3vw, 34px);
     text-shadow: 0 0 4px #fff, 0 0 12px #777;
 }
+.fade-room {
+    font-size: clamp(12px, 1.4vw, 17px);
+    letter-spacing: 2px;
+    text-shadow: none;
+}
 .fade-screen.active .fade-message {
+    opacity: 1;
+}
+.fade-screen.active .fade-stage {
     animation: blackoutText 1.5s steps(1, end) forwards;
 }
 @keyframes blackoutText {
@@ -2044,7 +2113,7 @@ input {
 }
 @media (prefers-reduced-motion: reduce) {
     .fade-screen { transition: none; }
-    .fade-screen.active .fade-message { animation: none; opacity: 1; }
+    .fade-screen.active .fade-message, .fade-screen.active .fade-stage { animation: none; opacity: 1; }
 }
 
 .reader-slot {
@@ -2277,6 +2346,9 @@ input {
 
 
 .pause-actions {
+
+    visibility: hidden;
+    pointer-events: none;
 
     margin-top:
         24px;
@@ -3245,7 +3317,7 @@ input {
 
 </div>
 
-<div class="fade-screen" id="fadeScreen" aria-hidden="true"><div class="fade-message" id="fadeMessage">STAGE 01<br>:ARCHIVE ACCESS</div></div>
+<div class="fade-screen" id="fadeScreen" aria-hidden="true"><div class="fade-message" id="fadeMessage"><span class="fade-stage">STAGE 01</span><span class="fade-room">:ARCHIVE ACCESS</span></div></div>
 
 <script>
 
@@ -5425,7 +5497,7 @@ function finishCardDrag(
             echoNext.classList.add("ready");
             setTimeout(function () {
                 const fadeMessage = document.getElementById("fadeMessage");
-                if (fadeMessage) fadeMessage.innerHTML = "STAGE 01<br>:ARCHIVE ACCESS";
+                if (fadeMessage) fadeMessage.innerHTML = '<span class="fade-stage">STAGE 01</span><span class="fade-room">:ARCHIVE ACCESS</span>';
                 if (fadeScreen) fadeScreen.classList.add("active");
                 // Leave the black screen and flickering stage sign visible for 3 seconds.
                 setTimeout(function () { parentAction("stage01"); }, 3000);
