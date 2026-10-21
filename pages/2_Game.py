@@ -24,19 +24,21 @@ action = st.query_params.get("action")
 
 
 if action == "restart":
-
     st.query_params.clear()
     for _key in list(st.session_state.keys()):
-        if _key.startswith(("s1_", "tutorial_", "stage01_")):
+        if _key.startswith(("s1_", "tutorial_", "stage01_", "stage02_")):
             del st.session_state[_key]
     st.session_state.tutorial_reset_save = True
+    st.session_state.stage01_reset_save = True
+    st.session_state.stage02_reset_save = True
     st.session_state.game_started = True
     st.session_state.game_paused = False
     st.session_state.game_finished = False
-    st.session_state.tutorial_complete = False
-    st.session_state.stage01_started = False
+    st.session_state.tutorial_complete = True
+    st.session_state.stage01_started = True
+    st.session_state.stage02_started = False
     st.session_state.remaining_seconds = 15 * 60
-    st.switch_page("pages/2_Game.py")
+    st.switch_page("pages/3_Stage_01.py")
 
 
 elif action == "title":
@@ -247,22 +249,22 @@ footer {{
 }}
 
 
-/* White-led inventory skin: preserve existing inventory behavior and card artwork. */
-.inventory-panel{{background:#f4f7f8!important;color:#101820!important;border:2px solid #111!important;box-shadow:0 0 0 2px #d7e3e8,8px 8px 0 #000!important}}
-.inventory-header{{border-bottom:2px solid #17232a!important}}
-.inventory-title{{color:#101820!important;text-shadow:none!important}}
-.inventory-close{{color:#52616b!important}}
-.inventory-slot{{background:#fff!important;color:#111!important;border:2px solid #a9b8bf!important;box-shadow:inset 0 0 0 1px #edf2f4!important}}
-.inventory-slot:hover,.inventory-slot.selected{{background:#dffaff!important;color:#06151a!important;border-color:#00a9c7!important;box-shadow:0 0 0 2px #7cecff!important}}
-.slot-number{{color:#647780!important}}
-.item-name{{color:#15252c!important}}
-.empty-text{{color:#a3b0b6!important}}
-.item-description{{background:#fff!important;color:#24343c!important;border-top:2px solid #a9b8bf!important;box-shadow:inset 0 0 0 1px #edf2f4!important}}
-.item-description strong{{color:#006b80!important}}
-.pixel-card-item{{background:#f4fcff!important;border:2px solid #008eaf!important;box-shadow:2px 0 #005a70,-2px 0 #005a70,0 2px #005a70,0 -2px #005a70,0 0 0 2px #d6faff!important}}
-.pixel-card-chip{{background:#00bcd7!important;border:1px solid #004b5a!important}}
-.pixel-card-mark{{color:#006b80!important}}
-.pixel-card-lines{{border-color:#008eaf!important}}
+/* Reference UI: black inventory, cyan pixel borders, white text. */
+.inventory-panel{background:#020609!important;color:#eefaff!important;border:2px solid #28dfff!important;box-shadow:0 0 0 2px #073c4b,0 0 18px #00dfff20!important}
+.inventory-header{border-bottom:2px solid #147b94!important}
+.inventory-title{color:#42eaff!important;text-shadow:0 0 6px #00dfff55!important}
+.inventory-close{color:#bcefff!important}
+.inventory-slot{background:#02090e!important;color:#fff!important;border:1px solid #147b94!important;box-shadow:inset 0 0 0 1px #00dfff0d!important}
+.inventory-slot:hover,.inventory-slot.selected{background:#073040!important;color:#fff!important;border-color:#42eaff!important;box-shadow:0 0 0 1px #42eaff,0 0 10px #00dfff22!important}
+.slot-number{color:#3ccde9!important}
+.item-name{color:#f4fdff!important}
+.empty-text{color:#45636c!important}
+.item-description{background:#02090e!important;color:#d9f7ff!important;border-top:2px solid #147b94!important;box-shadow:inset 0 0 0 1px #00dfff0d!important}
+.item-description strong{color:#42eaff!important}
+.pixel-card-item{background:#05202a!important;border:2px solid #28dfff!important;box-shadow:2px 0 #07566c,-2px 0 #07566c,0 2px #07566c,0 -2px #07566c,0 0 0 2px #001018!important}
+.pixel-card-chip{background:#28dfff!important;border:1px solid #07566c!important}
+.pixel-card-mark{color:#bdf7ff!important}
+.pixel-card-lines{border-color:#147b94!important}
 </style>
 """,
     unsafe_allow_html=True,
@@ -2393,6 +2395,15 @@ input {
 
 }
 
+
+/* Reference-matched pause popup: fixed to the viewport, black/cyan panel, white buttons. */
+.pause-overlay{position:fixed!important;inset:0!important;z-index:1500000!important;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.78)!important;padding:18px;box-sizing:border-box}
+.pause-overlay>div{width:min(390px,90vw)!important;box-sizing:border-box!important;background:#000!important;color:#fff!important;border:3px double #28dfff!important;padding:28px!important;box-shadow:0 0 0 1px #07566c,0 0 18px #00dfff22!important}
+.pause-title{color:#fff!important;font-family:NeoDungGeunMo,monospace!important;text-align:center!important;font-size:clamp(22px,3vw,30px)!important;letter-spacing:1px!important}
+.pause-sub{color:#8fdff0!important;font-family:NeoDungGeunMo,monospace!important;text-align:center!important}
+.pause-actions{visibility:visible!important;pointer-events:auto!important;margin-top:24px!important;display:flex!important;flex-direction:column!important;gap:12px!important;align-items:stretch!important}
+.pause-actions button,.pause-actions a{width:100%!important;min-height:44px!important;background:#fff!important;color:#000!important;border:1px solid #fff!important;border-radius:0!important;font-family:NeoDungGeunMo,monospace!important;display:flex!important;align-items:center!important;justify-content:center!important;text-decoration:none!important;cursor:pointer!important}
+.pause-actions button:hover,.pause-actions a:hover{background:#28dfff!important;color:#000!important;border-color:#28dfff!important}
 
 /* =====================================================
    MOBILE CONTROLS
