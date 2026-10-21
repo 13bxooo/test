@@ -252,19 +252,19 @@ footer {{
 /* Reference UI: black inventory, cyan pixel borders, white text. */]
 .inventory-panel{{background:#020609!important;color:#eefaff!important;border:2px solid #28dfff!important;box-shadow:0 0 0 2px #073c4b,0 0 18px #00dfff20!important}}
 .inventory-header{{border-bottom:2px solid #147b94!important}}
-.inventory-title{color:#42eaff!important;text-shadow:0 0 6px #00dfff55!important}
-.inventory-close{color:#bcefff!important}
-.inventory-slot{background:#02090e!important;color:#fff!important;border:1px solid #147b94!important;box-shadow:inset 0 0 0 1px #00dfff0d!important}
-.inventory-slot:hover,.inventory-slot.selected{background:#073040!important;color:#fff!important;border-color:#42eaff!important;box-shadow:0 0 0 1px #42eaff,0 0 10px #00dfff22!important}
-.slot-number{color:#3ccde9!important}
-.item-name{color:#f4fdff!important}
-.empty-text{color:#45636c!important}
-.item-description{background:#02090e!important;color:#d9f7ff!important;border-top:2px solid #147b94!important;box-shadow:inset 0 0 0 1px #00dfff0d!important}
-.item-description strong{color:#42eaff!important}
-.pixel-card-item{background:#05202a!important;border:2px solid #28dfff!important;box-shadow:2px 0 #07566c,-2px 0 #07566c,0 2px #07566c,0 -2px #07566c,0 0 0 2px #001018!important}
-.pixel-card-chip{background:#28dfff!important;border:1px solid #07566c!important}
-.pixel-card-mark{color:#bdf7ff!important}
-.pixel-card-lines{border-color:#147b94!important}
+.inventory-title{{color:#42eaff!important;text-shadow:0 0 6px #00dfff55!important}}
+.inventory-close{{color:#bcefff!important}}
+.inventory-slot{{background:#02090e!important;color:#fff!important;border:1px solid #147b94!important;box-shadow:inset 0 0 0 1px #00dfff0d!important}}
+.inventory-slot:hover,.inventory-slot.selected{{background:#073040!important;color:#fff!important;border-color:#42eaff!important;box-shadow:0 0 0 1px #42eaff,0 0 10px #00dfff22!important}}
+.slot-number{{color:#3ccde9!important}}
+.item-name{{color:#f4fdff!important}}
+.empty-text{{color:#45636c!important}}
+.item-description{{background:#02090e!important;color:#d9f7ff!important;border-top:2px solid #147b94!important;box-shadow:inset 0 0 0 1px #00dfff0d!important}}
+.item-description strong{{color:#42eaff!important}}
+.pixel-card-item{{background:#05202a!important;border:2px solid #28dfff!important;box-shadow:2px 0 #07566c,-2px 0 #07566c,0 2px #07566c,0 -2px #07566c,0 0 0 2px #001018!important}}
+.pixel-card-chip{{background:#28dfff!important;border:1px solid #07566c!important}}
+.pixel-card-mark{{color:#bdf7ff!important}}
+.pixel-card-lines{{border-color:#147b94!important}}
 </style>
 """,
     unsafe_allow_html=True,
