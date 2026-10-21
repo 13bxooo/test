@@ -76,6 +76,31 @@ html = r"""
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <style>
 __TUTORIAL_CSS__
+
+/* PROJECT: LOGIC shared neon laboratory UI */
+:root{--logic-cyan:#20e7ff;--logic-cyan-dim:#087b91;--logic-panel:#061117;--logic-white:#f3fdff}
+html,body{background:#020608!important;color:var(--logic-white)!important}
+#gameRoot,.game-root,.scene,.game-scene{border-color:#087b91!important}
+.code-button,.pause-actions button,.pause-actions a,.stage01-window-actions button,.stage01-window-actions a{border:1px solid var(--logic-cyan)!important;background:#041117!important;color:#d9fbff!important;border-radius:0!important;box-shadow:inset 0 0 0 1px #20e7ff12,0 0 10px #20e7ff1c!important;letter-spacing:1px!important;transition:background .12s,color .12s,box-shadow .12s!important}
+.code-button:hover,.pause-actions button:hover,.pause-actions a:hover,.stage01-window-actions button:hover,.stage01-window-actions a:hover{background:#c8fbff!important;color:#001116!important;box-shadow:0 0 18px #20e7ff77!important}
+.pause-overlay{background:rgba(0,5,8,.88)!important;backdrop-filter:blur(2px)}
+.pause-overlay>div{min-width:min(360px,88vw)!important;padding:30px 28px!important;border:1px solid var(--logic-cyan)!important;outline:1px solid #075363!important;background:linear-gradient(145deg,#07171e,#020609 70%)!important;box-shadow:0 0 0 5px #00d9ff0a,0 0 34px #00d9ff27!important}
+.pause-title{color:#eaffff!important;text-shadow:0 0 8px #20e7ff66!important;letter-spacing:3px!important}
+.pause-sub{color:#55bcca!important;letter-spacing:1px!important}
+.pause-actions{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:10px!important;margin-top:22px!important}
+.pause-actions .code-button,.pause-actions button,.pause-actions a{width:100%!important;min-height:44px!important;box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;text-decoration:none!important}
+.stage-transition{background:radial-gradient(ellipse at center,#08232c 0%,#020608 65%,#000 100%)!important;color:#eaffff!important}
+.stage-transition .stage-no{color:#eaffff!important;text-shadow:0 0 12px #20e7ff66!important}
+.stage-transition .stage-room{color:#55d9eb!important}
+.stage-transition .transition-line{background:var(--logic-cyan)!important;box-shadow:0 0 12px var(--logic-cyan)!important}
+.echo-panel,.echo-box,.status,.status-bar{border-color:#087b91!important}
+.inventory-panel{background:#f7fbfc!important;color:#101820!important;border:2px solid #d6faff!important;box-shadow:0 0 0 2px #087b91,0 0 22px #00d9ff22!important}
+.inventory-header{border-bottom:2px solid #087b91!important}
+.inventory-title{color:#101820!important;text-shadow:none!important}
+.inventory-slot{background:#fff!important;color:#101820!important;border:2px solid #a8c0c7!important}
+.inventory-slot:hover,.inventory-slot.selected{background:#d9fbff!important;border-color:#00a9c7!important;box-shadow:0 0 0 2px #20e7ff!important}
+@media(max-width:700px){.pause-overlay>div{padding:22px 18px!important}.pause-title{font-size:22px!important}}
+
 /* Stage-specific additions. Page 2's base scene styles are used above. */
 .stage01-timer{position:absolute;top:28px;right:72px;z-index:22;color:#777;font-size:11px;letter-spacing:1px}
 .stage01-pause{position:absolute;top:18px;right:18px;z-index:160;width:34px;height:34px;padding:0;border:0;background:#000;color:#fff;font-size:20px;line-height:1}
@@ -243,7 +268,7 @@ __TUTORIAL_CSS__
 
   <div class="stage-transition" id="stageTransition"><div class="stage-no">STAGE 01</div><div class="stage-room">:ARCHIVE ACCESS</div><div class="transition-line"></div></div>
   <div class="pause-overlay" id="pauseOverlay">
-    <div><div class="pause-title">GAME PAUSED</div><div class="pause-sub">PRESS Ⅱ TO CONTINUE</div><div class="pause-actions"><button class="code-button" id="resumeBtn" type="button">RESUME</button><button class="code-button" id="restartBtn" type="button">RESTART</button><button class="code-button" id="titleBtn" type="button">TITLE</button></div></div>
+    <div><div class="pause-title">GAME PAUSED</div><div class="pause-sub">SYSTEM HALTED // SELECT ACTION</div><div class="pause-actions"><button class="code-button" id="resumeBtn" type="button">RESUME</button><button class="code-button" id="restartBtn" type="button">RESTART</button><button class="code-button" id="titleBtn" type="button">TITLE</button></div></div>
   </div>
 <div class="save-fade" id="saveFade"><div class="fade-label"><span class="fade-gear">⚙</span>SAVING DATA...</div></div>
 <div class="save-gear" id="saveGear" aria-live="polite"><span class="gear">⚙</span><span id="saveGearText">SAVING...</span></div>
