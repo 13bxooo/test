@@ -249,8 +249,8 @@ footer {{
 }}
 
 
-/* Reference UI: black inventory, cyan pixel borders, white text. */
-.inventory-panel{background:#020609!important;color:#eefaff!important;border:2px solid #28dfff!important;box-shadow:0 0 0 2px #073c4b,0 0 18px #00dfff20!important}
+/* Reference UI: black inventory, cyan pixel borders, white text. */]
+.inventory-panel{{background:#020609!important;color:#eefaff!important;border:2px solid #28dfff!important;box-shadow:0 0 0 2px #073c4b,0 0 18px #00dfff20!important}}
 .inventory-header{border-bottom:2px solid #147b94!important}
 .inventory-title{color:#42eaff!important;text-shadow:0 0 6px #00dfff55!important}
 .inventory-close{color:#bcefff!important}
