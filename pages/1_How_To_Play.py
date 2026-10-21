@@ -23,8 +23,11 @@ st.markdown(f"""
 }}
 #MainMenu, header, footer, [data-testid="stSidebar"],
 [data-testid="stToolbar"], [data-testid="stDecoration"] {{display:none!important;}}
+html, body, [data-testid="stAppViewContainer"], .stApp, .stApp *, button, input, textarea {{
+    font-family:Neo,monospace!important;
+}}
 html, body, [data-testid="stAppViewContainer"], .stApp {{
-    background:#020609!important; color:#eefaff!important; font-family:Neo,monospace!important;
+    background:#000!important; color:#eefaff!important; font-family:Neo,monospace!important;
 }}
 .block-container {{max-width:1040px!important;padding:clamp(24px,6vh,70px) clamp(18px,4vw,48px) 44px!important;}}
 .manual-head {{border:3px double #26d9f5;padding:26px clamp(18px,4vw,42px);position:relative;
