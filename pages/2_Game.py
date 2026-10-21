@@ -246,6 +246,23 @@ footer {{
 
 }}
 
+
+/* White-led inventory skin: preserve existing inventory behavior and card artwork. */
+.inventory-panel{{background:#f4f7f8!important;color:#101820!important;border:2px solid #111!important;box-shadow:0 0 0 2px #d7e3e8,8px 8px 0 #000!important}}
+.inventory-header{{border-bottom:2px solid #17232a!important}}
+.inventory-title{{color:#101820!important;text-shadow:none!important}}
+.inventory-close{{color:#52616b!important}}
+.inventory-slot{{background:#fff!important;color:#111!important;border:2px solid #a9b8bf!important;box-shadow:inset 0 0 0 1px #edf2f4!important}}
+.inventory-slot:hover,.inventory-slot.selected{{background:#dffaff!important;color:#06151a!important;border-color:#00a9c7!important;box-shadow:0 0 0 2px #7cecff!important}}
+.slot-number{{color:#647780!important}}
+.item-name{{color:#15252c!important}}
+.empty-text{{color:#a3b0b6!important}}
+.item-description{{background:#fff!important;color:#24343c!important;border-top:2px solid #a9b8bf!important;box-shadow:inset 0 0 0 1px #edf2f4!important}}
+.item-description strong{{color:#006b80!important}}
+.pixel-card-item{{background:#f4fcff!important;border:2px solid #008eaf!important;box-shadow:2px 0 #005a70,-2px 0 #005a70,0 2px #005a70,0 -2px #005a70,0 0 0 2px #d6faff!important}}
+.pixel-card-chip{{background:#00bcd7!important;border:1px solid #004b5a!important}}
+.pixel-card-mark{{color:#006b80!important}}
+.pixel-card-lines{{border-color:#008eaf!important}}
 </style>
 """,
     unsafe_allow_html=True,
@@ -1885,6 +1902,15 @@ input {
 
 }
 
+
+/* Pixel-art access card shared by the draggable reader item and inventory icon */
+.pixel-card-item{position:relative;width:42px;height:28px;margin:7px auto 5px;background:#073b58;border:2px solid #54eaff;box-shadow:2px 0 #bafaff,-2px 0 #bafaff,0 2px #bafaff,0 -2px #bafaff,0 0 8px #00dfff66;image-rendering:pixelated;transform:rotate(-8deg)}
+.pixel-card-chip{position:absolute;left:5px;top:6px;width:8px;height:7px;background:#36e8ff;border:1px solid #b8fbff}
+.pixel-card-mark{position:absolute;right:5px;top:2px;color:#9af7ff;font:bold 12px monospace}
+.pixel-card-lines{position:absolute;left:5px;right:5px;bottom:4px;height:3px;border-top:1px solid #55eaff;border-bottom:1px solid #55eaff}
+.card{background:#073b58!important;border:2px solid #54eaff!important;box-shadow:2px 0 #bafaff,-2px 0 #bafaff,0 2px #bafaff,0 -2px #bafaff,0 0 12px #00dfff66!important;image-rendering:pixelated!important}
+.card-chip{background:#36e8ff!important;border:1px solid #b8fbff!important}
+.card:after{content:"A";position:absolute;right:12px;top:12px;color:#9af7ff;font:bold 20px monospace;text-shadow:0 0 5px #00dfff}
 
 /* =====================================================
    CARD ACCESS
@@ -3610,13 +3636,9 @@ function renderInventory() {
 
                 slot.innerHTML =
                     `
-                    <div class="slot-number">
-                        ${String(index + 1).padStart(2, "0")}
-                    </div>
-
-                    <div class="item-name">
-                        ${item.name}
-                    </div>
+                    <div class="slot-number">${String(index + 1).padStart(2, "0")}</div>
+                    ${item.name === "ACCESS KEY" ? '<div class="pixel-card-item"><span class="pixel-card-chip"></span><span class="pixel-card-mark">A</span><span class="pixel-card-lines"></span></div>' : ''}
+                    <div class="item-name">${item.name}</div>
                     `;
 
             }
