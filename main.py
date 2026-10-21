@@ -256,6 +256,20 @@ st.markdown(f"""
     }}
     [data-testid="stAlert"] {{top:70vh!important}}
 }}
+
+/* PROJECT: LOGIC UI refresh — title/menu */
+:root {{ color-scheme:dark; }}
+.stApp {{ background:radial-gradient(ellipse at 50% 38%,#071c25 0%,#020609 55%,#000 100%)!important; color:#e9fcff!important; }}
+.project-title {{ color:#e9fcff!important; text-shadow:0 0 5px #d9fbff,0 0 14px #00d9ff,0 0 34px #007d9a!important; letter-spacing:5px!important; }}
+.project-subtitle {{ color:#55d9eb!important; text-shadow:0 0 8px #00cce8!important; }}
+.st-key-start_button button,.st-key-how_to_play_button button {{ border:1px solid #00cde8!important; outline:1px solid #06404b!important; background:rgba(2,14,19,.94)!important; color:#c8faff!important; box-shadow:inset 0 0 16px #00cde812,0 0 12px #00cde82a!important; letter-spacing:2px!important; transition:all .16s steps(2,end)!important; }}
+.st-key-start_button button:hover,.st-key-how_to_play_button button:hover {{ background:#bffaff!important; color:#001014!important; box-shadow:0 0 22px #00d9ff88!important; }}
+.st-key-popup {{ border:1px solid #00cde8!important; outline:1px solid #063b46!important; background:#02090d!important; box-shadow:0 0 22px #00cde833!important; }}
+.st-key-popup button {{ border:1px solid #124a55!important; background:#031117!important; color:#c8faff!important; letter-spacing:1px!important; }}
+.st-key-popup button:hover {{ background:#bffaff!important; color:#001014!important; }}
+.st-key-confirm_modal [data-testid="stVerticalBlockBorderWrapper"] {{ border:1px solid #00cde8!important; box-shadow:0 0 28px #00cde833!important; }}
+.st-key-confirm_modal [data-testid="stButton"] button {{ border:1px solid #00cde8!important; color:#c8faff!important; }}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -270,7 +284,7 @@ st.markdown(
 
 with st.container(key="start_button"):
     start_clicked = st.button(
-        "START", key="start", use_container_width=True
+        "NEW GAME / CONTINUE", key="start", use_container_width=True
     )
 
 if start_clicked:
