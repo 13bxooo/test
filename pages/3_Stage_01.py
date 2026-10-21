@@ -87,16 +87,12 @@ __TUTORIAL_CSS__
 .stage01-object{animation:standbySpark 3.1s infinite steps(2,end)}
 .stage01-object:nth-of-type(2n){animation-delay:.8s}
 @keyframes standbySpark{0%,88%,100%{filter:brightness(1);box-shadow:0 0 0 transparent}90%,94%{filter:brightness(1.7);box-shadow:0 0 12px #40f6ff55}}
-.stage-transition{position:fixed;inset:0;z-index:999999;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;color:#000;opacity:1;transition:opacity .45s steps(5,end);pointer-events:auto;text-align:center;padding:20px}
+.stage-transition{position:fixed;inset:0;z-index:999999;background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;opacity:1;transition:opacity .7s steps(8,end);pointer-events:auto;text-align:center}
 .stage-transition.hide{opacity:0;pointer-events:none}
-.transition-card{width:min(590px,92vw);background:#fff;border:5px double #000;box-shadow:0 0 0 3px #fff,0 0 0 6px #000;image-rendering:pixelated}
-.transition-image{height:clamp(150px,34vh,300px);background:#111 center/cover no-repeat;image-rendering:pixelated;filter:saturate(.85) contrast(1.08);border-bottom:2px solid #000}
-.transition-dialogue{padding:14px 18px 16px;text-align:left;background:#fff;color:#000;font-size:clamp(12px,1.6vw,16px);line-height:1.8}
-.transition-speaker{display:inline-block;background:#000;color:#fff;padding:2px 8px;margin-bottom:8px;font-size:12px;letter-spacing:1px}
-.transition-line-text{min-height:2.8em}
-#transitionContinue{display:block;margin:12px 0 0 auto;background:#fff;color:#000;border:1px solid #000;padding:8px 18px;font:inherit;cursor:pointer}
-#transitionContinue:hover{background:#000;color:#fff}
-
+.stage-transition .stage-no{font-size:clamp(25px,4vw,48px);letter-spacing:3px;line-height:1.6}
+.stage-transition .stage-room{font-size:clamp(15px,2vw,24px);color:#aaa;letter-spacing:2px}
+.stage-transition .transition-line{width:0;height:2px;background:#fff;margin-top:24px;animation:lineScan 1.4s steps(10,end) forwards}
+@keyframes lineScan{to{width:min(360px,70vw)}}
 .stage01-a{left:11%;top:17%}
 .stage01-b{left:42%;top:13%;width:16%;height:13%}
 .stage01-c{right:12%;top:18%}
@@ -106,7 +102,7 @@ __TUTORIAL_CSS__
 .stage01-window-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;align-items:center}
 .stage01-window-actions button,.stage01-window-actions a{min-width:150px;text-align:center;justify-content:center}
 .pause-actions{visibility:visible;pointer-events:auto}
-.pause-actions button,.pause-actions a{background:#fff!important;color:#000!important;border:1px solid #000!important;min-width:130px;text-align:center;justify-content:center;text-decoration:none}
+.pause-actions button,.pause-actions a{min-width:130px;text-align:center;justify-content:center;text-decoration:none}
 .save-gear{position:fixed;left:18px;bottom:18px;z-index:99999;display:none;align-items:center;gap:8px;padding:8px 11px;background:#050505;border:1px solid #666;color:#ddd;font-size:11px;letter-spacing:1px}
 .save-gear.show{display:flex}
 .save-gear .gear{display:inline-block;font-size:20px;animation:gearSpin .8s linear infinite}
@@ -160,6 +156,15 @@ __TUTORIAL_CSS__
 #exitLight{top:8px;right:8px}
 .exit-reader-label{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:9px;line-height:1.8;letter-spacing:1px;color:#666;text-align:center;white-space:nowrap}
 #exitDoor.near .exit-reader-label{color:#fff}
+
+/* Reference-matched pause panel: black interior, cyan frame, white action buttons. */
+.pause-overlay{position:fixed!important;inset:0!important;z-index:1500000!important;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.78)!important;padding:18px;box-sizing:border-box}
+.pause-overlay>div{width:min(390px,90vw)!important;box-sizing:border-box!important;background:#000!important;color:#fff!important;border:3px double #28dfff!important;padding:28px!important;box-shadow:0 0 0 1px #07566c,0 0 18px #00dfff22!important}
+.pause-title{color:#fff!important;font-family:NeoDungGeunMo,monospace!important;text-align:center!important}
+.pause-sub{color:#8fdff0!important;font-family:NeoDungGeunMo,monospace!important;text-align:center!important}
+.pause-actions{display:flex!important;flex-direction:column!important;gap:12px!important}
+.pause-actions button,.pause-actions a{width:100%!important;min-height:44px!important;background:#fff!important;color:#000!important;border:1px solid #fff!important;border-radius:0!important;font-family:NeoDungGeunMo,monospace!important}
+.pause-actions button:hover,.pause-actions a:hover{background:#27dff5!important;color:#000!important;border-color:#27dff5!important}
 </style></head><body>
 <div class="game" id="gameRoot" tabindex="0">
   <div class="project-title">PROJECT : LOGIC</div>
@@ -245,12 +250,7 @@ __TUTORIAL_CSS__
     </div>
   </div>
 
-  <div class="stage-transition" id="stageTransition">
-    <div class="transition-card">
-      <div class="transition-image" id="transitionImage" role="img" aria-label="RESEARCH ROOM"></div>
-      <div class="transition-dialogue"><span class="transition-speaker">ECHO // SYSTEM</span><div class="transition-line-text">연구실에 도착했습니다. 주변 기록을 확인하고 단서를 수집하세요.</div><button type="button" id="transitionContinue">CONTINUE　▼</button></div>
-    </div>
-  </div>
+  <div class="stage-transition" id="stageTransition"><div class="stage-no">STAGE 01</div><div class="stage-room">:ARCHIVE ACCESS</div><div class="transition-line"></div></div>
   <div class="pause-overlay" id="pauseOverlay">
     <div><div class="pause-title">GAME PAUSED</div><div class="pause-sub">PRESS Ⅱ TO CONTINUE</div><div class="pause-actions"><button class="code-button" id="resumeBtn" type="button">RESUME</button><button class="code-button" id="restartBtn" type="button">RESTART</button><button class="code-button" id="titleBtn" type="button">TITLE</button></div></div>
   </div>
@@ -385,19 +385,7 @@ document.querySelectorAll('.inventory-slot').forEach((slot,i)=>slot.addEventList
 document.addEventListener('keydown',e=>{const key=e.key.toLowerCase();if(codeOpen){if(/^[0-9]$/.test(e.key)){e.preventDefault();appendPinDigit(e.key);return}if(key==='backspace'){e.preventDefault();backspacePin();return}if(key==='enter'){e.preventDefault();verify();return}if(key==='escape'){e.preventDefault();closeCode();return}return}if(e.repeat&&['e','h','i','escape'].includes(key))return;if(e.code==='Space'){e.preventDefault();if(!paused&&!isOverlayOpen())nextEcho();return}if(key==='escape'){if(codeOpen){closeCode();return}if(dataOpen){closeRecord();return}if(helpOpen){openHelp();return}if(inventoryOpen){openInventory();return}if(paused){resume();return}return}if(key==='h'){e.preventDefault();openHelp();return}if(key==='i'){e.preventDefault();openInventory();return}if(key==='e'){e.preventDefault();interact();return}if(['w','a','s','d'].includes(key)&&!paused&&!isOverlayOpen()){keys[key]=true;e.preventDefault()}});
 document.addEventListener('keyup',e=>{const key=e.key.toLowerCase();if(key in keys){keys[key]=false;e.preventDefault()}});window.addEventListener('blur',clearKeys);root.addEventListener('pointerdown',focusGame);
 function loop(){updateMovement();checkInteraction();requestAnimationFrame(loop)}
-const restored=restoreStageState();if(!restored){player.style.left=playerX+'%';player.style.top=playerY+'%';renderInventory();updateTimer();typeEcho(0)}const stageTransition=$('stageTransition');
-const transitionImage=$('transitionImage');
-if(transitionImage){
-  const roomNode=document.querySelector('.room')||document.querySelector('.stage-room-bg')||document.querySelector('.scene');
-  if(roomNode){
-    const bg=getComputedStyle(roomNode).backgroundImage;
-    if(bg&&bg!=='none') transitionImage.style.backgroundImage=bg;
-  }
-  const closeTransition=()=>stageTransition.classList.add('hide');
-  $('transitionContinue')?.addEventListener('click',closeTransition);
-  document.addEventListener('keydown',ev=>{if(ev.code==='Space'&& !stageTransition.classList.contains('hide')){ev.preventDefault();closeTransition();}});
-}
-if(stageTransition){if(restored){stageTransition.remove()}else{setTimeout(()=>stageTransition.classList.add('hide'),9000);setTimeout(()=>stageTransition.remove(),2700)}}checkInteraction();focusGame();setInterval(syncTimer,250);setInterval(saveStageState,1000);requestAnimationFrame(loop);
+const restored=restoreStageState();if(!restored){player.style.left=playerX+'%';player.style.top=playerY+'%';renderInventory();updateTimer();typeEcho(0)}const stageTransition=$('stageTransition');if(stageTransition){if(restored){stageTransition.remove()}else{setTimeout(()=>stageTransition.classList.add('hide'),1900);setTimeout(()=>stageTransition.remove(),2700)}}checkInteraction();focusGame();setInterval(syncTimer,250);setInterval(saveStageState,1000);requestAnimationFrame(loop);
 })();
 </script></body></html>
 """
