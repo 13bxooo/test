@@ -93,4 +93,4 @@ st.markdown(
 }}
 :root {{ color-scheme: dark; }}
 #MainMenu, header, footer, [data-testid="stSidebar"] {{ display:none !important; visibility:hidden !important; }}
-.stApp {{
+html, body, [data-testid="stAppViewContainer"], .stApp {{
