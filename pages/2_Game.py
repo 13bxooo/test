@@ -2677,6 +2677,31 @@ input {
 
 }
 
+
+/* PROJECT: LOGIC shared neon laboratory UI */
+:root{--logic-cyan:#20e7ff;--logic-cyan-dim:#087b91;--logic-panel:#061117;--logic-white:#f3fdff}
+html,body{background:#020608!important;color:var(--logic-white)!important}
+#gameRoot,.game-root,.scene,.game-scene{border-color:#087b91!important}
+.code-button,.pause-actions button,.pause-actions a,.stage01-window-actions button,.stage01-window-actions a{border:1px solid var(--logic-cyan)!important;background:#041117!important;color:#d9fbff!important;border-radius:0!important;box-shadow:inset 0 0 0 1px #20e7ff12,0 0 10px #20e7ff1c!important;letter-spacing:1px!important;transition:background .12s,color .12s,box-shadow .12s!important}
+.code-button:hover,.pause-actions button:hover,.pause-actions a:hover,.stage01-window-actions button:hover,.stage01-window-actions a:hover{background:#c8fbff!important;color:#001116!important;box-shadow:0 0 18px #20e7ff77!important}
+.pause-overlay{background:rgba(0,5,8,.88)!important;backdrop-filter:blur(2px)}
+.pause-overlay>div{min-width:min(360px,88vw)!important;padding:30px 28px!important;border:1px solid var(--logic-cyan)!important;outline:1px solid #075363!important;background:linear-gradient(145deg,#07171e,#020609 70%)!important;box-shadow:0 0 0 5px #00d9ff0a,0 0 34px #00d9ff27!important}
+.pause-title{color:#eaffff!important;text-shadow:0 0 8px #20e7ff66!important;letter-spacing:3px!important}
+.pause-sub{color:#55bcca!important;letter-spacing:1px!important}
+.pause-actions{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:10px!important;margin-top:22px!important}
+.pause-actions .code-button,.pause-actions button,.pause-actions a{width:100%!important;min-height:44px!important;box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;text-decoration:none!important}
+.stage-transition{background:radial-gradient(ellipse at center,#08232c 0%,#020608 65%,#000 100%)!important;color:#eaffff!important}
+.stage-transition .stage-no{color:#eaffff!important;text-shadow:0 0 12px #20e7ff66!important}
+.stage-transition .stage-room{color:#55d9eb!important}
+.stage-transition .transition-line{background:var(--logic-cyan)!important;box-shadow:0 0 12px var(--logic-cyan)!important}
+.echo-panel,.echo-box,.status,.status-bar{border-color:#087b91!important}
+.inventory-panel{background:#f7fbfc!important;color:#101820!important;border:2px solid #d6faff!important;box-shadow:0 0 0 2px #087b91,0 0 22px #00d9ff22!important}
+.inventory-header{border-bottom:2px solid #087b91!important}
+.inventory-title{color:#101820!important;text-shadow:none!important}
+.inventory-slot{background:#fff!important;color:#101820!important;border:2px solid #a8c0c7!important}
+.inventory-slot:hover,.inventory-slot.selected{background:#d9fbff!important;border-color:#00a9c7!important;box-shadow:0 0 0 2px #20e7ff!important}
+@media(max-width:700px){.pause-overlay>div{padding:22px 18px!important}.pause-title{font-size:22px!important}}
+
 </style>
 
 </head>
@@ -3295,11 +3320,12 @@ input {
 
 
 <div class="pause-sub">
-    PRESS ▶ TO CONTINUE
+    SYSTEM HALTED // SELECT ACTION
 </div>
 
 
 <div class="pause-actions">
+<button class="code-button" id="resumeButton" type="button" style="width:170px;min-height:44px;display:flex;align-items:center;justify-content:center;box-sizing:border-box;">RESUME</button>
 
 
 <a
@@ -5561,6 +5587,13 @@ dragCard.addEventListener(
     finishCardDrag
 );
 
+
+/* Unified pause actions: RESUME delegates to Streamlit's native pause-state button. */
+const resumeButton = document.getElementById("resumeButton");
+if (resumeButton) resumeButton.addEventListener("click", () => {
+    try { const host = window.parent.document.querySelector('.st-key-pause_game_button button'); if (host) { host.click(); return; } } catch (e) {}
+    pauseOverlay.style.display = "none";
+});
 
 /* =====================================================
    RESTART / TITLE
