@@ -72,8 +72,8 @@ st.markdown(f"""
     display:none;
 }}
 .stApp {{
-    background:#fff;
-    color:#000;
+    background:#000;
+    color:#fff;
     font-family:NeoDungGeunMo,monospace;
 }}
 .block-container {{
@@ -86,12 +86,12 @@ st.markdown(f"""
     left:0;
     width:100%;
     text-align:center;
-    color:#000;
+    color:#fff;
     font-family:NeoDungGeunMo,monospace;
     font-size:42px;
     letter-spacing:3px;
     z-index:10;
-    text-shadow:none;
+    text-shadow:0 0 3px #fff,0 0 10px #aaa;
     animation:titleFlicker 5.2s infinite steps(1,end);
 }}
 .project-subtitle {{
@@ -110,7 +110,7 @@ st.markdown(f"""
     0%,7%,9%,11%,44%,46%,48%,100% {{
         opacity:1;
         filter:brightness(1);
-        text-shadow:none;
+        text-shadow:0 0 3px #fff,0 0 10px #aaa;
     }}
     8%,10% {{
         opacity:.35;
@@ -120,7 +120,7 @@ st.markdown(f"""
     45%,47% {{
         opacity:.65;
         filter:brightness(.8);
-        text-shadow:none;
+        text-shadow:0 0 2px #fff;
     }}
     72% {{opacity:.92}}
     73% {{opacity:.55}}
@@ -154,8 +154,8 @@ st.markdown(f"""
     height:55px!important;
     border:0!important;
     border-radius:0!important;
-    background:#fff!important;
-    color:#000!important;
+    background:#000!important;
+    color:#fff!important;
     font-family:NeoDungGeunMo,monospace!important;
     font-size:19px!important;
     box-shadow:none!important;
@@ -172,8 +172,8 @@ st.markdown(f"""
     width:190px!important;
     margin:0!important;
     padding:6px!important;
-    background:#fff!important;
-    border:1px solid #000!important;
+    background:#000!important;
+    border:1px solid #555!important;
     z-index:200!important;
 }}
 .st-key-confirm_modal {{
@@ -190,27 +190,27 @@ st.markdown(f"""
     width:min(430px,92vw)!important;
     max-width:430px!important;
     border:1px solid #aaa!important;
-    background:#fff!important;
-    box-shadow:0 0 0 1px #333,0 12px 40px #0002!important;
+    background:#050505!important;
+    box-shadow:0 0 0 1px #333,0 12px 40px #000!important;
     padding:22px 24px!important;
 }}
 .st-key-confirm_modal [data-testid="stMarkdownContainer"] p {{
     font-family:NeoDungGeunMo,monospace!important;
     font-size:13px!important;
     line-height:1.8!important;
-    color:#111!important;
+    color:#ddd!important;
 }}
 .st-key-confirm_modal [data-testid="stButton"] button {{
     height:40px!important;
     border:1px solid #666!important;
-    background:#fff!important;
-    color:#000!important;
+    background:#050505!important;
+    color:#fff!important;
     font-family:NeoDungGeunMo,monospace!important;
     border-radius:0!important;
 }}
 .st-key-confirm_modal [data-testid="stButton"] button:hover {{
-    background:#000!important;
-    color:#fff!important;
+    background:#fff!important;
+    color:#000!important;
 }}
 .st-key-popup button {{
     width:100%!important;
@@ -219,15 +219,15 @@ st.markdown(f"""
     padding:0!important;
     border:0!important;
     border-radius:0!important;
-    background:#fff!important;
-    color:#000!important;
+    background:#000!important;
+    color:#fff!important;
     font-family:NeoDungGeunMo,monospace!important;
     font-size:14px!important;
 }}
 .st-key-popup button:last-child {{margin-bottom:0!important}}
 .st-key-popup button:hover {{
-    background:#000!important;
-    color:#fff!important;
+    background:#fff!important;
+    color:#000!important;
 }}
 [data-testid="stAlert"] {{
     position:fixed!important;
