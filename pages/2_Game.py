@@ -469,7 +469,7 @@ input {
         13px;
 
     color:
-        #333333;
+        #777777;
 
     letter-spacing:
         1px;
@@ -633,7 +633,7 @@ input {
         rgba(255,255,255,0.22);
 
     color:
-        #333333;
+        #777777;
 
     font-size:
         12px;
@@ -1354,7 +1354,7 @@ input {
         14px;
 
     color:
-        #333333;
+        #777777;
 
     z-index:
         20;
@@ -1781,7 +1781,7 @@ input {
         center;
 
     color:
-        #333333;
+        #777777;
 
     font-size:
         11px;
@@ -1892,7 +1892,7 @@ input {
         12px;
 
     color:
-        #333333;
+        #777777;
 
     font-size:
         11px;
@@ -2065,7 +2065,7 @@ input {
         center;
 
     color:
-        #333333;
+        #777777;
 
     font-size:
         10px;
@@ -2253,7 +2253,7 @@ input {
         center;
 
     color:
-        #333333;
+        #777777;
 
     font-size:
         11px;
@@ -2338,13 +2338,12 @@ input {
         center;
 
     background:
-        rgba(0,0,0,0.78);
+        rgba(0,0,0,0.90);
 
 }
 
 
-.pause-overlay > div { background:#fff!important; color:#000!important; border:2px solid #000!important; box-shadow:0 0 0 3px #fff,0 12px 36px #000!important; padding:30px 34px!important; min-width:min(320px,86vw)!important; text-align:center!important; }
-.pause-title { color:#000!important;
+.pause-title {
 
     font-size:
         28px;
@@ -2361,7 +2360,7 @@ input {
 .pause-sub {
 
     color:
-        #333333;
+        #777777;
 
     font-size:
         13px;
