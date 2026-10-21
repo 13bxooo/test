@@ -105,14 +105,13 @@ html, body, [class*="css"], button, input, textarea, [data-testid="stMarkdownCon
 /* Hide Streamlit's normal top spacing so the background fills the viewport. */
 [data-testid="stAppViewContainer"] > .main {{ padding:0 !important; }}
 [data-testid="stAppViewContainer"] > .main .block-container {{ padding:0 !important; }}
-/* The original reference image includes a four-item menu. Cover that area and
-   replace it with the requested START / HOW TO PLAY buttons. */
+/* Cover the menu baked into the background without adding an extra box.
+   The title, subtitle, and decorative effects in the image remain visible. */
 .title-menu-mask {{
-  position:fixed; z-index:5; left:50%; top:48.5vh; transform:translateX(-50%);
-  width: min(290px, 78vw); height: 40vh; min-height:220px; max-height:360px;
-  background:rgba(0,5,12,.96); border:2px solid #26d9f5;
-  box-shadow:0 0 0 3px rgba(0,0,0,.65), 0 0 22px #00dfff25;
-  pointer-events:none;
+  position:fixed; z-index:5; left:50%; top:34vh; transform:translateX(-50%);
+  width:min(300px, 78vw); height:36vh; min-height:190px; max-height:310px;
+  background:rgba(0,4,10,.98); border:0 !important; outline:0 !important;
+  box-shadow:none !important; pointer-events:none;
 }}
 .st-key-start_button, .st-key-how_to_play_button {{
   position:fixed !important; left:50% !important; transform:translateX(-50%) !important;
@@ -130,21 +129,23 @@ html, body, [class*="css"], button, input, textarea, [data-testid="stMarkdownCon
 .st-key-start_button button:hover, .st-key-how_to_play_button button:hover {{
   background:#fff !important; color:#000 !important; border-color:#fff !important;
 }}
-/* START submenu: small fixed pop-up to the right of the main menu. */
+/* Compact START submenu, with a close control in its top-right corner. */
 .st-key-start_popup {{
-  position:fixed !important; z-index:40 !important; top:55.5vh !important;
-  left:calc(50% + 165px) !important; width:190px !important;
-  margin:0 !important; padding:10px !important; box-sizing:border-box !important;
+  position:fixed !important; z-index:40 !important; top:54vh !important;
+  left:calc(50% + 155px) !important; width:164px !important;
+  margin:0 !important; padding:8px !important; box-sizing:border-box !important;
   border:1px solid #26d9f5 !important; background:#02070b !important;
-  box-shadow:0 0 20px #00dfff28 !important;
+  box-shadow:0 0 14px #00dfff20 !important;
 }}
 .st-key-start_popup button {{
-  width:100% !important; height:38px !important; min-height:38px !important;
-  margin:0 0 7px !important; border:1px solid #147b94 !important;
+  width:100% !important; height:32px !important; min-height:32px !important;
+  margin:0 0 5px !important; border:1px solid #147b94 !important;
   border-radius:0 !important; background:#000 !important; color:#fff !important;
-  font-family:NeoDungGeunMo,monospace !important; font-size:13px !important;
+  font-family:NeoDungGeunMo,monospace !important; font-size:12px !important;
 }}
 .st-key-start_popup button:last-child {{ margin-bottom:0 !important; }}
+.st-key-start_popup [data-testid="stHorizontalBlock"] {{ gap:0.25rem !important; }}
+.st-key-start_popup [data-testid="stHorizontalBlock"] button {{ height:24px !important; min-height:24px !important; padding:0 !important; }}
 .st-key-start_popup button:hover {{ background:#fff !important; color:#000 !important; }}
 /* Error and warning cards are separate pop-ups beside the START submenu. */
 .st-key-error_popup, .st-key-warning_popup {{
@@ -166,14 +167,14 @@ html, body, [class*="css"], button, input, textarea, [data-testid="stMarkdownCon
 }}
 .st-key-error_popup button:hover, .st-key-warning_popup button:hover {{ background:#fff !important; color:#000 !important; }}
 @media(max-width:1000px) {{
-  .st-key-start_popup {{ left:calc(50% + 130px) !important; width:170px !important; }}
+  .st-key-start_popup {{ left:calc(50% + 115px) !important; width:150px !important; }}
   .st-key-error_popup, .st-key-warning_popup {{ left:50% !important; top:83vh !important; transform:translateX(-50%) !important; width:min(360px,90vw) !important; }}
 }}
 @media(max-width:600px) {{
-  .title-menu-mask {{ top:52vh; width:230px; height:26vh; min-height:170px; }}
-  .st-key-start_button {{ top:57vh !important; width:190px !important; }}
-  .st-key-how_to_play_button {{ top:67vh !important; width:190px !important; }}
-  .st-key-start_popup {{ top:77vh !important; left:50% !important; transform:translateX(-50%) !important; width:190px !important; }}
+  .title-menu-mask {{ top:34vh; width:230px; height:30vh; min-height:150px; }}
+  .st-key-start_button {{ top:52vh !important; width:190px !important; }}
+  .st-key-how_to_play_button {{ top:62vh !important; width:190px !important; }}
+  .st-key-start_popup {{ top:73vh !important; left:50% !important; transform:translateX(-50%) !important; width:170px !important; }}
   .st-key-error_popup, .st-key-warning_popup {{ top:77vh !important; }}
 }}
 </style>
@@ -200,6 +201,15 @@ if how_clicked:
 
 if st.session_state.start_open:
     with st.container(key="start_popup", border=True):
+        popup_head, popup_close = st.columns([5, 1], gap="small")
+        with popup_head:
+            st.markdown("**SELECT MODE**")
+        with popup_close:
+            if st.button("×", key="close_start_popup", help="팝업 닫기"):
+                st.session_state.start_open = False
+                st.session_state.error_popup = False
+                st.session_state.warning_popup = False
+                st.rerun()
         continue_clicked = st.button("CONTINUE", key="start_continue", use_container_width=True)
         new_game_clicked = st.button("NEW GAME", key="start_new_game", use_container_width=True)
 
@@ -243,24 +253,24 @@ if st.session_state.start_open:
 
 if st.session_state.error_popup:
     with st.container(key="error_popup", border=True):
-        close_col, title_col = st.columns([1, 7], gap="small")
+        title_col, close_col = st.columns([7, 1], gap="small")
+        with title_col:
+            st.markdown("### ⚠ ERROR")
         with close_col:
             if st.button("×", key="close_error", help="팝업 닫기"):
                 st.session_state.error_popup = False
                 st.rerun()
-        with title_col:
-            st.markdown("### ⚠ ERROR")
         st.markdown("이전 플레이 기록이 존재하지 않습니다.")
 
 if st.session_state.warning_popup:
     with st.container(key="warning_popup", border=True):
-        close_col, title_col = st.columns([1, 7], gap="small")
+        title_col, close_col = st.columns([7, 1], gap="small")
+        with title_col:
+            st.markdown("### ⚠ WARNING")
         with close_col:
             if st.button("×", key="close_warning", help="팝업 닫기"):
                 st.session_state.warning_popup = False
                 st.rerun()
-        with title_col:
-            st.markdown("### ⚠ WARNING")
         st.markdown("이전 플레이 기록이 존재합니다.\n\n새 게임을 진행하시겠습니까?")
         yes_col, no_col = st.columns(2, gap="small")
         with yes_col:
