@@ -94,3 +94,232 @@ st.markdown(
 :root {{ color-scheme: dark; }}
 #MainMenu, header, footer, [data-testid="stSidebar"] {{ display:none !important; visibility:hidden !important; }}
 html, body, [data-testid="stAppViewContainer"], .stApp {{
+  background-color:#000 !important;
+  background-image:url("data:image/jpeg;base64,{background_data}") !important;
+  background-position:center center !important;
+  background-size:cover !important;
+  background-repeat:no-repeat !important;
+  background-attachment:fixed !important;
+  color:#fff !important;
+  font-family:NeoDungGeunMo, monospace !important;
+  min-height:100vh;
+}}
+[data-testid="stAppViewContainer"] > .main,
+[data-testid="stAppViewContainer"] > .main > .block-container {{
+  background:transparent !important;
+}}
+html, body, [class*="css"], button, input, textarea, [data-testid="stMarkdownContainer"] {{
+  font-family:NeoDungGeunMo, monospace !important;
+}}
+.block-container {{ max-width:none !important; padding:0 !important; }}
+/* Hide Streamlit's normal top spacing so the background fills the viewport. */
+[data-testid="stAppViewContainer"] > .main {{ padding:0 !important; }}
+[data-testid="stAppViewContainer"] > .main .block-container {{ padding:0 !important; }}
+/* Transparent title overlay adds glow to the title already present in title_background.jpeg. */
+.title-glow {{
+  position:fixed; z-index:10; top:29.3vh; left:0; width:100%; height:7vh;
+  text-align:center; color:transparent; pointer-events:none;
+  font-family:NeoDungGeunMo,monospace; font-size:clamp(28px,3.2vw,48px);
+  letter-spacing:2px; line-height:1.2;
+  text-shadow:0 0 2px #fff,0 0 7px #fff,0 0 16px #00eaff,0 0 30px #00bfff;
+  animation:titleFlicker 4.2s infinite steps(1,end);
+}}
+@keyframes titleFlicker {{
+  0%,7%,9%,11%,44%,46%,48%,100% {{ opacity:1; filter:brightness(1); }}
+  8%,10% {{ opacity:.25; filter:brightness(.65); }}
+  45%,47% {{ opacity:.6; filter:brightness(.8); }}
+  72% {{ opacity:.9; }} 73% {{ opacity:.5; }} 74% {{ opacity:1; }}
+}}
+@media(prefers-reduced-motion:reduce) {{ .title-glow {{ animation:none; }} }}
+.st-key-start_button, .st-key-how_to_play_button {{
+  position:fixed !important; left:50% !important; transform:translateX(-50%) !important;
+  z-index:20 !important; margin:0 !important; padding:0 !important; width:min(240px,68vw) !important;
+}}
+.st-key-start_button {{ top:57vh !important; }}
+.st-key-how_to_play_button {{ top:68vh !important; }}
+.st-key-start_button button, .st-key-how_to_play_button button {{
+  width:100% !important; height:43px !important; min-height:43px !important;
+  border:1px solid #159db9 !important; border-radius:0 !important;
+  background:#000 !important; color:#f4fcff !important;
+  font-family:NeoDungGeunMo,monospace !important; font-size:17px !important;
+  box-shadow:none !important; padding:0 12px !important;
+}}
+.st-key-start_button button:hover, .st-key-how_to_play_button button:hover {{
+  background:#fff !important; color:#000 !important; border-color:#fff !important;
+}}
+/* Compact START submenu, with a close control in its top-right corner. */
+.st-key-start_popup {{
+  position:fixed !important; z-index:40 !important; top:54vh !important;
+  left:calc(50% + 155px) !important; width:164px !important;
+  margin:0 !important; padding:8px !important; box-sizing:border-box !important;
+  border:1px solid #26d9f5 !important; background:#02070b !important;
+  box-shadow:0 0 14px #00dfff20 !important;
+}}
+.st-key-start_popup button {{
+  width:100% !important; height:32px !important; min-height:32px !important;
+  margin:0 0 5px !important; border:1px solid #147b94 !important;
+  border-radius:0 !important; background:#000 !important; color:#fff !important;
+  font-family:NeoDungGeunMo,monospace !important; font-size:12px !important;
+}}
+.st-key-start_popup button:last-child {{ margin-bottom:0 !important; }}
+.st-key-start_popup [data-testid="stHorizontalBlock"] {{ gap:0.25rem !important; }}
+.st-key-start_popup [data-testid="stHorizontalBlock"] button {{ height:24px !important; min-height:24px !important; padding:0 !important; }}
+.st-key-start_popup button:hover {{ background:#fff !important; color:#000 !important; }}
+/* Error and warning cards are separate pop-ups beside the START submenu. */
+.st-key-error_popup, .st-key-warning_popup {{
+  position:fixed !important; z-index:60 !important; top:55.5vh !important;
+  left:calc(50% + 370px) !important; width:min(300px,28vw) !important;
+  min-width:240px !important; margin:0 !important; padding:12px 14px !important;
+  border:1px solid #26d9f5 !important; background:#02070b !important;
+  box-shadow:0 0 22px #00dfff28 !important; box-sizing:border-box !important;
+}}
+.st-key-error_popup [data-testid="stMarkdownContainer"],
+.st-key-warning_popup [data-testid="stMarkdownContainer"] {{
+  color:#f3faff !important; font-family:NeoDungGeunMo,monospace !important;
+  font-size:13px !important; line-height:1.8 !important;
+}}
+.st-key-error_popup button, .st-key-warning_popup button {{
+  border:1px solid #26d9f5 !important; border-radius:0 !important;
+  background:#000 !important; color:#fff !important;
+  font-family:NeoDungGeunMo,monospace !important;
+}}
+.st-key-close_start_popup button, .st-key-close_error button, .st-key-close_warning button {{
+  width:28px !important; min-width:28px !important; height:28px !important;
+  min-height:28px !important; aspect-ratio:1/1 !important; padding:0 !important;
+  line-height:1 !important; display:flex !important; align-items:center !important; justify-content:center !important;
+}}
+.st-key-error_popup button:hover, .st-key-warning_popup button:hover {{ background:#fff !important; color:#000 !important; }}
+@media(max-width:1000px) {{
+  .st-key-start_popup {{ left:calc(50% + 115px) !important; width:150px !important; }}
+  .st-key-error_popup, .st-key-warning_popup {{ left:50% !important; top:83vh !important; transform:translateX(-50%) !important; width:min(360px,90vw) !important; }}
+}}
+@media(max-width:600px) {{
+  .st-key-start_button {{ top:52vh !important; width:190px !important; }}
+  .st-key-how_to_play_button {{ top:62vh !important; width:190px !important; }}
+  .st-key-start_popup {{ top:73vh !important; left:50% !important; transform:translateX(-50%) !important; width:170px !important; }}
+  .st-key-error_popup, .st-key-warning_popup {{ top:77vh !important; }}
+}}
+</style>
+<div class="title-glow" aria-hidden="true">PROJECT :: LOGIC</div>
+""",
+    unsafe_allow_html=True,
+)
+
+# Main title menu: exactly two buttons.
+start_clicked = st.button("START", key="start_button")
+how_clicked = st.button("HOW TO PLAY", key="how_to_play_button")
+
+if start_clicked:
+    st.session_state.start_open = not st.session_state.start_open
+    st.session_state.error_popup = False
+    st.session_state.warning_popup = False
+    st.rerun()
+
+if how_clicked:
+    st.session_state.start_open = False
+    st.session_state.error_popup = False
+    st.session_state.warning_popup = False
+    st.switch_page("pages/1_How_To_Play.py")
+
+if st.session_state.start_open:
+    with st.container(key="start_popup", border=True):
+        popup_head, popup_close = st.columns([5, 1], gap="small")
+        with popup_head:
+            st.markdown("**SELECT MODE**")
+        with popup_close:
+            if st.button("×", key="close_start_popup", help="팝업 닫기"):
+                st.session_state.start_open = False
+                st.session_state.error_popup = False
+                st.session_state.warning_popup = False
+                st.rerun()
+        continue_clicked = st.button("CONTINUE", key="start_continue", use_container_width=True)
+        new_game_clicked = st.button("NEW GAME", key="start_new_game", use_container_width=True)
+
+    if continue_clicked:
+        st.session_state.start_open = True
+        if not has_saved_progress():
+            st.session_state.error_popup = True
+            st.session_state.warning_popup = False
+            st.rerun()
+        st.session_state.game_paused = False
+        if st.session_state.get("stage02_started", False):
+            st.switch_page("pages/4_Stage_02.py")
+        elif st.session_state.get("stage01_started", False):
+            st.switch_page("pages/3_Stage_01.py")
+        else:
+            st.switch_page("pages/2_Game.py")
+
+    if new_game_clicked:
+        st.session_state.error_popup = False
+        if has_saved_progress():
+            st.session_state.warning_popup = True
+            st.rerun()
+        else:
+            # No existing run: begin immediately at the tutorial.
+            st.session_state.warning_popup = False
+            for key in list(st.session_state.keys()):
+                if key.startswith(("s1_", "tutorial_", "stage01_", "stage02_")):
+                    del st.session_state[key]
+            st.session_state.tutorial_reset_save = True
+            st.session_state.stage01_reset_save = True
+            st.session_state.stage02_reset_save = True
+            st.session_state.game_started = True
+            st.session_state.game_paused = False
+            st.session_state.game_finished = False
+            st.session_state.tutorial_complete = False
+            st.session_state.stage01_started = False
+            st.session_state.stage02_started = False
+            st.session_state.remaining_seconds = 15 * 60
+            st.session_state.start_open = False
+            st.switch_page("pages/2_Game.py")
+
+if st.session_state.error_popup:
+    with st.container(key="error_popup", border=True):
+        title_col, close_col = st.columns([7, 1], gap="small")
+        with title_col:
+            st.markdown("### ⚠ ERROR")
+        with close_col:
+            if st.button("×", key="close_error", help="팝업 닫기"):
+                st.session_state.error_popup = False
+                st.rerun()
+        st.markdown("이전 플레이 기록이 존재하지 않습니다.")
+
+if st.session_state.warning_popup:
+    with st.container(key="warning_popup", border=True):
+        title_col, close_col = st.columns([7, 1], gap="small")
+        with title_col:
+            st.markdown("### ⚠ WARNING")
+        with close_col:
+            if st.button("×", key="close_warning", help="팝업 닫기"):
+                st.session_state.warning_popup = False
+                st.rerun()
+        st.markdown("이전 플레이 기록이 존재합니다.\n\n새 게임을 진행하시겠습니까?")
+        yes_col, no_col = st.columns(2, gap="small")
+        with yes_col:
+            yes_clicked = st.button("YES", key="warning_yes", use_container_width=True)
+        with no_col:
+            no_clicked = st.button("NO", key="warning_no", use_container_width=True)
+
+    if yes_clicked:
+        # Clear Streamlit state and signal each game page to clear its browser save.
+        for key in list(st.session_state.keys()):
+            if key.startswith(("s1_", "tutorial_", "stage01_", "stage02_")):
+                del st.session_state[key]
+        st.session_state.tutorial_reset_save = True
+        st.session_state.stage01_reset_save = True
+        st.session_state.stage02_reset_save = True
+        st.session_state.game_started = True
+        st.session_state.game_paused = False
+        st.session_state.game_finished = False
+        st.session_state.tutorial_complete = False
+        st.session_state.stage01_started = False
+        st.session_state.stage02_started = False
+        st.session_state.remaining_seconds = 15 * 60
+        st.session_state.warning_popup = False
+        st.session_state.error_popup = False
+        st.session_state.start_open = False
+        st.switch_page("pages/2_Game.py")
+
+    if no_clicked:
+        st.session_state.warning_popup = False
+        st.rerun()
