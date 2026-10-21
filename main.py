@@ -28,20 +28,23 @@ elif _page_action == "stage01":
     st.switch_page("pages/3_Stage_01.py")
 
 elif _page_action == "restart":
+    # RESTART is a full run restart: always begin at Stage 01, never retry Stage 02.
     st.query_params.clear()
     for _key in list(st.session_state.keys()):
         if _key.startswith(("s1_", "tutorial_", "stage01_", "stage02_")):
             del st.session_state[_key]
-
     st.session_state.tutorial_reset_save = True
+    st.session_state.stage01_reset_save = True
+    st.session_state.stage02_reset_save = True
     st.session_state.game_started = True
     st.session_state.game_paused = False
     st.session_state.game_finished = False
-    st.session_state.tutorial_complete = False
-    st.session_state.stage01_started = False
+    st.session_state.tutorial_complete = True
+    st.session_state.stage01_started = True
+    st.session_state.stage02_started = False
     st.session_state.remaining_seconds = 15 * 60
     st.session_state.start_open = False
-    st.switch_page("pages/2_Game.py")
+    st.switch_page("pages/3_Stage_01.py")
 
 for key, value in {
     "start_open": False,
@@ -51,9 +54,14 @@ for key, value in {
     "remaining_seconds": 15 * 60,
     "new_game_confirm": False,
     "show_title_warning": False,
+    "settings_open": False,
+    "exit_notice": False,
+    "sound_enabled": True,
 }.items():
     if key not in st.session_state:
         st.session_state[key] = value
+
+lab_background_data = base64.b64encode((Path(__file__).resolve().parent / "assets" / "lab_background.jpeg").read_bytes()).decode("ascii")
 
 font_data = ""
 for candidate in (Path("neodgm.ttf"), Path("neodgm(2).ttf")):
@@ -72,17 +80,19 @@ st.markdown(f"""
     display:none;
 }}
 .stApp {{
-    background:#000;
+    background: #000 url(data:image/jpeg;base64,{lab_background_data}) center center / cover no-repeat fixed!important;
     color:#fff;
     font-family:NeoDungGeunMo,monospace;
 }}
+.stApp::before {{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.38;background:repeating-linear-gradient(0deg,transparent 0 39px,#0a8fb522 40px,#0a8fb522 41px),linear-gradient(90deg,transparent 0 7%,#0a8fb51c 7.1%,transparent 7.3% 92%,#0a8fb51c 92.1%,transparent 92.3%);}}
+.block-container>div {{position:relative;z-index:1;}}
 .block-container {{
     padding:0!important;
     max-width:100%!important;
 }}
 .project-title {{
     position:fixed;
-    top:12vh;
+    top:20vh;
     left:0;
     width:100%;
     text-align:center;
@@ -96,7 +106,7 @@ st.markdown(f"""
 }}
 .project-subtitle {{
     position:fixed;
-    top:22vh;
+    top:31vh;
     left:0;
     width:100%;
     text-align:center;
@@ -154,8 +164,9 @@ st.markdown(f"""
     height:55px!important;
     border:0!important;
     border-radius:0!important;
-    background:#000!important;
+    background:rgba(0,0,0,.92)!important;
     color:#fff!important;
+    border:1px solid #26d9f5!important;
     font-family:NeoDungGeunMo,monospace!important;
     font-size:19px!important;
     box-shadow:none!important;
@@ -173,7 +184,8 @@ st.markdown(f"""
     margin:0!important;
     padding:6px!important;
     background:#000!important;
-    border:1px solid #555!important;
+    border:1px solid #26d9f5!important;
+    box-shadow:0 0 18px #00dfff22!important;
     z-index:200!important;
 }}
 .st-key-confirm_modal {{
@@ -239,13 +251,22 @@ st.markdown(f"""
     font-family:NeoDungGeunMo,monospace!important;
     font-size:13px!important;
 }}
+ .st-key-menu_panel{{position:fixed!important;top:49vh!important;left:50%!important;transform:translateX(-50%)!important;width:min(250px,78vw)!important;box-sizing:border-box!important;padding:12px 16px!important;border:2px solid #26d9f5!important;background:rgba(0,0,0,.84)!important;box-shadow:0 0 18px #00dfff20!important;z-index:100!important}}
+.st-key-menu_panel [data-testid="stButton"]{{margin:0 0 5px!important}}
+.st-key-menu_panel [data-testid="stButton"]:last-child{{margin-bottom:0!important}}
+.st-key-menu_panel button{{width:100%!important;height:37px!important;min-height:37px!important;border:1px solid #147b94!important;border-radius:0!important;background:#000!important;color:#eafaff!important;font-family:NeoDungGeunMo,monospace!important;font-size:14px!important;box-shadow:none!important}}
+.st-key-menu_panel button:hover{{background:#fff!important;color:#000!important;border-color:#fff!important}}
+.st-key-settings_modal{{position:fixed!important;inset:0!important;z-index:9999!important;display:flex!important;align-items:center!important;justify-content:center!important;background:rgba(0,0,0,.82)!important;padding:18px!important}}
+.st-key-settings_modal [data-testid="stVerticalBlockBorderWrapper"]{{width:min(400px,92vw)!important;border:2px solid #26d9f5!important;background:#000!important;padding:24px!important}}
+.st-key-settings_modal button{{background:#000!important;color:#fff!important;border:1px solid #26d9f5!important;border-radius:0!important;font-family:NeoDungGeunMo,monospace!important}}
 @media(max-width:700px) {{
+    .st-key-menu_panel{{top:48vh!important;width:min(230px,80vw)!important}}
     .project-title {{
-        top:15vh;
+        top:17vh;
         font-size:30px;
         letter-spacing:2px;
     }}
-    .project-subtitle {{top:23vh;font-size:10px}}
+    .project-subtitle {{top:28vh;font-size:10px}}
     .st-key-start_button {{top:56vh!important;width:160px!important}}
     .st-key-how_to_play_button {{top:73vh!important;width:200px!important}}
     .st-key-popup {{
@@ -264,80 +285,66 @@ st.session_state.show_title_warning = False
 
 st.markdown(
     '<div class="project-title">PROJECT : LOGIC</div>'
-    '<div class="project-subtitle">FACILITY CONTROL SYSTEM</div>',
+    '<div class="project-subtitle">INFORMATION IS NOT ALWAYS TRUE</div>',
     unsafe_allow_html=True,
 )
 
-with st.container(key="start_button"):
-    start_clicked = st.button(
-        "START", key="start", use_container_width=True
-    )
+with st.container(key="menu_panel"):
+    new_game_clicked = st.button("NEW GAME", key="menu_new_game", use_container_width=True)
+    continue_clicked = st.button("CONTINUE", key="menu_continue", use_container_width=True)
+    settings_clicked = st.button("SETTINGS", key="menu_settings", use_container_width=True)
+    exit_clicked = st.button("EXIT", key="menu_exit", use_container_width=True)
 
-if start_clicked:
-    st.session_state.start_open = not st.session_state.start_open
+if settings_clicked:
+    st.session_state.settings_open = not st.session_state.settings_open
+    st.session_state.exit_notice = False
+if exit_clicked:
+    st.session_state.exit_notice = not st.session_state.exit_notice
+    st.session_state.settings_open = False
 
-with st.container(key="how_to_play_button"):
-    how_clicked = st.button(
-        "HOW TO PLAY", key="how_to_play", use_container_width=True
-    )
+if continue_clicked:
+    st.session_state.start_open = False
+    st.session_state.game_started = True
+    st.session_state.game_paused = False
+    if st.session_state.get("stage02_started", False):
+        st.switch_page("pages/4_Stage_02.py")
+    elif st.session_state.get("stage01_started", False):
+        st.switch_page("pages/3_Stage_01.py")
+    else:
+        st.switch_page("pages/2_Game.py")
 
-if how_clicked:
-    st.switch_page("pages/1_How_To_Play.py")
+if new_game_clicked:
+    # NEW GAME always overwrites the previous run and its browser-local saves.
+    progress_prefixes = ("s1_", "tutorial_", "stage01_", "stage02_")
+    for _key in list(st.session_state.keys()):
+        if _key.startswith(progress_prefixes):
+            del st.session_state[_key]
+    st.session_state.tutorial_reset_save = True
+    st.session_state.stage01_reset_save = True
+    st.session_state.stage02_reset_save = True
+    st.session_state.game_started = True
+    st.session_state.game_paused = False
+    st.session_state.game_finished = False
+    st.session_state.tutorial_complete = False
+    st.session_state.stage01_started = False
+    st.session_state.stage02_started = False
+    st.session_state.remaining_seconds = 15 * 60
+    st.session_state.new_game_confirm = False
+    st.session_state.start_open = False
+    st.session_state.settings_open = False
+    st.session_state.exit_notice = False
+    st.switch_page("pages/2_Game.py")
 
-if st.session_state.start_open:
-    with st.container(key="popup"):
-        continue_clicked = st.button(
-            "CONTINUE", key="continue", use_container_width=True
-        )
-        new_game_clicked = st.button(
-            "NEW GAME", key="new_game", use_container_width=True
-        )
-
-    if continue_clicked:
-        st.session_state.start_open = False
-        st.session_state.game_started = True
-        st.session_state.game_paused = False
-
-        if st.session_state.get("stage02_started", False):
-            st.switch_page("pages/4_Stage_02.py")
-        elif st.session_state.get("stage01_started", False):
-            st.switch_page("pages/3_Stage_01.py")
-        else:
-            st.switch_page("pages/2_Game.py")
-
-    if new_game_clicked:
-        progress_prefixes = (
-            "s1_", "tutorial_", "stage01_", "stage02_"
-        )
-        has_progress = (
-            bool(st.session_state.get("game_started", False))
-            or any(
-                key.startswith(progress_prefixes) and bool(value)
-                for key, value in st.session_state.items()
-            )
-            or bool(st.session_state.get("stage01_started", False))
-        )
-
-        if has_progress:
-            st.session_state.new_game_confirm = True
+if st.session_state.settings_open:
+    with st.container(key="settings_modal", border=True):
+        st.markdown("### SETTINGS")
+        st.session_state.sound_enabled = st.toggle("SOUND", value=st.session_state.sound_enabled, key="sound_toggle")
+        if st.button("CLOSE", key="close_settings", use_container_width=True):
+            st.session_state.settings_open = False
             st.rerun()
-        else:
-            for _key in list(st.session_state.keys()):
-                if _key.startswith(progress_prefixes):
-                    del st.session_state[_key]
 
-            st.session_state.tutorial_reset_save = True
-            st.session_state.stage01_reset_save = True
-            st.session_state.game_started = True
-            st.session_state.game_paused = False
-            st.session_state.game_finished = False
-            st.session_state.tutorial_complete = False
-            st.session_state.stage01_started = False
-            st.session_state.stage02_started = False
-            st.session_state.remaining_seconds = 15 * 60
-            st.session_state.new_game_confirm = False
-            st.session_state.start_open = False
-            st.switch_page("pages/2_Game.py")
+if st.session_state.exit_notice:
+    st.warning("SESSION MENU // 브라우저 탭을 닫으면 게임을 종료할 수 있습니다.")
 
 if st.session_state.get("new_game_confirm", False):
     with st.container(key="confirm_modal", border=False):
@@ -370,6 +377,7 @@ if st.session_state.get("new_game_confirm", False):
 
         st.session_state.tutorial_reset_save = True
         st.session_state.stage01_reset_save = True
+        st.session_state.stage02_reset_save = True
         st.session_state.game_started = True
         st.session_state.game_paused = False
         st.session_state.game_finished = False
