@@ -15,19 +15,21 @@ st.set_page_config(
 # to click these after its save/fade animation, avoiding sandboxed top-frame navigation.
 st.markdown("<style>.st-key-host_title_nav,.st-key-host_restart_nav,.st-key-host_stage2_nav{position:fixed!important;left:-10000px!important;top:0!important;width:1px!important;height:1px!important;overflow:hidden!important;}</style>", unsafe_allow_html=True)
 _host_title = st.button("TITLE NAV", key="host_title_nav")
-if _host_title:
-    st.session_state.stage01_started = True
-    st.session_state.stage02_started = False
-    st.session_state.game_started = True
-    st.session_state.start_open = True
-    st.session_state.game_paused = False
-    st.rerun()
 _host_restart = st.button("RESTART NAV", key="host_restart_nav")
 _host_stage2 = st.button("STAGE 02 NAV", key="host_stage2_nav")
 if _host_title:
+    st.session_state.game_paused = False
+    st.session_state.start_open = False
+    st.session_state.show_title_warning = False
     st.switch_page("main.py")
 if _host_restart:
     st.session_state["stage01_reset_save"] = True
+    st.session_state["stage02_reset_save"] = True
+    st.session_state["stage01_started"] = True
+    st.session_state["stage02_started"] = False
+    st.session_state.game_started = True
+    st.session_state.game_paused = False
+    st.session_state.tutorial_complete = True
     st.rerun()
 if _host_stage2:
     st.session_state["stage01_started"] = True
@@ -38,6 +40,7 @@ if _host_stage2:
 # scene framing, room, player, ECHO bar, help and inventory panels stay consistent.
 page_dir = Path(__file__).resolve().parent
 project_root = page_dir.parent
+lab_background_data = base64.b64encode((project_root / "assets" / "lab_background.jpeg").read_bytes()).decode("ascii")
 font_data = ""
 for candidate in (
     project_root / "neodgm.ttf",
@@ -76,6 +79,22 @@ html = r"""
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <style>
 __TUTORIAL_CSS__
+
+.pause-overlay{position:fixed!important;inset:0!important;z-index:1500000!important;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.78)!important;padding:18px;box-sizing:border-box}
+.pause-overlay>div{width:min(390px,90vw)!important;box-sizing:border-box!important;background:#000!important;color:#fff!important;border:3px double #28dfff!important;padding:28px!important;box-shadow:0 0 0 1px #07566c,0 0 18px #00dfff22!important}
+.pause-title{color:#fff!important;font-family:NeoDungGeunMo,monospace!important;text-align:center!important;font-size:clamp(22px,3vw,30px)!important;letter-spacing:1px!important}
+.pause-sub{color:#8fdff0!important;font-family:NeoDungGeunMo,monospace!important;text-align:center!important}
+.pause-actions{visibility:visible!important;pointer-events:auto!important;margin-top:24px!important;display:flex!important;flex-direction:column!important;gap:12px!important;align-items:stretch!important}
+.pause-actions button,.pause-actions a{width:100%!important;min-height:44px!important;background:#fff!important;color:#000!important;border:1px solid #fff!important;border-radius:0!important;font-family:NeoDungGeunMo,monospace!important;display:flex!important;align-items:center!important;justify-content:center!important;text-decoration:none!important;cursor:pointer!important}
+.pause-actions button:hover,.pause-actions a:hover{background:#28dfff!important;color:#000!important;border-color:#28dfff!important}
+.game-area{background-image:linear-gradient(rgba(0,0,0,.18),rgba(0,0,0,.35)),url(data:image/jpeg;base64,__LAB_BACKGROUND__)!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;}
+.room{background:rgba(0,0,0,.12)!important;}
+.inventory-panel{background:#020609!important;color:#eefaff!important;border:2px solid #28dfff!important;box-shadow:0 0 0 2px #073c4b,0 0 18px #00dfff20!important}
+.inventory-header{border-bottom:2px solid #147b94!important}
+.inventory-title{color:#42eaff!important;text-shadow:0 0 6px #00dfff55!important}
+.inventory-slot{background:#02090e!important;color:#fff!important;border:1px solid #147b94!important;box-shadow:inset 0 0 0 1px #00dfff0d!important}
+.inventory-slot:hover,.inventory-slot.selected{background:#073040!important;color:#fff!important;border-color:#42eaff!important;box-shadow:0 0 0 1px #42eaff,0 0 10px #00dfff22!important}
+.item-description{background:#02090e!important;color:#d9f7ff!important;border-top:2px solid #147b94!important}
 /* Stage-specific additions. Page 2's base scene styles are used above. */
 .stage01-timer{position:absolute;top:28px;right:72px;z-index:22;color:#777;font-size:11px;letter-spacing:1px}
 .stage01-pause{position:absolute;top:18px;right:18px;z-index:160;width:34px;height:34px;padding:0;border:0;background:#000;color:#fff;font-size:20px;line-height:1}
@@ -89,9 +108,24 @@ __TUTORIAL_CSS__
 @keyframes standbySpark{0%,88%,100%{filter:brightness(1);box-shadow:0 0 0 transparent}90%,94%{filter:brightness(1.7);box-shadow:0 0 12px #40f6ff55}}
 .stage-transition{position:fixed;inset:0;z-index:999999;background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;opacity:1;transition:opacity .7s steps(8,end);pointer-events:auto;text-align:center}
 .stage-transition.hide{opacity:0;pointer-events:none}
-.stage-transition .stage-no{font-size:clamp(25px,4vw,48px);letter-spacing:3px;line-height:1.6}
+.stage-transition .stage-no{font-size:clamp(25px,4vw,48px);letter-spacing:3px;line-height:1.6;text-shadow:0 0 8px #dffaff}
 .stage-transition .stage-room{font-size:clamp(15px,2vw,24px);color:#aaa;letter-spacing:2px}
-.stage-transition .transition-line{width:0;height:2px;background:#fff;margin-top:24px;animation:lineScan 1.4s steps(10,end) forwards}
+.stage-transition .transition-line{width:0;height:2px;background:#28dfff;margin-top:24px;box-shadow:0 0 10px #28dfff;animation:lineScan 1.4s steps(10,end) forwards}
+.stage-transition{background:#000!important}
+.stage-transition .stage-card{width:min(540px,84vw);min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid #147b94;outline:1px solid #28dfff;outline-offset:5px;background:#000;position:relative;z-index:1;padding:20px;box-sizing:border-box}
+.stage-transition .loading-indicator{position:relative;z-index:1;margin-top:34px;width:min(360px,78vw);text-align:center;color:#bcefff;font-size:11px;letter-spacing:1px}
+.stage-transition .loading-symbol{font-size:32px;color:#28dfff;text-shadow:0 0 12px #28dfff;animation:loadPulse 1.1s steps(2,end) infinite;margin-bottom:8px}
+.stage-transition .loading-label{color:#bcefff;margin-bottom:12px}
+.stage-transition .loading-track{height:7px;border:1px solid #147b94;background:#02090e;padding:1px;box-sizing:border-box;overflow:hidden}
+.stage-transition .loading-track span{display:block;height:100%;width:0;background:#28dfff;box-shadow:0 0 9px #28dfff;animation:loadBar 2.5s steps(12,end) forwards}
+.stage-transition .transition-gear{position:absolute;left:20px;bottom:18px;color:#9bbdc5;font-size:24px;animation:gearRotate 1.2s linear infinite;z-index:2}
+@keyframes loadPulse{50%{opacity:.4;transform:scale(.92)}}
+@keyframes loadBar{to{width:100%}}
+@keyframes gearRotate{to{transform:rotate(360deg)}}
+
+.stage-transition:before{content:"";position:absolute;width:min(540px,84vw);height:190px;border:2px solid #147b94;outline:1px solid #28dfff;outline-offset:5px;pointer-events:none}
+.stage-transition .stage-no,.stage-transition .stage-room,.stage-transition .transition-line{position:relative;z-index:1}
+.stage-transition .stage-room{color:#bcefff!important}
 @keyframes lineScan{to{width:min(360px,70vw)}}
 .stage01-a{left:11%;top:17%}
 .stage01-b{left:42%;top:13%;width:16%;height:13%}
@@ -156,15 +190,6 @@ __TUTORIAL_CSS__
 #exitLight{top:8px;right:8px}
 .exit-reader-label{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:9px;line-height:1.8;letter-spacing:1px;color:#666;text-align:center;white-space:nowrap}
 #exitDoor.near .exit-reader-label{color:#fff}
-
-/* Reference-matched pause panel: black interior, cyan frame, white action buttons. */
-.pause-overlay{position:fixed!important;inset:0!important;z-index:1500000!important;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.78)!important;padding:18px;box-sizing:border-box}
-.pause-overlay>div{width:min(390px,90vw)!important;box-sizing:border-box!important;background:#000!important;color:#fff!important;border:3px double #28dfff!important;padding:28px!important;box-shadow:0 0 0 1px #07566c,0 0 18px #00dfff22!important}
-.pause-title{color:#fff!important;font-family:NeoDungGeunMo,monospace!important;text-align:center!important}
-.pause-sub{color:#8fdff0!important;font-family:NeoDungGeunMo,monospace!important;text-align:center!important}
-.pause-actions{display:flex!important;flex-direction:column!important;gap:12px!important}
-.pause-actions button,.pause-actions a{width:100%!important;min-height:44px!important;background:#fff!important;color:#000!important;border:1px solid #fff!important;border-radius:0!important;font-family:NeoDungGeunMo,monospace!important}
-.pause-actions button:hover,.pause-actions a:hover{background:#27dff5!important;color:#000!important;border-color:#27dff5!important}
 </style></head><body>
 <div class="game" id="gameRoot" tabindex="0">
   <div class="project-title">PROJECT : LOGIC</div>
@@ -250,7 +275,7 @@ __TUTORIAL_CSS__
     </div>
   </div>
 
-  <div class="stage-transition" id="stageTransition"><div class="stage-no">STAGE 01</div><div class="stage-room">:ARCHIVE ACCESS</div><div class="transition-line"></div></div>
+  <div class="stage-transition" id="stageTransition"><div class="stage-card"><div class="stage-no">STAGE 01</div><div class="stage-room">: RESEARCH ROOM</div><div class="transition-line"></div></div><div class="loading-indicator"><div class="loading-symbol">◉</div><div class="loading-label">데이터를 불러오는 중입니다...</div><div class="loading-track"><span></span></div></div><div class="transition-gear">⚙</div></div>
   <div class="pause-overlay" id="pauseOverlay">
     <div><div class="pause-title">GAME PAUSED</div><div class="pause-sub">PRESS Ⅱ TO CONTINUE</div><div class="pause-actions"><button class="code-button" id="resumeBtn" type="button">RESUME</button><button class="code-button" id="restartBtn" type="button">RESTART</button><button class="code-button" id="titleBtn" type="button">TITLE</button></div></div>
   </div>
@@ -391,5 +416,6 @@ const restored=restoreStageState();if(!restored){player.style.left=playerX+'%';p
 """
 
 html = html.replace("__TUTORIAL_CSS__", tutorial_css)
+html = html.replace("__LAB_BACKGROUND__", lab_background_data)
 html = html.replace("__RESET_STAGE_SAVE__", "true" if st.session_state.pop("stage01_reset_save", False) else "false")
 components.html(html, height=1000, scrolling=False)
