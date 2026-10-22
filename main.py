@@ -81,8 +81,7 @@ def has_saved_progress() -> bool:
         or st.session_state.get("s1_progress")
     )
 
-st.markdown(
-    """
+css_template = """
 <style>
 @font-face {
   font-family: NeoDungGeunMo;
@@ -107,9 +106,17 @@ html, body, [class*="css"], button, input, textarea, [data-testid="stMarkdownCon
 [data-testid="stAppViewContainer"] > .main .block-container { padding:0 !important; }
 /* Cover the menu baked into the background without adding an extra box.
    The title, subtitle, and decorative effects in the image remain visible. */
+.page-subtitle {
+  position:fixed; z-index:10; left:50%; top:46vh; transform:translateX(-50%);
+  width:max-content; max-width:90vw; text-align:center;
+  color:#d9f7ff; font-family:NeoDungGeunMo,monospace !important;
+  font-size:clamp(12px,1.25vw,22px); letter-spacing:1px;
+  text-shadow:0 0 5px #8beaff,0 0 12px #00cfff;
+  pointer-events:none; white-space:nowrap;
+}
 .title-menu-mask {
-  position:fixed; z-index:5; left:50%; top:43vh; transform:translateX(-50%);
-  width:min(300px, 78vw); height:27vh; min-height:170px; max-height:250px;
+  position:fixed; z-index:5; left:50%; top:34vh; transform:translateX(-50%);
+  width:min(300px, 78vw); height:36vh; min-height:190px; max-height:310px;
   background:rgba(0,4,10,.98); border:0 !important; outline:0 !important;
   box-shadow:none !important; pointer-events:none;
 }
@@ -171,7 +178,8 @@ html, body, [class*="css"], button, input, textarea, [data-testid="stMarkdownCon
   .st-key-error_popup, .st-key-warning_popup { left:50% !important; top:83vh !important; transform:translateX(-50%) !important; width:min(360px,90vw) !important; }
 }
 @media(max-width:600px) {
-  .title-menu-mask { top:43vh; width:230px; height:25vh; min-height:140px; }
+  .page-subtitle { top:45vh; font-size:12px; }
+  .title-menu-mask { top:34vh; width:230px; height:30vh; min-height:150px; }
   .st-key-start_button { top:52vh !important; width:190px !important; }
   .st-key-how_to_play_button { top:62vh !important; width:190px !important; }
   .st-key-start_popup { top:73vh !important; left:50% !important; transform:translateX(-50%) !important; width:170px !important; }
@@ -179,9 +187,10 @@ html, body, [class*="css"], button, input, textarea, [data-testid="stMarkdownCon
 }
 </style>
 <div class="title-menu-mask" aria-hidden="true"></div>
-""",
-    unsafe_allow_html=True,
-)
+<div class="page-subtitle">INFORMATION IS NOT ALWAYS TRUE</div>
+"""
+css = css_template.replace("__FONT_DATA__", font_data).replace("__BACKGROUND_DATA__", background_data)
+st.markdown(css, unsafe_allow_html=True)
 
 # Main title menu: exactly two buttons.
 start_clicked = st.button("START", key="start_button")
