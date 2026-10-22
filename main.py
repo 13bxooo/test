@@ -105,6 +105,21 @@ html, body, [class*="css"], button, input, textarea, [data-testid="stMarkdownCon
 /* Hide Streamlit's normal top spacing so the background fills the viewport. */
 [data-testid="stAppViewContainer"] > .main {{ padding:0 !important; }}
 [data-testid="stAppViewContainer"] > .main .block-container {{ padding:0 !important; }}
+/* Subtitle only: keep the existing background image and its title untouched. */
+.subtitle-overlay {{
+  position:fixed !important; top:46vh !important; left:50% !important;
+  transform:translateX(-50%) !important; width:max-content !important;
+  max-width:92vw !important; z-index:10 !important;
+  margin:0 !important; padding:0 !important; background:transparent !important;
+  border:0 !important; box-shadow:none !important;
+  color:#eafaff !important; font-family:NeoDungGeunMo,monospace !important;
+  font-size:clamp(10px,1.45vw,17px) !important; letter-spacing:0.12em !important;
+  text-align:center !important; text-shadow:0 0 5px #00dfff, 0 0 12px #00dfff66 !important;
+  pointer-events:none !important;
+}}
+@media(max-width:600px) {{
+  .subtitle-overlay {{ top:44vh !important; font-size:10px !important; letter-spacing:0.04em !important; }}
+}}
 .st-key-start_button, .st-key-how_to_play_button {{
   position:fixed !important; left:50% !important; transform:translateX(-50%) !important;
   z-index:20 !important; margin:0 !important; padding:0 !important; width:min(240px,68vw) !important;
@@ -170,6 +185,12 @@ html, body, [class*="css"], button, input, textarea, [data-testid="stMarkdownCon
 }}
 </style>
 """,
+    unsafe_allow_html=True,
+)
+
+# Add only the missing subtitle; the title and background remain from title_background.jpeg.
+st.markdown(
+    '<div class="subtitle-overlay">INFORMATION IS NOT ALWAYS TRUE</div>',
     unsafe_allow_html=True,
 )
 
