@@ -81,116 +81,97 @@ def has_saved_progress() -> bool:
         or st.session_state.get("s1_progress")
     )
 
-css_template = """
+st.markdown(
+    f"""
 <style>
-@font-face {
+@font-face {{
   font-family: NeoDungGeunMo;
-  src: url(data:font/ttf;base64,__FONT_DATA__) format('truetype');
+  src: url(data:font/ttf;base64,{font_data}) format('truetype');
   font-weight: normal;
   font-style: normal;
-}
-:root { color-scheme: dark; }
-#MainMenu, header, footer, [data-testid="stSidebar"] { display:none !important; visibility:hidden !important; }
-.stApp {
-  background:#000 url(data:image/jpeg;base64,__BACKGROUND_DATA__) center center / cover no-repeat fixed !important;
+}}
+:root {{ color-scheme: dark; }}
+#MainMenu, header, footer, [data-testid="stSidebar"] {{ display:none !important; visibility:hidden !important; }}
+.stApp {{
+  background:#000 url(data:image/jpeg;base64,{background_data}) center center / cover no-repeat fixed !important;
   color:#fff !important;
   font-family:NeoDungGeunMo, monospace !important;
   min-height:100vh;
-}
-html, body, [class*="css"], button, input, textarea, [data-testid="stMarkdownContainer"] {
+}}
+html, body, [class*="css"], button, input, textarea, [data-testid="stMarkdownContainer"] {{
   font-family:NeoDungGeunMo, monospace !important;
-}
-.block-container { max-width:none !important; padding:0 !important; }
+}}
+.block-container {{ max-width:none !important; padding:0 !important; }}
 /* Hide Streamlit's normal top spacing so the background fills the viewport. */
-[data-testid="stAppViewContainer"] > .main { padding:0 !important; }
-[data-testid="stAppViewContainer"] > .main .block-container { padding:0 !important; }
-/* Cover the menu baked into the background without adding an extra box.
-   The title, subtitle, and decorative effects in the image remain visible. */
-.page-subtitle {
-  position:fixed; z-index:10; left:50%; top:46vh; transform:translateX(-50%);
-  width:max-content; max-width:90vw; text-align:center;
-  color:#d9f7ff; font-family:NeoDungGeunMo,monospace !important;
-  font-size:clamp(12px,1.25vw,22px); letter-spacing:1px;
-  text-shadow:0 0 5px #8beaff,0 0 12px #00cfff;
-  pointer-events:none; white-space:nowrap;
-}
-.title-menu-mask {
-  position:fixed; z-index:5; left:50%; top:34vh; transform:translateX(-50%);
-  width:min(300px, 78vw); height:36vh; min-height:190px; max-height:310px;
-  background:rgba(0,4,10,.98); border:0 !important; outline:0 !important;
-  box-shadow:none !important; pointer-events:none;
-}
-.st-key-start_button, .st-key-how_to_play_button {
+[data-testid="stAppViewContainer"] > .main {{ padding:0 !important; }}
+[data-testid="stAppViewContainer"] > .main .block-container {{ padding:0 !important; }}
+.st-key-start_button, .st-key-how_to_play_button {{
   position:fixed !important; left:50% !important; transform:translateX(-50%) !important;
   z-index:20 !important; margin:0 !important; padding:0 !important; width:min(240px,68vw) !important;
-}
-.st-key-start_button { top:57vh !important; }
-.st-key-how_to_play_button { top:68vh !important; }
-.st-key-start_button button, .st-key-how_to_play_button button {
+}}
+.st-key-start_button {{ top:57vh !important; }}
+.st-key-how_to_play_button {{ top:68vh !important; }}
+.st-key-start_button button, .st-key-how_to_play_button button {{
   width:100% !important; height:43px !important; min-height:43px !important;
   border:1px solid #159db9 !important; border-radius:0 !important;
   background:#000 !important; color:#f4fcff !important;
   font-family:NeoDungGeunMo,monospace !important; font-size:17px !important;
   box-shadow:none !important; padding:0 12px !important;
-}
-.st-key-start_button button:hover, .st-key-how_to_play_button button:hover {
+}}
+.st-key-start_button button:hover, .st-key-how_to_play_button button:hover {{
   background:#fff !important; color:#000 !important; border-color:#fff !important;
-}
+}}
 /* Compact START submenu, with a close control in its top-right corner. */
-.st-key-start_popup {
+.st-key-start_popup {{
   position:fixed !important; z-index:40 !important; top:54vh !important;
   left:calc(50% + 155px) !important; width:164px !important;
   margin:0 !important; padding:8px !important; box-sizing:border-box !important;
   border:1px solid #26d9f5 !important; background:#02070b !important;
   box-shadow:0 0 14px #00dfff20 !important;
-}
-.st-key-start_popup button {
+}}
+.st-key-start_popup button {{
   width:100% !important; height:32px !important; min-height:32px !important;
   margin:0 0 5px !important; border:1px solid #147b94 !important;
   border-radius:0 !important; background:#000 !important; color:#fff !important;
   font-family:NeoDungGeunMo,monospace !important; font-size:12px !important;
-}
-.st-key-start_popup button:last-child { margin-bottom:0 !important; }
-.st-key-start_popup [data-testid="stHorizontalBlock"] { gap:0.25rem !important; }
-.st-key-start_popup [data-testid="stHorizontalBlock"] button { height:24px !important; min-height:24px !important; padding:0 !important; }
-.st-key-start_popup button:hover { background:#fff !important; color:#000 !important; }
+}}
+.st-key-start_popup button:last-child {{ margin-bottom:0 !important; }}
+.st-key-start_popup [data-testid="stHorizontalBlock"] {{ gap:0.25rem !important; }}
+.st-key-start_popup [data-testid="stHorizontalBlock"] button {{ height:24px !important; min-height:24px !important; padding:0 !important; }}
+.st-key-start_popup button:hover {{ background:#fff !important; color:#000 !important; }}
 /* Error and warning cards are separate pop-ups beside the START submenu. */
-.st-key-error_popup, .st-key-warning_popup {
+.st-key-error_popup, .st-key-warning_popup {{
   position:fixed !important; z-index:60 !important; top:55.5vh !important;
   left:calc(50% + 370px) !important; width:min(300px,28vw) !important;
   min-width:240px !important; margin:0 !important; padding:12px 14px !important;
   border:1px solid #26d9f5 !important; background:#02070b !important;
   box-shadow:0 0 22px #00dfff28 !important; box-sizing:border-box !important;
-}
+}}
 .st-key-error_popup [data-testid="stMarkdownContainer"],
-.st-key-warning_popup [data-testid="stMarkdownContainer"] {
+.st-key-warning_popup [data-testid="stMarkdownContainer"] {{
   color:#f3faff !important; font-family:NeoDungGeunMo,monospace !important;
   font-size:13px !important; line-height:1.8 !important;
-}
-.st-key-error_popup button, .st-key-warning_popup button {
+}}
+.st-key-error_popup button, .st-key-warning_popup button {{
   border:1px solid #26d9f5 !important; border-radius:0 !important;
   background:#000 !important; color:#fff !important;
   font-family:NeoDungGeunMo,monospace !important;
-}
-.st-key-error_popup button:hover, .st-key-warning_popup button:hover { background:#fff !important; color:#000 !important; }
-@media(max-width:1000px) {
-  .st-key-start_popup { left:calc(50% + 115px) !important; width:150px !important; }
-  .st-key-error_popup, .st-key-warning_popup { left:50% !important; top:83vh !important; transform:translateX(-50%) !important; width:min(360px,90vw) !important; }
-}
-@media(max-width:600px) {
-  .page-subtitle { top:45vh; font-size:12px; }
-  .title-menu-mask { top:34vh; width:230px; height:30vh; min-height:150px; }
-  .st-key-start_button { top:52vh !important; width:190px !important; }
-  .st-key-how_to_play_button { top:62vh !important; width:190px !important; }
-  .st-key-start_popup { top:73vh !important; left:50% !important; transform:translateX(-50%) !important; width:170px !important; }
-  .st-key-error_popup, .st-key-warning_popup { top:77vh !important; }
-}
+}}
+.st-key-error_popup button:hover, .st-key-warning_popup button:hover {{ background:#fff !important; color:#000 !important; }}
+@media(max-width:1000px) {{
+  .st-key-start_popup {{ left:calc(50% + 115px) !important; width:150px !important; }}
+  .st-key-error_popup, .st-key-warning_popup {{ left:50% !important; top:83vh !important; transform:translateX(-50%) !important; width:min(360px,90vw) !important; }}
+}}
+@media(max-width:600px) {{
+  .st-key-start_button {{ top:52vh !important; width:190px !important; }}
+  .st-key-how_to_play_button {{ top:62vh !important; width:190px !important; }}
+  .st-key-start_popup {{ top:73vh !important; left:50% !important; transform:translateX(-50%) !important; width:170px !important; }}
+  .st-key-error_popup, .st-key-warning_popup {{ top:77vh !important; }}
+}}
 </style>
-<div class="title-menu-mask" aria-hidden="true"></div>
-<div class="page-subtitle">INFORMATION IS NOT ALWAYS TRUE</div>
-"""
-css = css_template.replace("__FONT_DATA__", font_data).replace("__BACKGROUND_DATA__", background_data)
-st.markdown(css, unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 # Main title menu: exactly two buttons.
 start_clicked = st.button("START", key="start_button")
