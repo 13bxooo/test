@@ -2751,62 +2751,46 @@ button,.game button,.code-button,.help-key{border-radius:0!important}
 .exit-wall::before,.exit-wall::after { content:none !important; }
 .exit-sign { right:9% !important; color:#17394b !important; }
 .exit-arrow { display:none !important; }
-/* =========================================================
-   FINAL VISUAL PASS: steel floor + unified object lighting
-   ========================================================= */
-.game,
-.game-area {
-    background: #000000 !important;
+/* FINAL OVERRIDE: white tiled floor, black outside, consistent object viewpoint. */
+html, body, .game, .game-area {
+    background: #000 !important;
     background-image: none !important;
 }
-
-/* Steel floor plates: each tile has a dark seam, brushed-metal face,
-   and four small recessed corner fasteners. */
+.game-area {
+    background: #000 !important;
+    background-image: none !important;
+}
 .room {
-    background-color: #75858d !important;
+    background-color: #fff !important;
     background-image:
-        radial-gradient(circle at 5px 5px, #34444d 0 1.5px, #c1cbd0 1.7px 2.6px, transparent 2.8px),
-        radial-gradient(circle at calc(100% - 5px) 5px, #34444d 0 1.5px, #c1cbd0 1.7px 2.6px, transparent 2.8px),
-        radial-gradient(circle at 5px calc(100% - 5px), #34444d 0 1.5px, #c1cbd0 1.7px 2.6px, transparent 2.8px),
-        radial-gradient(circle at calc(100% - 5px) calc(100% - 5px), #34444d 0 1.5px, #c1cbd0 1.7px 2.6px, transparent 2.8px),
-        linear-gradient(135deg, rgba(255,255,255,.30), transparent 42%, rgba(21,35,43,.18)),
-        linear-gradient(180deg, #aab7bd 0%, #87979f 48%, #71828a 100%) !important;
-    background-size: 48px 48px, 48px 48px, 48px 48px, 48px 48px, 100% 100%, 100% 100% !important;
-    background-position: 0 0, 0 0, 0 0, 0 0, 0 0, 0 0 !important;
-    background-repeat: repeat, repeat, repeat, repeat, no-repeat, no-repeat !important;
-    border: 8px solid #25343c !important;
-    outline: 2px solid #b7c5cb !important;
-    box-shadow: inset 0 0 0 3px #d5dde1, inset 0 0 0 6px #586a73, 0 0 0 3px #000 !important;
+        linear-gradient(to right, transparent calc(100% - 1px), #dfe4e7 calc(100% - 1px)),
+        linear-gradient(to bottom, transparent calc(100% - 1px), #dfe4e7 calc(100% - 1px)),
+        linear-gradient(180deg, #fff 0%, #f9fafb 100%) !important;
+    background-size: 48px 48px, 48px 48px, 100% 100% !important;
+    background-repeat: repeat, repeat, no-repeat !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
 }
-
-/* A common top-left light source and hard, pixel-shaped cast shadows
-   makes the computer, desk and door feel grounded in one room. */
-.object.computer,
-.object.desk,
-.exit-wall {
-    image-rendering: pixelated !important;
-    filter: drop-shadow(6px 6px 0 rgba(20, 31, 38, .72)) !important;
-}
-
-.object.computer,
-.object.desk {
-    transform-origin: center bottom !important;
-}
-
-.object.computer::before,
-.object.computer::after,
-.object.desk::before,
-.object.desk::after,
-.exit-wall::before,
-.exit-wall::after {
+/* Remove CSS-added halos/outlines; retain only each sprite's own shading. */
+.object.computer, .object.desk, .exit-wall {
+    outline: 0 !important;
+    border: 0 !important;
+    filter: none !important;
+    box-shadow: none !important;
     image-rendering: pixelated !important;
 }
-
-/* Everything outside the room's game viewport stays pure black. */
-html, body {
-    background: #000000 !important;
+.object.computer::before, .object.computer::after,
+.object.desk::before, .object.desk::after,
+.exit-wall::before, .exit-wall::after {
+    outline: 0 !important;
+    box-shadow: none !important;
 }
-
+/* Crop the sprite canvas edge so no decorative white frame reads as an outer halo. */
+.object.computer, .object.desk, .exit-wall {
+    clip-path: inset(2px);
+}
+.exit-sign { background: transparent !important; box-shadow: none !important; outline: none !important; }
 </style>
 
 </head>
