@@ -2951,61 +2951,93 @@ html, body, .game, .game-area {
   background-image:none !important;
 }
 .room-line-horizontal,.room-line-vertical,.monitor { display:none !important; }
-/* PIXEL SCENE + LIVE GAME LAYERS
-   The room art is the detailed pixel background. Interactive DOM objects and the live
-   player stay above it, so movement and E-key interactions remain functional. */
-.game-area {
-  background-color:#030609 !important;
-  background-repeat:no-repeat !important;
-  background-position:center center !important;
-  background-size:contain !important;
-  image-rendering:pixelated !important;
-}
+/* REBUILT SCENE: independent pixel-art layers, no decorative metal frame or player overlay */
+.game, .game-area { background:#05070b !important; color:#eafaff !important; }
+.game-area { background-image:none !important; }
 .room {
   left:7% !important; top:8% !important; width:86% !important; height:82% !important;
-  overflow:visible !important; background:transparent !important;
-  border:0 !important; outline:0 !important; box-shadow:none !important;
-  clip-path:none !important;
+  overflow:visible !important; border:0 !important; outline:0 !important; box-shadow:none !important;
+  background-color:#10151b !important;
+  background-image:
+    linear-gradient(180deg, rgba(7,11,17,.94) 0%, rgba(15,21,28,.18) 25%, rgba(4,8,13,.08) 100%),
+    repeating-linear-gradient(0deg, transparent 0 47px, rgba(1,4,8,.38) 47px 49px),
+    repeating-linear-gradient(90deg, transparent 0 47px, rgba(1,4,8,.38) 47px 49px),
+    linear-gradient(135deg,#28313a 0%,#1b242d 28%,#121a22 68%,#202a33 100%) !important;
+  background-size:100% 100%,48px 48px,48px 48px,100% 100% !important;
 }
-.room::before,.room::after { content:none !important; display:none !important; }
-.room-line-horizontal,.room-line-vertical,.monitor { display:none !important; }
-.object.computer,.object.desk,.exit-wall,.exit-sign,.player {
-  opacity:1 !important; visibility:visible !important; pointer-events:auto;
-}
-.object.computer,.object.desk,.exit-wall {
-  filter:none !important; outline:0 !important; border:0 !important;
-  box-shadow:none !important; image-rendering:pixelated !important;
-}
-/* Align the interactive object layers to the objects in the reference scene. */
+.room::before { content:""; position:absolute; inset:0; pointer-events:none; z-index:0;
+  background:linear-gradient(90deg,rgba(0,0,0,.42),transparent 12%,transparent 88%,rgba(0,0,0,.48)),
+             linear-gradient(0deg,rgba(0,0,0,.35),transparent 24%,rgba(0,0,0,.18)); }
+.room::after { content:""; position:absolute; left:0; right:0; bottom:0; height:17%; pointer-events:none; z-index:0;
+  background:linear-gradient(180deg,transparent,rgba(0,0,0,.30)); }
+.room-line-horizontal,.room-line-vertical,.room > .monitor { display:none !important; }
+/* Object layers sit above the floor/background and are not baked into it. */
 .object.computer {
-  left:34% !important; top:7% !important; width:32% !important; height:25% !important;
-  z-index:5 !important; background-size:100% 100% !important;
-}
-.object.desk {
-  left:27% !important; top:59% !important; width:46% !important; height:23% !important;
-  z-index:6 !important; background-size:100% 100% !important;
-}
-.exit-wall {
-  left:auto !important; right:3% !important; top:28% !important; width:13% !important; height:39% !important;
-  z-index:5 !important; background-size:100% 100% !important;
-}
-.exit-sign { z-index:7 !important; pointer-events:none !important; }
-.player {
-  z-index:12 !important; opacity:1 !important; visibility:visible !important;
-  background:#f1f4ff !important; border:2px solid #17243a !important;
-  box-shadow:0 2px 0 #0b1220, inset 0 -5px 0 #7184a4 !important;
+  left:37% !important; top:7% !important; width:26% !important; height:25% !important;
+  z-index:6 !important; box-sizing:border-box !important; overflow:visible !important;
+  display:block !important; padding:0 !important; color:transparent !important;
+  background:linear-gradient(90deg,#1d2832 0 8%,#53616a 8% 12%,#26343e 12% 88%,#111b24 88% 100%) !important;
+  border:0 !important; outline:0 !important;
+  box-shadow:inset 0 0 0 3px #0b1118, inset 0 0 0 6px #65727a, 0 5px 0 #0a1016, 5px 8px 0 rgba(0,0,0,.42) !important;
   image-rendering:pixelated !important;
 }
-.player::before {
-  content:"" !important; position:absolute !important; left:3px !important; right:3px !important;
-  top:-7px !important; height:9px !important; background:#282436 !important;
-  border:2px solid #121725 !important; box-shadow:inset 0 2px 0 #62566c !important;
+.object.computer::before {
+  content:"" !important; position:absolute !important; left:8% !important; right:8% !important; top:7% !important; height:61% !important;
+  background:linear-gradient(180deg,#061a27 0%,#073b51 48%,#03111d 100%) !important;
+  border:3px solid #0a1119 !important; box-shadow:inset 0 0 0 2px #258ba0, inset 0 0 0 5px #092b3b, 0 2px 0 #82949a !important;
 }
-.player::after {
-  content:"" !important; position:absolute !important; left:4px !important; right:4px !important;
-  bottom:-5px !important; height:4px !important; background:#101727 !important;
+.object.computer::after {
+  content:"" !important; position:absolute !important; left:16% !important; right:16% !important; top:22% !important; height:30% !important;
+  background:repeating-linear-gradient(0deg,transparent 0 5px,rgba(60,221,239,.42) 5px 6px),
+             linear-gradient(90deg,transparent 0 12%,#3ee6ef 12% 14%,transparent 14% 48%,#3ee6ef 48% 51%,transparent 51% 82%,#3ee6ef 82% 84%,transparent 84%);
+  opacity:.88 !important; z-index:2 !important;
 }
+.object.computer .object-label,.object.desk .object-label { display:none !important; }
+.object.desk {
+  left:28% !important; top:57% !important; width:44% !important; height:23% !important;
+  z-index:7 !important; box-sizing:border-box !important; display:block !important; padding:0 !important;
+  color:transparent !important; border:0 !important; outline:0 !important;
+  background:linear-gradient(180deg,#a56f48 0 12%,#765039 12% 19%,#49352c 19% 100%) !important;
+  box-shadow:inset 0 4px 0 #d3a078, inset 0 -5px 0 #30251f, 0 6px 0 #191d22, 7px 10px 0 rgba(0,0,0,.4) !important;
+  image-rendering:pixelated !important;
+}
+.object.desk::before {
+  content:"" !important; position:absolute !important; left:4% !important; right:4% !important; top:-18% !important; height:28% !important;
+  background:linear-gradient(180deg,#d1a078 0 18%,#966443 18% 76%,#513a2c 76% 100%) !important;
+  border:0 !important; box-shadow:inset 0 3px 0 #e0b18a, inset 0 -3px 0 #5a3b2a !important;
+}
+.object.desk::after {
+  content:"" !important; position:absolute !important; left:8% !important; right:8% !important; bottom:-15% !important; height:18% !important;
+  background:linear-gradient(90deg,#36271f 0 8%,#9b6b46 8% 15%,#3b2a20 15% 85%,#9b6b46 85% 92%,#30241e 92% 100%) !important;
+  border:0 !important; box-shadow:0 3px 0 #11171d !important;
+}
+/* Door is a separate, reachable interactive layer. */
+.exit-wall {
+  left:auto !important; right:1.5% !important; top:28% !important; width:13% !important; height:40% !important;
+  z-index:6 !important; box-sizing:border-box !important; cursor:pointer !important;
+  background:linear-gradient(90deg,#10232a 0 8%,#27636a 8% 13%,#163d47 13% 87%,#0b2029 87% 100%) !important;
+  border:0 !important; outline:0 !important;
+  box-shadow:inset 0 0 0 3px #071219,inset 0 0 0 6px #387c7d, 4px 4px 0 rgba(0,0,0,.42) !important;
+}
+.exit-wall::before { content:"" !important; position:absolute !important; left:13% !important; right:13% !important; top:8% !important; height:72% !important;
+  background:linear-gradient(180deg,#071b24,#0c3039 50%,#07171e) !important; border:2px solid #62b9b5 !important;
+  box-shadow:inset 0 0 0 3px #153f48,inset 0 0 0 5px #0a2029 !important; }
+.exit-wall::after { content:"" !important; position:absolute !important; right:18% !important; top:43% !important; width:7px !important; height:7px !important;
+  background:#b9ff8a !important; border:1px solid #e6ffd4 !important; box-shadow:0 0 7px #8cff85 !important; }
+.exit-sign { z-index:8 !important; pointer-events:none !important; right:1% !important; top:70% !important; color:#9ce9dc !important; font-size:10px !important; text-shadow:1px 1px #07151b !important; }
+.exit-arrow { display:none !important; }
+/* Keep the actual movable player element plain: no pseudo-element hat/extra overlay. */
+.player {
+  z-index:12 !important; opacity:1 !important; visibility:visible !important;
+  width:24px !important; height:28px !important; background:#d5e8ed !important;
+  border:0 !important; outline:0 !important; border-radius:0 !important;
+  box-shadow:inset 0 0 0 2px #243b4a, inset 0 -7px 0 #4f7487, 0 3px 0 #05090d !important;
+  image-rendering:pixelated !important;
+}
+.player::before { content:none !important; display:none !important; }
+.player::after { content:"" !important; position:absolute !important; left:5px !important; right:5px !important; bottom:-3px !important; height:3px !important; background:#101a22 !important; border:0 !important; box-shadow:none !important; }
 .interaction-message { z-index:20 !important; }
+.project-title,.stage-title { color:#eafaff !important; text-shadow:1px 1px #09131b !important; }
 </style>
 
 </head>
