@@ -105,9 +105,20 @@ html, body, [class*="css"], button, input, textarea, [data-testid="stMarkdownCon
 /* Hide Streamlit's normal top spacing so the background fills the viewport. */
 [data-testid="stAppViewContainer"] > .main {{ padding:0 !important; }}
 [data-testid="stAppViewContainer"] > .main .block-container {{ padding:0 !important; }}
-/* Subtitle only: keep the existing background image and its title untouched. */
+/* Explicit title and subtitle overlays ensure both remain visible even if the background asset lacks text. */
+.title-overlay {{
+  position:fixed !important; top:25vh !important; left:50% !important;
+  transform:translateX(-50%) !important; width:max-content !important;
+  max-width:94vw !important; z-index:10 !important;
+  margin:0 !important; padding:0 !important; background:transparent !important;
+  border:0 !important; box-shadow:none !important;
+  color:#f2fbff !important; font-family:NeoDungGeunMo,monospace !important;
+  font-size:clamp(24px,4.2vw,52px) !important; letter-spacing:0.04em !important;
+  text-align:center !important; text-shadow:0 0 5px #00dfff, 0 0 14px #00dfff88 !important;
+  pointer-events:none !important; white-space:nowrap !important;
+}}
 .subtitle-overlay {{
-  position:fixed !important; top:46vh !important; left:50% !important;
+  position:fixed !important; top:36vh !important; left:50% !important;
   transform:translateX(-50%) !important; width:max-content !important;
   max-width:92vw !important; z-index:10 !important;
   margin:0 !important; padding:0 !important; background:transparent !important;
@@ -118,7 +129,8 @@ html, body, [class*="css"], button, input, textarea, [data-testid="stMarkdownCon
   pointer-events:none !important;
 }}
 @media(max-width:600px) {{
-  .subtitle-overlay {{ top:44vh !important; font-size:10px !important; letter-spacing:0.04em !important; }}
+  .title-overlay {{ top:24vh !important; font-size:clamp(19px,6vw,30px) !important; }}
+  .subtitle-overlay {{ top:34vh !important; font-size:10px !important; letter-spacing:0.04em !important; }}
 }}
 .st-key-start_button, .st-key-how_to_play_button {{
   position:fixed !important; left:50% !important; transform:translateX(-50%) !important;
@@ -188,8 +200,9 @@ html, body, [class*="css"], button, input, textarea, [data-testid="stMarkdownCon
     unsafe_allow_html=True,
 )
 
-# Add only the missing subtitle; the title and background remain from title_background.jpeg.
+# Keep the title and subtitle explicit so they remain visible independently of the background asset.
 st.markdown(
+    '<div class="title-overlay">PROJECT : LOGIC</div>'
     '<div class="subtitle-overlay">INFORMATION IS NOT ALWAYS TRUE</div>',
     unsafe_allow_html=True,
 )
