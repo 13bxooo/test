@@ -140,36 +140,47 @@ footer {{
 }}
 
 
-/* Pixel-art UI styling is defined in the game iframe below. */
-
-/* Reference-style pixel-art inventory: square slots and stepped cyan corners. */
-.inventory-panel{{background:#02070c!important;color:#e7fbff!important;border:0!important;box-shadow:inset 2px 0 #48dfff,inset -2px 0 #48dfff,inset 0 2px #48dfff,inset 0 -2px #48dfff,0 0 0 1px #123c4d!important;outline:1px solid #48dfff;outline-offset:-6px;image-rendering:pixelated}}
-.inventory-header{{border-bottom:2px solid #2587a7!important}}
-.inventory-title{{color:#8cecff!important;text-shadow:0 0 5px #00cfff55!important}}
-.inventory-close{{color:#52616b!important}}
-.inventory-slot{{background:#02070c!important;color:#d8faff!important;border:1px solid #28556a!important;box-shadow:inset 2px 2px #0a1720,inset -2px -2px #0a1720!important;image-rendering:pixelated}}
-.inventory-slot:hover,.inventory-slot.selected{{background:#08212b!important;color:#eaffff!important;border-color:#7cecff!important;box-shadow:inset 2px 2px #123b4b,inset -2px -2px #123b4b,0 0 0 1px #7cecff!important}}
-.slot-number{{color:#647780!important}}
-.item-name{{color:#15252c!important}}
+/* In-game pause control and pixel-art UI styling */
+.pixel-frame{{
+    border:1px solid #54dfff!important;
+    box-shadow:0 0 0 1px #123c4d, inset 0 0 0 1px #061923!important;
+    border-radius:0!important;
+    position:relative;
+}}
+.pixel-frame:before,.pixel-frame:after{{content:"";position:absolute;width:12px;height:12px;pointer-events:none;border-color:#8af0ff;border-style:solid}}
+.pixel-frame:before{{top:-2px;left:-2px;border-width:2px 0 0 2px}}
+.pixel-frame:after{{right:-2px;bottom:-2px;border-width:0 2px 2px 0}}
+.inventory-panel,.item-description,.help-panel,.computer-panel,.pause-overlay>div,.item-acquired-notice,.item-acquired-dialog,.tutorial-transition-card{{border-style:solid!important;border-radius:0!important}}
+.inventory-header,.help-header{{border-bottom:1px solid #2587a7!important}}
+.inventory-panel{{background:#02070c!important;color:#d9faff!important;border:1px solid #48dfff!important;box-shadow:0 0 0 1px #123c4d!important}}
+.inventory-header{{border-bottom:1px solid #2587a7!important}}
+.inventory-title{{color:#8defff!important;text-shadow:0 0 5px #00cfff55!important}}
+.inventory-close{{color:#8defff!important}}
+.inventory-slot{{background:#02070c!important;color:#d9faff!important;border:1px solid #24576a!important;box-shadow:inset 0 0 0 1px #061923!important}}
+.inventory-slot:hover,.inventory-slot.selected{{background:#06202b!important;color:#fff!important;border-color:#62e8ff!important;box-shadow:0 0 0 1px #1b8198!important}}
+.slot-number{{color:#70e7ff!important}}
+.item-name{{color:#d9faff!important}}
 .empty-text{{display:none!important}}
-.item-description{{background:#02070c!important;color:#d8faff!important;border:1px solid #48dfff!important;box-shadow:inset 3px 0 #123c4d,inset -3px 0 #123c4d!important}}
-.item-description strong{{color:#006b80!important}}
+.item-description{{background:#02070c!important;color:#d9faff!important;border:1px solid #48dfff!important;box-shadow:0 0 0 1px #123c4d!important}}
+.item-description strong{{color:#8defff!important}}
 .pixel-card-item{{background:#f4fcff!important;border:2px solid #008eaf!important;box-shadow:2px 0 #005a70,-2px 0 #005a70,0 2px #005a70,0 -2px #005a70,0 0 0 2px #d6faff!important}}
 .access-card-image{{display:block;width:100%;height:100%;object-fit:contain;image-rendering:pixelated}}
 .inventory-slot .access-card-image{{width:86%;height:78%;max-width:100px;max-height:100px}}
 .pixel-card-chip{{background:#00bcd7!important;border:1px solid #004b5a!important}}
 .pixel-card-mark{{color:#006b80!important}}
 .pixel-card-lines{{border-color:#008eaf!important}}
+
+/* Inventory and card keep the dark cyan pixel-art palette. */
+.inventory-panel:before,.pause-menu-panel:before,.item-acquired-dialog:before,.tutorial-transition-card:before{{content:"";position:absolute;left:-2px;top:-2px;width:12px;height:12px;border-left:2px solid #8af0ff;border-top:2px solid #8af0ff;pointer-events:none}}
+.inventory-panel:after,.pause-menu-panel:after,.item-acquired-dialog:after,.tutorial-transition-card:after{{content:"";position:absolute;right:-2px;bottom:-2px;width:12px;height:12px;border-right:2px solid #8af0ff;border-bottom:2px solid #8af0ff;pointer-events:none}}
 </style>
 """,
     unsafe_allow_html=True,
 )
 
 
-# Pause control is rendered inside the game iframe to avoid duplicate Streamlit buttons.
+# Pause state is handled inside the game iframe so RESUME never reloads Streamlit.
 paused = st.session_state.game_paused
-
-# Pause actions are provided by the in-game HTML popup only; no duplicate host buttons.
 
 # =========================================================
 # GAME HTML
@@ -2206,39 +2217,39 @@ input {
 
 
 
-/* Pixel-art UI frames: square pixels and stepped corner accents, never dotted lines. */
-.inventory-panel,.item-description,.help-panel,.computer-panel,.pause-overlay>div,.item-acquired-notice,.item-acquired-dialog,.tutorial-transition-card{border:2px solid #48dfff!important;box-shadow:inset 3px 3px #123c4d,inset -3px -3px #123c4d!important;image-rendering:pixelated}
-.inventory-panel,.pause-overlay>div,.item-acquired-notice,.tutorial-transition-card{position:relative}
-.inventory-panel:before,.pause-overlay>div:before,.item-acquired-notice:before,.tutorial-transition-card:before{content:"";position:absolute;inset:4px;border:1px solid #174557;pointer-events:none}
-.inventory-slot{border:1px solid #28556a!important;box-shadow:inset 2px 2px #0a1720,inset -2px -2px #0a1720!important;image-rendering:pixelated}
-.inventory-header,.help-header{border-bottom:2px solid #2587a7!important}
+/* Pixel-art frame: crisp solid lines with stepped corner accents, not dotted lines. */
+.inventory-panel,.item-description,.help-panel,.computer-panel,.pause-overlay>div,.item-acquired-notice,.item-acquired-dialog,.tutorial-transition-card{border-style:solid!important;border-radius:0!important}
+.inventory-panel,.inventory-slot,.item-description,.help-panel,.computer-panel,.pause-overlay>div,.item-acquired-notice,.item-acquired-dialog,.tutorial-transition-card{image-rendering:pixelated}
+.inventory-panel:before,.pause-menu-panel:before,.item-acquired-dialog:before,.tutorial-transition-card:before{content:"";position:absolute;left:-2px;top:-2px;width:12px;height:12px;border-left:2px solid #8af0ff;border-top:2px solid #8af0ff;pointer-events:none}
+.inventory-panel:after,.pause-menu-panel:after,.item-acquired-dialog:after,.tutorial-transition-card:after{content:"";position:absolute;right:-2px;bottom:-2px;width:12px;height:12px;border-right:2px solid #8af0ff;border-bottom:2px solid #8af0ff;pointer-events:none}
 
+/* Pixel-art pause button replaces the old Streamlit button completely. */
+.pause-toggle{position:absolute;top:20px;right:24px;z-index:1000;width:42px;height:42px;display:flex;align-items:center;justify-content:center;background:#02070c;border:1px solid #54dfff;color:#8defff;font:20px NeoDungGeunMo,monospace;cursor:pointer;box-shadow:0 0 0 1px #123c4d}
+.pause-toggle:before,.pause-toggle:after{content:"";position:absolute;width:7px;height:7px;border-color:#8af0ff;border-style:solid}
+.pause-toggle:before{left:-2px;top:-2px;border-width:2px 0 0 2px}.pause-toggle:after{right:-2px;bottom:-2px;border-width:0 2px 2px 0}
+.pause-toggle:hover{background:#d9faff;color:#001018}
 /* Reference-matched stage and item-acquired overlays */
 .tutorial-transition{position:fixed;inset:0;z-index:1000000;display:none;align-items:center;justify-content:center;background:#000;opacity:1;transition:opacity .45s steps(6,end);pointer-events:auto}
 .tutorial-transition.show{display:flex}.tutorial-transition.hide{opacity:0;pointer-events:none}
-.tutorial-transition-card{position:relative;width:min(350px,78vw);min-height:145px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid #57dfff;color:#f5fbff;box-shadow:0 0 0 1px #143d4c,0 0 14px #00cfff22;letter-spacing:2px}
+.tutorial-transition-card{position:relative;width:min(350px,78vw);min-height:145px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #57dfff;color:#f5fbff;box-shadow:0 0 0 1px #143d4c,0 0 14px #00cfff22;letter-spacing:2px}
 .tutorial-transition-card:before,.tutorial-transition-card:after{content:'';position:absolute;width:18px;height:18px;border-color:#78ecff;border-style:solid}
 .tutorial-transition-card:before{top:-2px;left:-2px;border-width:2px 0 0 2px}.tutorial-transition-card:after{right:-2px;bottom:-2px;border-width:0 2px 2px 0}
 .tutorial-transition-stage{font-size:clamp(25px,4vw,36px);line-height:1.6;text-shadow:0 0 5px #fff}.tutorial-transition-room{font-size:clamp(14px,2vw,20px);color:#a8f2ff;letter-spacing:1px}
-.item-acquired-notice{position:fixed;left:50%;bottom:5%;transform:translateX(-50%);z-index:500;display:none;grid-template-columns:minmax(120px,.78fr) minmax(240px,1.45fr);gap:14px;width:min(720px,92vw);padding:14px;background:#02070c;border:2px solid #48dfff;box-shadow:inset 3px 3px #123c4d,inset -3px -3px #123c4d;cursor:pointer}
+.item-acquired-notice{position:fixed;left:50%;bottom:5%;transform:translateX(-50%);z-index:500;display:none;grid-template-columns:minmax(120px,.78fr) minmax(240px,1.45fr);gap:14px;width:min(720px,92vw);padding:14px;background:#02070c;border:1px solid #48dfff;box-shadow:0 0 0 1px #123c4d,0 0 16px #00cfff22;cursor:pointer}
 .item-acquired-notice.show{display:grid}.item-acquired-art{display:flex;align-items:center;justify-content:center;min-height:120px;position:relative}
 .item-acquired-art .pixel-card-item{width:94px;height:62px;transform:rotate(-10deg) scale(1.05);margin:0;box-shadow:3px 0 #bafaff,-3px 0 #bafaff,0 3px #bafaff,0 -3px #bafaff,0 0 16px #00dfff88}
-.item-acquired-dialog{border:2px solid #2587a7;padding:12px 14px;min-height:120px;position:relative}.item-acquired-tag{display:inline-block;background:#087aa1;color:#e8fbff;padding:4px 10px;font-size:12px;margin-bottom:10px}
+.item-acquired-dialog{border:1px solid #2587a7;padding:12px 14px;min-height:120px;position:relative}.item-acquired-tag{display:inline-block;background:#087aa1;color:#e8fbff;padding:4px 10px;font-size:12px;margin-bottom:10px}
 .item-acquired-text{font-size:clamp(12px,1.5vw,16px);line-height:1.8;color:#d9faff;white-space:pre-line}.item-acquired-close{position:absolute;right:10px;bottom:8px;color:#54dfff;font-size:9px}
 @media(max-width:560px){.item-acquired-notice{grid-template-columns:88px minmax(0,1fr);gap:8px;padding:9px}.item-acquired-art{min-height:105px}.item-acquired-art .access-card-image{width:88px;height:85px}.item-acquired-dialog{padding:9px;min-height:105px}.item-acquired-text{font-size:11px}}
 
 
-.game-pause-toggle{position:fixed;top:24px;right:28px;z-index:1000;width:45px;height:45px;padding:0;background:#000;color:#7cecff;border:2px solid #28556a;border-radius:0;font:22px NeoDungGeunMo,monospace;cursor:pointer;image-rendering:pixelated;box-shadow:inset 3px 3px #123c4d,inset -3px -3px #123c4d}
-.game-pause-toggle:hover{background:#fff;color:#000}
-.game-pause-toggle:focus{outline:2px solid #7cecff;outline-offset:2px}
-@media(max-width:700px){.game-pause-toggle{top:12px;right:12px;width:40px;height:40px}}
 .pause-overlay{background:rgba(0,0,0,.72)}
-.pause-overlay>div{width:min(440px,88vw);padding:34px 38px;background:#02070c;border:2px solid #54dfff;box-shadow:inset 3px 3px #123c4d,inset -3px -3px #123c4d}
+.pause-overlay>div{position:relative;width:min(390px,86vw);padding:34px 34px;background:#02070c;border:1px solid #54dfff;box-shadow:0 0 0 1px #123c4d,0 0 18px #00cfff22}
 .pause-title,.pause-sub{display:none}
 .pause-actions{visibility:visible;pointer-events:auto;margin:0;display:flex;flex-direction:column;gap:16px;align-items:stretch}
 .pause-actions .pause-row{display:flex;align-items:center;gap:12px;width:100%}
-.pause-actions .pause-icon{width:30px;height:30px;flex:0 0 30px;display:inline-flex;align-items:center;justify-content:center;border:2px solid #58dfff;border-radius:50%;color:#82eaff;font-size:10px}
-.pause-actions .pause-nav-link,.pause-actions .pause-menu-button{flex:1;display:flex;align-items:center;min-height:38px;padding:6px 0;border:0!important;background:transparent!important;color:#d8faff!important;font-size:17px;text-decoration:none;text-align:left;cursor:pointer}
+.pause-actions .pause-icon{width:28px;height:28px;flex:0 0 28px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #58dfff;border-radius:50%;color:#82eaff;font-size:10px}
+.pause-actions .pause-nav-link,.pause-actions .pause-menu-button{flex:1;display:flex;align-items:center;min-height:32px;padding:4px 0;border:0!important;background:transparent!important;color:#d8faff!important;font-size:17px;text-decoration:none;text-align:left;cursor:pointer}
 .pause-actions .pause-nav-link:hover,.pause-actions .pause-menu-button:hover{color:#fff!important;text-shadow:0 0 6px #54dfff}
 
 /* =====================================================
@@ -2538,6 +2549,7 @@ input {
     tabindex="0"
 >
 
+<button class="pause-toggle" id="pauseToggle" type="button" aria-label="Pause game">Ⅱ</button>
 
 <div class="project-title">
     PROJECT : LOGIC
@@ -3133,7 +3145,6 @@ input {
      PAUSE
      ===================================================== -->
 
-<button class="game-pause-toggle" id="gamePauseToggle" type="button" aria-label="일시정지">Ⅱ</button>
 <div class="item-acquired-notice" id="itemAcquiredNotice" role="button" tabindex="0" aria-label="아이템 획득 알림을 닫으려면 클릭"><div class="item-acquired-art"><img class="access-card-image" src="data:image/png;base64,__CARD_IMAGE_BASE64__" alt="Access card"></div><div class="item-acquired-dialog"><div class="item-acquired-tag">ECHO</div><div class="item-acquired-text">카드가 인벤토리에 추가되었습니다.
 이 카드는 특정 장비를 작동시키거나 인증할 때 사용됩니다.</div><div class="item-acquired-close">CLICK TO CLOSE</div></div></div>
 <div class="tutorial-transition" id="tutorialTransition" aria-hidden="true"><div class="tutorial-transition-card"><div class="tutorial-transition-stage">STAGE 00</div><div class="tutorial-transition-room">:TUTORIAL</div></div></div>
@@ -3355,22 +3366,27 @@ const pauseOverlay =
         "pauseOverlay"
     );
 
-const gamePauseToggle = document.getElementById("gamePauseToggle");
+const pauseToggle = document.getElementById("pauseToggle");
 const resumeButton = document.getElementById("resumeButton");
 
 function setPaused(nextPaused) {
     paused = nextPaused;
     pauseOverlay.style.display = paused ? "flex" : "none";
-    gamePauseToggle.textContent = paused ? "▶" : "Ⅱ";
-    gamePauseToggle.setAttribute("aria-label", paused ? "재개" : "일시정지");
+    pauseToggle.textContent = paused ? "▶" : "Ⅱ";
+    pauseToggle.setAttribute("aria-label", paused ? "Resume game" : "Pause game");
+    clearKeys();
+    if (!paused) focusGame();
 }
 
-gamePauseToggle.addEventListener("click", function () {
+pauseToggle.addEventListener("click", function (event) {
+    event.preventDefault();
+    event.stopPropagation();
     setPaused(!paused);
 });
 
 resumeButton.addEventListener("click", function (event) {
     event.preventDefault();
+    event.stopPropagation();
     setPaused(false);
 });
 
@@ -5482,12 +5498,9 @@ window.addEventListener(
    PAUSE INITIAL STATE
    ===================================================== */
 
+pauseToggle.textContent = paused ? "▶" : "Ⅱ";
 if (paused) {
     pauseOverlay.style.display = "flex";
-    gamePauseToggle.textContent = "▶";
-} else {
-    pauseOverlay.style.display = "none";
-    gamePauseToggle.textContent = "Ⅱ";
 }
 
 
