@@ -2834,6 +2834,108 @@ html, body, .game, .game-area {
     text-shadow: 2px 2px #172b42 !important;
 }
 .player { z-index: 8 !important; }
+
+/* FINAL ART DIRECTION: isometric lab, detailed props, raised metal tiles */
+html, body, .game, .game-area {
+  background:#05070d !important; background-image:none !important; color:#dcecff !important;
+}
+.game-area { overflow:hidden !important; }
+/* Cut-corner room footprint instead of a flat rectangular box. */
+.room {
+  left:8% !important; top:7% !important; width:84% !important; height:83% !important;
+  overflow:hidden !important;
+  clip-path:polygon(10% 0, 90% 0, 100% 13%, 100% 83%, 90% 100%, 10% 100%, 0 86%, 0 14%) !important;
+  border:0 !important; outline:0 !important; border-radius:0 !important;
+  background-color:#64748b !important;
+  background-image:
+    linear-gradient(135deg,rgba(255,255,255,.30) 0 2%,transparent 2.5% 82%,rgba(8,17,33,.22) 83% 100%),
+    linear-gradient(90deg,transparent 0 96%,#35465d 96% 100%),
+    linear-gradient(180deg,transparent 0 95%,#34445b 95% 100%),
+    linear-gradient(180deg,#d8e1ed 0%,#aebdd0 54%,#8294ad 100%) !important;
+  background-size:64px 64px,64px 64px,64px 64px,100% 100% !important;
+  box-shadow:inset 0 0 0 5px #29364c,inset 0 0 0 10px #8798b0,0 10px 0 #1a2232,0 17px 0 #080b12 !important;
+}
+.room::before {
+  content:"" !important; position:absolute !important; inset:0 !important; pointer-events:none !important; z-index:0 !important;
+  background:
+    linear-gradient(90deg,rgba(15,24,40,.62),transparent 8%,transparent 91%,rgba(15,24,40,.52)),
+    linear-gradient(180deg,rgba(18,28,45,.68),transparent 18%,transparent 80%,rgba(18,28,45,.45)),
+    repeating-linear-gradient(0deg,transparent 0 62px,rgba(26,39,59,.65) 62px 65px),
+    repeating-linear-gradient(90deg,transparent 0 62px,rgba(26,39,59,.65) 62px 65px) !important;
+  box-shadow:inset 0 0 0 14px rgba(28,41,62,.55) !important;
+}
+.room::after {
+  content:"" !important; position:absolute !important; inset:14px !important; z-index:1 !important; pointer-events:none !important;
+  background-image:
+    radial-gradient(circle at 4px 4px,#26374f 0 2px,#d7e5f3 2.5px 3.5px,transparent 4px),
+    radial-gradient(circle at calc(100% - 4px) 4px,#26374f 0 2px,#d7e5f3 2.5px 3.5px,transparent 4px),
+    radial-gradient(circle at 4px calc(100% - 4px),#26374f 0 2px,#d7e5f3 2.5px 3.5px,transparent 4px),
+    radial-gradient(circle at calc(100% - 4px) calc(100% - 4px),#26374f 0 2px,#d7e5f3 2.5px 3.5px,transparent 4px) !important;
+  background-size:64px 64px !important; background-repeat:repeat !important; opacity:.85 !important;
+}
+.room-line-horizontal,.room-line-vertical,.monitor { display:none !important; }
+/* Detailed, layered terminal housing and luminous screen. */
+.object.computer {
+  left:35% !important; top:7% !important; width:30% !important; height:25% !important;
+  padding:0 !important; color:transparent !important; border:0 !important; outline:0 !important;
+  background-color:transparent !important; background-size:100% 100% !important;
+  filter:drop-shadow(5px 8px 0 rgba(8,13,25,.68)) drop-shadow(0 0 8px rgba(55,201,255,.13)) !important;
+  image-rendering:pixelated !important; z-index:4 !important;
+}
+.object.computer::before { content:"" !important; position:absolute !important; left:20% !important; top:8% !important; width:60% !important; height:48% !important;
+  background:
+    linear-gradient(90deg,transparent 0 7%,#5deaff 7% 9%,transparent 9% 91%,#5deaff 91% 93%,transparent 93%),
+    linear-gradient(180deg,#06111f 0 12%,#0b2940 12% 100%) !important;
+  border:4px solid #263c58 !important; box-shadow:inset 0 0 0 2px #7598b8,inset 0 0 0 5px #122a42, inset 0 0 14px #00c8ff,0 4px 0 #0b1729 !important;
+}
+.object.computer::after { content:"" !important; position:absolute !important; left:27% !important; top:18% !important; width:46% !important; height:25% !important;
+  background:
+    radial-gradient(circle at 22% 45%,#b1ffff 0 2px,#37dfff 3px 5px,transparent 6px),
+    linear-gradient(90deg,transparent 0 46%,#4ee8ff 46% 49%,transparent 49%),
+    repeating-linear-gradient(0deg,transparent 0 5px,#4bdcf2 5px 7px,transparent 7px 10px) !important;
+  opacity:.92 !important; box-shadow:0 0 9px #12d8ff !important;
+}
+.object.computer .object-label,.object.desk .object-label { display:none !important; }
+/* Desk becomes a layered workstation: thick beveled top, drawers, keyboard, papers and equipment. */
+.object.desk {
+  left:27% !important; top:58% !important; width:46% !important; height:23% !important;
+  padding:0 !important; color:transparent !important; border:0 !important; outline:0 !important;
+  background-color:transparent !important; background-size:100% 100% !important;
+  filter:drop-shadow(5px 8px 0 rgba(8,13,25,.62)) !important; image-rendering:pixelated !important; z-index:5 !important;
+}
+.object.desk::before { content:"" !important; position:absolute !important; left:9% !important; top:8% !important; width:82% !important; height:42% !important;
+  background:
+    linear-gradient(90deg,transparent 0 8%,#314761 8% 10%,transparent 10% 90%,#314761 90% 92%,transparent 92%),
+    linear-gradient(180deg,#f1f6ff 0 9%,#a9bbd2 9% 17%,#3e5877 17% 24%,#cbd8e8 24% 82%,#667f9c 82% 100%) !important;
+  border:3px solid #26374e !important; box-shadow:inset 0 0 0 2px #f3f7ff,inset 0 -5px 0 #637b97,0 4px 0 #18283d !important;
+}
+.object.desk::after { content:"" !important; position:absolute !important; left:15% !important; top:16% !important; width:70% !important; height:27% !important;
+  background:
+    linear-gradient(90deg,#0a1729 0 3%,transparent 3% 38%,#0a1729 38% 41%,transparent 41% 100%),
+    repeating-linear-gradient(90deg,#d9e8f8 0 3px,#7189a5 3px 5px),
+    linear-gradient(#20334b,#0d1a2c) !important;
+  border:3px solid #26374e !important; box-shadow:inset 0 0 0 2px #b7d5ec,0 2px 0 #19283d !important;
+}
+.object.desk .access-key { z-index:7 !important; }
+/* Security door: recessed segmented panels, illuminated scanner, hinges and thick sill. */
+.exit-wall {
+  left:auto !important; right:4% !important; top:28% !important; width:13% !important; height:39% !important;
+  border:0 !important; outline:0 !important; background-color:transparent !important; background-size:100% 100% !important;
+  filter:drop-shadow(-5px 7px 0 rgba(8,13,25,.65)) !important; image-rendering:pixelated !important; z-index:4 !important;
+}
+.exit-wall::before { content:"" !important; position:absolute !important; left:12% !important; top:7% !important; width:72% !important; height:86% !important;
+  background:
+    linear-gradient(90deg,#f0f6ff 0 8%,#829ab7 8% 13%,#243a55 13% 17%,transparent 17% 83%,#263a54 83% 88%,#8ca4bf 88% 94%,#e7f1ff 94% 100%),
+    repeating-linear-gradient(180deg,#d2dfed 0 22px,#8fa5c0 22px 25px,#334b67 25px 29px) !important;
+  border:4px solid #1d2c43 !important; box-shadow:inset 0 0 0 3px #c8d9ed,inset 0 0 0 7px #617c9d,0 0 0 2px #8ea8c8 !important;
+}
+.exit-wall::after { content:"" !important; position:absolute !important; right:16% !important; top:42% !important; width:17% !important; height:18% !important;
+  background:linear-gradient(180deg,#a4ffff 0 15%,#14cce8 15% 80%,#08718f 80% 100%) !important;
+  border:2px solid #14263d !important; box-shadow:0 0 8px #00dfff,0 0 0 2px #7898b9 !important;
+}
+.exit-sign { z-index:6 !important; color:#d4f7ff !important; text-shadow:2px 2px #132239,0 0 6px #00bde9 !important; background:transparent !important; }
+.player { z-index:8 !important; filter:drop-shadow(3px 5px 0 rgba(8,13,25,.5)) !important; }
+
 </style>
 
 </head>
