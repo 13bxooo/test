@@ -24,21 +24,19 @@ action = st.query_params.get("action")
 
 
 if action == "restart":
+
     st.query_params.clear()
     for _key in list(st.session_state.keys()):
-        if _key.startswith(("s1_", "tutorial_", "stage01_", "stage02_")):
+        if _key.startswith(("s1_", "tutorial_", "stage01_")):
             del st.session_state[_key]
     st.session_state.tutorial_reset_save = True
-    st.session_state.stage01_reset_save = True
-    st.session_state.stage02_reset_save = True
     st.session_state.game_started = True
     st.session_state.game_paused = False
     st.session_state.game_finished = False
-    st.session_state.tutorial_complete = True
-    st.session_state.stage01_started = True
-    st.session_state.stage02_started = False
+    st.session_state.tutorial_complete = False
+    st.session_state.stage01_started = False
     st.session_state.remaining_seconds = 15 * 60
-    st.switch_page("pages/3_Stage_01.py")
+    st.switch_page("pages/2_Game.py")
 
 
 elif action == "title":
@@ -211,10 +209,24 @@ footer {{
         'NeoDungGeunMo',
         monospace !important;
 
-    font-size: 24px !important;
-
+    font-size: 0 !important;
+    position: relative !important;
 }}
-
+.st-key-pause_game_button button::before {{
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 15px;
+    left: calc(50% - 5px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: #7cecff;
+    box-shadow: 7px 0 0 #7cecff;
+}}
+.st-key-pause_game_button button:hover::before {{
+    background: #000;
+    box-shadow: 7px 0 0 #000;
+}}
 
 .st-key-pause_game_button button:hover {{
 
@@ -249,22 +261,22 @@ footer {{
 }}
 
 
-/* Reference UI: black inventory, cyan pixel borders, white text. */]
-.inventory-panel{{background:#020609!important;color:#eefaff!important;border:2px solid #28dfff!important;box-shadow:0 0 0 2px #073c4b,0 0 18px #00dfff20!important}}
-.inventory-header{{border-bottom:2px solid #147b94!important}}
-.inventory-title{{color:#42eaff!important;text-shadow:0 0 6px #00dfff55!important}}
-.inventory-close{{color:#bcefff!important}}
-.inventory-slot{{background:#02090e!important;color:#fff!important;border:1px solid #147b94!important;box-shadow:inset 0 0 0 1px #00dfff0d!important}}
-.inventory-slot:hover,.inventory-slot.selected{{background:#073040!important;color:#fff!important;border-color:#42eaff!important;box-shadow:0 0 0 1px #42eaff,0 0 10px #00dfff22!important}}
-.slot-number{{color:#3ccde9!important}}
-.item-name{{color:#f4fdff!important}}
-.empty-text{{color:#45636c!important}}
-.item-description{{background:#02090e!important;color:#d9f7ff!important;border-top:2px solid #147b94!important;box-shadow:inset 0 0 0 1px #00dfff0d!important}}
-.item-description strong{{color:#42eaff!important}}
-.pixel-card-item{{background:#05202a!important;border:2px solid #28dfff!important;box-shadow:2px 0 #07566c,-2px 0 #07566c,0 2px #07566c,0 -2px #07566c,0 0 0 2px #001018!important}}
-.pixel-card-chip{{background:#28dfff!important;border:1px solid #07566c!important}}
-.pixel-card-mark{{color:#bdf7ff!important}}
-.pixel-card-lines{{border-color:#147b94!important}}
+/* White-led inventory skin: preserve existing inventory behavior and card artwork. */
+.inventory-panel{{background:#f4f7f8!important;color:#101820!important;border:2px solid #111!important;box-shadow:0 0 0 2px #d7e3e8,8px 8px 0 #000!important}}
+.inventory-header{{border-bottom:2px solid #17232a!important}}
+.inventory-title{{color:#101820!important;text-shadow:none!important}}
+.inventory-close{{color:#52616b!important}}
+.inventory-slot{{background:#fff!important;color:#111!important;border:2px solid #a9b8bf!important;box-shadow:inset 0 0 0 1px #edf2f4!important}}
+.inventory-slot:hover,.inventory-slot.selected{{background:#dffaff!important;color:#06151a!important;border-color:#00a9c7!important;box-shadow:0 0 0 2px #7cecff!important}}
+.slot-number{{color:#647780!important}}
+.item-name{{color:#15252c!important}}
+.empty-text{{color:#a3b0b6!important}}
+.item-description{{background:#fff!important;color:#24343c!important;border-top:2px solid #a9b8bf!important;box-shadow:inset 0 0 0 1px #edf2f4!important}}
+.item-description strong{{color:#006b80!important}}
+.pixel-card-item{{background:#f4fcff!important;border:2px solid #008eaf!important;box-shadow:2px 0 #005a70,-2px 0 #005a70,0 2px #005a70,0 -2px #005a70,0 0 0 2px #d6faff!important}}
+.pixel-card-chip{{background:#00bcd7!important;border:1px solid #004b5a!important}}
+.pixel-card-mark{{color:#006b80!important}}
+.pixel-card-lines{{border-color:#008eaf!important}}
 </style>
 """,
     unsafe_allow_html=True,
@@ -278,7 +290,7 @@ footer {{
 pause_clicked = st.button(
     "▶"
     if st.session_state.game_paused
-    else "||",
+    else "Ⅱ",
     key="pause_game_button",
 )
 
@@ -1399,113 +1411,70 @@ input {
    ===================================================== */
 
 .inventory-panel {
-
-    width:
-        min(820px,88vw);
-
-    background:
-        #050505;
-
-    padding:
-        34px 38px;
-
+    position: relative;
+    width: min(820px, 88vw);
+    padding: 24px 26px 26px;
+    background: #02070c;
+    color: #d8faff;
+    border: 1px solid #48dfff;
+    box-shadow: 0 0 0 1px #123c4d, 0 0 16px #00cfff22;
 }
 
 
 .inventory-header {
-
-    display:
-        flex;
-
-    justify-content:
-        space-between;
-
-    align-items:
-        center;
-
-    padding-bottom:
-        18px;
-
-    margin-bottom:
-        22px;
-
-    border-bottom:
-        1px solid #333333;
-
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    min-height: 28px;
+    padding: 0 0 8px 8px;
+    margin: 0 0 14px;
+    border-bottom: 1px solid #2587a7;
 }
 
 
 .inventory-title {
-
-    font-size:
-        24px;
-
+    color: #72eaff;
+    font-size: 17px;
+    letter-spacing: 1px;
+    text-shadow: 0 0 5px #00cfff77;
 }
 
 
 .inventory-close {
-
-    font-size:
-        12px;
-
-    color:
-        #666666;
-
+    margin-left: auto;
+    color: #4b8da0;
+    font-size: 9px;
 }
 
 
 .inventory-grid {
-
-    display:
-        grid;
-
-    grid-template-columns:
-        repeat(4,1fr);
-
-    gap:
-        10px;
-
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+    gap: 10px;
 }
 
 
 .inventory-slot {
-
-    position:
-        relative;
-
-    aspect-ratio:
-        1;
-
-    background:
-        #090909;
-
-    border:
-        1px solid #292929;
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-    cursor:
-        pointer;
-
+    position: relative;
+    aspect-ratio: 1 / 1;
+    background: #01060b;
+    border: 1px solid #28546a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: inset 0 0 0 1px #06131d;
+    color: #baf6ff;
 }
 
 
 .inventory-slot:hover,
 .inventory-slot.selected {
-
-    background:
-        #ffffff;
-
-    color:
-        #000000;
-
+    background: #03121b;
+    color: #d8faff;
+    border-color: #7cecff;
+    box-shadow: 0 0 0 1px #1683a4, 0 0 9px #00cfff33;
 }
 
 
@@ -2396,14 +2365,30 @@ input {
 }
 
 
-/* Reference-matched pause popup: fixed to the viewport, black/cyan panel, white buttons. */
-.pause-overlay{position:fixed!important;inset:0!important;z-index:1500000!important;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.78)!important;padding:18px;box-sizing:border-box}
-.pause-overlay>div{width:min(390px,90vw)!important;box-sizing:border-box!important;background:#000!important;color:#fff!important;border:3px double #28dfff!important;padding:28px!important;box-shadow:0 0 0 1px #07566c,0 0 18px #00dfff22!important}
-.pause-title{color:#fff!important;font-family:NeoDungGeunMo,monospace!important;text-align:center!important;font-size:clamp(22px,3vw,30px)!important;letter-spacing:1px!important}
-.pause-sub{color:#8fdff0!important;font-family:NeoDungGeunMo,monospace!important;text-align:center!important}
-.pause-actions{visibility:visible!important;pointer-events:auto!important;margin-top:24px!important;display:flex!important;flex-direction:column!important;gap:12px!important;align-items:stretch!important}
-.pause-actions button,.pause-actions a{width:100%!important;min-height:44px!important;background:#fff!important;color:#000!important;border:1px solid #fff!important;border-radius:0!important;font-family:NeoDungGeunMo,monospace!important;display:flex!important;align-items:center!important;justify-content:center!important;text-decoration:none!important;cursor:pointer!important}
-.pause-actions button:hover,.pause-actions a:hover{background:#28dfff!important;color:#000!important;border-color:#28dfff!important}
+
+/* Reference-matched stage and item-acquired overlays */
+.tutorial-transition{position:fixed;inset:0;z-index:1000000;display:none;align-items:center;justify-content:center;background:#000;opacity:1;transition:opacity .45s steps(6,end);pointer-events:auto}
+.tutorial-transition.show{display:flex}.tutorial-transition.hide{opacity:0;pointer-events:none}
+.tutorial-transition-card{position:relative;width:min(350px,78vw);min-height:145px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid #57dfff;color:#f5fbff;box-shadow:0 0 0 1px #143d4c,0 0 14px #00cfff22;letter-spacing:2px}
+.tutorial-transition-card:before,.tutorial-transition-card:after{content:'';position:absolute;width:18px;height:18px;border-color:#78ecff;border-style:solid}
+.tutorial-transition-card:before{top:-2px;left:-2px;border-width:2px 0 0 2px}.tutorial-transition-card:after{right:-2px;bottom:-2px;border-width:0 2px 2px 0}
+.tutorial-transition-stage{font-size:clamp(25px,4vw,36px);line-height:1.6;text-shadow:0 0 5px #fff}.tutorial-transition-room{font-size:clamp(14px,2vw,20px);color:#a8f2ff;letter-spacing:1px}
+.item-acquired-notice{position:fixed;left:50%;bottom:5%;transform:translateX(-50%);z-index:500;display:none;grid-template-columns:minmax(120px,.78fr) minmax(240px,1.45fr);gap:14px;width:min(720px,92vw);padding:14px;background:#02070c;border:1px solid #48dfff;box-shadow:0 0 0 1px #123c4d,0 0 16px #00cfff22;cursor:pointer}
+.item-acquired-notice.show{display:grid}.item-acquired-art{display:flex;align-items:center;justify-content:center;min-height:120px;position:relative}
+.item-acquired-art .pixel-card-item{width:94px;height:62px;transform:rotate(-10deg) scale(1.05);margin:0;box-shadow:3px 0 #bafaff,-3px 0 #bafaff,0 3px #bafaff,0 -3px #bafaff,0 0 16px #00dfff88}
+.item-acquired-dialog{border:1px solid #2587a7;padding:12px 14px;min-height:120px;position:relative}.item-acquired-tag{display:inline-block;background:#087aa1;color:#e8fbff;padding:4px 10px;font-size:12px;margin-bottom:10px}
+.item-acquired-text{font-size:clamp(12px,1.5vw,16px);line-height:1.8;color:#d9faff;white-space:pre-line}.item-acquired-close{position:absolute;right:10px;bottom:8px;color:#54dfff;font-size:9px}
+@media(max-width:560px){.item-acquired-notice{grid-template-columns:88px minmax(0,1fr);gap:8px;padding:9px}.item-acquired-art{min-height:105px}.item-acquired-art .pixel-card-item{width:60px;height:40px}.item-acquired-dialog{padding:9px;min-height:105px}.item-acquired-text{font-size:11px}}
+
+
+.pause-overlay{background:rgba(0,0,0,.72)}
+.pause-overlay>div{width:min(320px,82vw);padding:20px 22px;background:#02070c;border:1px solid #54dfff;box-shadow:0 0 0 1px #123c4d,0 0 18px #00cfff22}
+.pause-title,.pause-sub{display:none}
+.pause-actions{visibility:visible;pointer-events:auto;margin:0;display:flex;flex-direction:column;gap:9px;align-items:stretch}
+.pause-actions .pause-row{display:flex;align-items:center;gap:12px;width:100%}
+.pause-actions .pause-icon{width:22px;height:22px;flex:0 0 22px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #58dfff;border-radius:50%;color:#82eaff;font-size:10px}
+.pause-actions .pause-nav-link,.pause-actions .pause-menu-button{flex:1;display:flex;align-items:center;min-height:24px;padding:2px 0;border:0!important;background:transparent!important;color:#d8faff!important;font-size:14px;text-decoration:none;text-align:left;cursor:pointer}
+.pause-actions .pause-nav-link:hover,.pause-actions .pause-menu-button:hover{color:#fff!important;text-shadow:0 0 6px #54dfff}
 
 /* =====================================================
    MOBILE CONTROLS
@@ -2960,6 +2945,11 @@ input {
     data-slot="7"
 ></div>
 
+<div class="inventory-slot" data-slot="8"></div>
+<div class="inventory-slot" data-slot="9"></div>
+<div class="inventory-slot" data-slot="10"></div>
+<div class="inventory-slot" data-slot="11"></div>
+
 </div>
 
 
@@ -3292,57 +3282,10 @@ input {
      PAUSE
      ===================================================== -->
 
-<div
-    class="pause-overlay"
-    id="pauseOverlay"
->
-
-<div>
-
-
-<div class="pause-title">
-    GAME PAUSED
-</div>
-
-
-<div class="pause-sub">
-    PRESS ▶ TO CONTINUE
-</div>
-
-
-<div class="pause-actions">
-
-
-<a
-    class="code-button pause-nav-link"
-    id="restartButton"
-    href="?action=restart"
-    target="_top"
-    rel="noopener"
-    style="width:170px;display:flex;align-items:center;justify-content:center;box-sizing:border-box;text-decoration:none;"
->RESTART</a>
-
-
-<a
-    class="code-button pause-nav-link"
-    id="titleButton"
-    href="?action=title"
-    target="_top"
-    rel="noopener"
-    style="width:170px;display:flex;align-items:center;justify-content:center;box-sizing:border-box;text-decoration:none;background:#000;color:#fff;border:1px solid #333;"
->TITLE</a>
-
-
-</div>
-
-
-</div>
-
-</div>
-
-
-</div>
-
+<div class="item-acquired-notice" id="itemAcquiredNotice" role="button" tabindex="0" aria-label="아이템 획득 알림을 닫으려면 클릭"><div class="item-acquired-art"><div class="pixel-card-item"><span class="pixel-card-chip"></span><span class="pixel-card-mark">A</span><span class="pixel-card-lines"></span></div></div><div class="item-acquired-dialog"><div class="item-acquired-tag">ECHO</div><div class="item-acquired-text">카드가 인벤토리에 추가되었습니다.
+이 카드는 특정 장비를 작동시키거나 인증할 때 사용됩니다.</div><div class="item-acquired-close">CLICK TO CLOSE</div></div></div>
+<div class="tutorial-transition" id="tutorialTransition" aria-hidden="true"><div class="tutorial-transition-card"><div class="tutorial-transition-stage">STAGE 00</div><div class="tutorial-transition-room">:TUTORIAL</div></div></div>
+<div class="pause-overlay" id="pauseOverlay"><div class="pause-menu-panel"><div class="pause-actions"><div class="pause-row"><span class="pause-icon">Ⅱ</span><a class="pause-nav-link" id="resumeButton" href="?action=resume" target="_top" rel="noopener">RESUME</a></div><div class="pause-row"><span class="pause-icon">↻</span><a class="pause-nav-link" id="restartButton" href="?action=restart" target="_top" rel="noopener">RESTART</a></div><div class="pause-row"><span class="pause-icon">⌂</span><a class="pause-nav-link" id="titleButton" href="?action=title" target="_top" rel="noopener">TITLE</a></div></div></div></div>
 
 <div
     class="status"
@@ -3834,6 +3777,12 @@ function restoreTutorialState() {
 }
 
 const tutorialWasRestored = restoreTutorialState();
+const tutorialTransition = document.getElementById("tutorialTransition");
+if (!tutorialWasRestored && tutorialTransition) {
+    tutorialTransition.classList.add("show");
+    window.setTimeout(() => tutorialTransition.classList.add("hide"), 2550);
+    window.setTimeout(() => tutorialTransition.remove(), 3050);
+}
 if (!tutorialWasRestored) typeEcho(0);
 setInterval(saveTutorialState, 250);
 window.addEventListener("beforeunload", saveTutorialState);
@@ -4651,6 +4600,14 @@ function interact() {
 
 
         renderInventory();
+        const itemNotice = document.getElementById("itemAcquiredNotice");
+        if (itemNotice) {
+            itemNotice.classList.add("show");
+            const dismissItemNotice = () => itemNotice.classList.remove("show");
+            itemNotice.onclick = dismissItemNotice;
+            itemNotice.onkeydown = (event) => { if (event.key === "Enter" || event.key === " ") dismissItemNotice(); };
+            window.setTimeout(dismissItemNotice, 6500);
+        }
 
 
         typeEcho(5);
@@ -5736,3 +5693,4 @@ components.html(
     height=1000,
     scrolling=False,
 )
+
