@@ -2640,6 +2640,65 @@ button,.game button,.code-button,.help-key{border-radius:0!important}
 .project-title { color:#123b50 !important; text-shadow:1px 1px #fff !important; }
 .stage-title { color:#426b7d !important; }
 
+
+/* FINAL ROOM ART: black game frame, clean white tiled room, three readable pixel objects. */
+.game, .game-area { background-color:#02070c !important; color:#d9faff !important; }
+.game-area {
+  background-image: linear-gradient(#0a202b 1px, transparent 1px), linear-gradient(90deg,#0a202b 1px,transparent 1px) !important;
+  background-size:40px 40px !important;
+}
+.room {
+  background-color:#edf3f6 !important;
+  background-image:linear-gradient(#c7d4db 1px,transparent 1px),linear-gradient(90deg,#c7d4db 1px,transparent 1px),linear-gradient(180deg,#f9fcff 0%,#e4edf2 100%) !important;
+  background-size:40px 40px,40px 40px,100% 100% !important;
+  border:8px solid #273d4b !important;
+  outline:3px solid #91dff0 !important;
+  box-shadow:inset 0 0 0 4px #b6cbd5, 0 0 0 3px #081923 !important;
+}
+.room-line-horizontal,.room-line-vertical { display:none !important; }
+/* Keep the monitor's interaction node, but integrate its visual into the main computer. */
+.room > .monitor { display:none !important; }
+.object.computer {
+  left:40% !important; top:8% !important; width:20% !important; height:19% !important;
+  box-sizing:border-box !important; padding:0 !important; overflow:visible !important;
+  color:transparent !important; background:#b8cbd4 !important;
+  border:4px solid #263f50 !important; outline:3px solid #e9faff !important;
+  box-shadow:inset 0 0 0 3px #7796a5, 5px 5px 0 #9aafb9 !important;
+}
+.object.computer::before {
+  content:"" !important; position:absolute !important; left:7% !important; right:7% !important; top:7% !important; height:65% !important;
+  background:linear-gradient(135deg,#06465c,#087b9b 55%,#022b40) !important;
+  border:3px solid #142d3c !important; box-shadow:inset 0 0 0 2px #39dfff, 0 0 0 1px #eafaff !important;
+}
+.object.computer::after {
+  content:"△" !important; position:absolute !important; top:14% !important; left:0 !important; right:0 !important;
+  text-align:center !important; color:#72f0ff !important; font-size:clamp(20px,3vw,36px) !important;
+  text-shadow:2px 2px #07394d !important; z-index:2 !important;
+}
+.object.computer .object-label { display:none !important; }
+.object.desk {
+  left:43% !important; top:62% !important; width:14% !important; height:11% !important;
+  box-sizing:border-box !important; padding:0 !important; color:transparent !important;
+  background:#dbe7ed !important; border:4px solid #344d5a !important; outline:2px solid #f8fdff !important;
+  box-shadow:inset 0 0 0 3px #a8c0ca, 5px 5px 0 #9aafb9 !important;
+}
+.object.desk::before {
+  content:"" !important; position:absolute !important; left:7% !important; right:7% !important; top:12% !important; height:40% !important;
+  background:linear-gradient(135deg,#0b536a,#087d9a) !important; border:2px solid #294654 !important;
+  box-shadow:inset 0 0 0 2px #66e9ff !important;
+}
+.object.desk::after {
+  left:8% !important; right:8% !important; bottom:-13px !important; height:10px !important;
+  border:3px solid #344d5a !important; background:#a8bec8 !important; box-shadow:inset 0 0 0 2px #e9f4f8 !important;
+}
+.object.desk .object-label { display:none !important; }
+/* Exit remains at its original position on the right wall. */
+.exit-wall { right:0 !important; left:auto !important; top:35% !important; width:8% !important; height:30% !important; background:#dfeaf0 !important; border:4px solid #263f4d !important; box-shadow:inset 0 0 0 3px #a8cbd7, -4px 0 0 #7899a7 !important; }
+.exit-wall::before,.exit-wall::after { height:3px !important; background:#7899a7 !important; }
+.exit-sign { right:9% !important; left:auto !important; top:45% !important; color:#254b5c !important; text-shadow:1px 1px #fff !important; }
+.exit-arrow { display:none !important; }
+.player { z-index:8 !important; }
+
 </style>
 
 </head>
