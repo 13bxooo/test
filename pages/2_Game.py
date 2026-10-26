@@ -140,112 +140,21 @@ footer {{
 }}
 
 
-/* =====================================================
-   PAUSE BUTTON
-   ===================================================== */
-
-.st-key-pause_game_button {{
-
-    position: fixed !important;
-
-    top: 24px !important;
-    right: 28px !important;
-
-    width: 45px !important;
-    height: 45px !important;
-
-    z-index: 999999 !important;
-
-    padding: 0 !important;
-    margin: 0 !important;
-}}
-
-
-.st-key-pause_game_button button {{
-
-    width: 45px !important;
-    height: 45px !important;
-
-    padding: 0 !important;
-    margin: 0 !important;
-
-    border: none !important;
-    border-radius: 0 !important;
-
-    background: #000000 !important;
-    color: #ffffff !important;
-
-    font-family:
-        'NeoDungGeunMo',
-        monospace !important;
-
-    font-size: 0 !important;
-    position: relative !important;
-}}
-.st-key-pause_game_button button::before {{
-    content: '';
-    position: absolute;
-    width: 4px;
-    height: 15px;
-    left: calc(50% - 5px);
-    top: 50%;
-    transform: translateY(-50%);
-    background: #7cecff;
-    box-shadow: 7px 0 0 #7cecff;
-}}
-.st-key-pause_game_button button:hover::before {{
-    background: #000;
-    box-shadow: 7px 0 0 #000;
-}}
-
-.st-key-pause_game_button button:hover {{
-
-    background: #ffffff !important;
-    color: #000000 !important;
-
-}}
-
-
-@media (max-width: 700px) {{
-
-    .st-key-pause_game_button {{
-
-        top: 12px !important;
-        right: 12px !important;
-
-        width: 40px !important;
-        height: 40px !important;
-
-    }}
-
-
-    .st-key-pause_game_button button {{
-
-        width: 40px !important;
-        height: 40px !important;
-
-        font-size: 20px !important;
-
-    }}
-
-}}
-
-
 /* Pixel-dot UI finish shared by inventory, pause and item panels. */
-.inventory-panel,.inventory-slot,.item-description,.help-panel,.computer-panel,.pause-overlay>div,.item-acquired-notice,.item-acquired-dialog,.tutorial-transition-card{{border-style:dotted!important}}
-.inventory-header,.help-header{{border-bottom-style:dotted!important}}
+.inventory-panel,.inventory-slot,.item-description,.help-panel,.computer-panel,.pause-overlay>div,.item-acquired-notice,.item-acquired-dialog,.tutorial-transition-card{{border-style:solid!important;clip-path:polygon(0 5px,5px 5px,5px 0,calc(100% - 5px) 0,calc(100% - 5px) 5px,100% 5px,100% calc(100% - 5px),calc(100% - 5px) calc(100% - 5px),calc(100% - 5px) 100%,5px 100%,5px calc(100% - 5px),0 calc(100% - 5px))}}
+.inventory-header,.help-header{{border-bottom-style:solid!important}}
 
 /* White-led inventory skin: preserve existing inventory behavior and card artwork. */
-.inventory-panel{{background:#f4f7f8!important;color:#101820!important;border:2px dotted #48dfff!important;box-shadow:0 0 0 1px #123c4d!important}}
-.inventory-header{{border-bottom:2px dotted #2587a7!important}}
+.inventory-panel{{background:#f4f7f8!important;color:#101820!important;border:2px solid #48dfff!important;box-shadow:0 0 0 1px #123c4d!important}}
+.inventory-header{{border-bottom:2px solid #2587a7!important}}
 .inventory-title{{color:#101820!important;text-shadow:none!important}}
 .inventory-close{{color:#52616b!important}}
-.inventory-slot{{background:#fff!important;color:#111!important;border:1px dotted #48dfff!important;box-shadow:none!important}}
+.inventory-slot{{background:#fff!important;color:#111!important;border:1px solid #48dfff!important;box-shadow:none!important}}
 .inventory-slot:hover,.inventory-slot.selected{{background:#dffaff!important;color:#06151a!important;border-color:#00a9c7!important;box-shadow:0 0 0 2px #7cecff!important}}
 .slot-number{{color:#647780!important}}
 .item-name{{color:#15252c!important}}
 .empty-text{{display:none!important}}
-.item-description{{background:#fff!important;color:#24343c!important;border:1px dotted #48dfff!important;box-shadow:none!important}}
+.item-description{{background:#fff!important;color:#24343c!important;border:1px solid #48dfff!important;box-shadow:none!important}}
 .item-description strong{{color:#006b80!important}}
 .pixel-card-item{{background:#f4fcff!important;border:2px solid #008eaf!important;box-shadow:2px 0 #005a70,-2px 0 #005a70,0 2px #005a70,0 -2px #005a70,0 0 0 2px #d6faff!important}}
 .access-card-image{{display:block;width:100%;height:100%;object-fit:contain;image-rendering:pixelated}}
@@ -260,29 +169,10 @@ footer {{
 
 
 # =========================================================
-# PAUSE
+# PAUSE STATE
 # =========================================================
 
-pause_clicked = st.button(
-    "▶"
-    if st.session_state.game_paused
-    else "Ⅱ",
-    key="pause_game_button",
-)
-
-
-if pause_clicked:
-
-    st.session_state.game_paused = (
-        not st.session_state.game_paused
-    )
-
-    st.rerun()
-
-
 paused = st.session_state.game_paused
-
-# Pause actions are provided by the in-game HTML popup only; no duplicate host buttons.
 
 # =========================================================
 # GAME HTML
@@ -2319,19 +2209,19 @@ input {
 
 
 
-/* Dotted pixel-frame treatment inside the game iframe. */
-.inventory-panel,.inventory-slot,.item-description,.help-panel,.computer-panel,.pause-overlay>div,.item-acquired-notice,.item-acquired-dialog,.tutorial-transition-card{border-style:dotted!important}
-.inventory-header,.help-header{border-bottom-style:dotted!important}
+/* Pixel-art pixel-frame treatment inside the game iframe. */
+.inventory-panel,.inventory-slot,.item-description,.help-panel,.computer-panel,.pause-overlay>div,.item-acquired-notice,.item-acquired-dialog,.tutorial-transition-card{border-style:solid!important;clip-path:polygon(0 5px,5px 5px,5px 0,calc(100% - 5px) 0,calc(100% - 5px) 5px,100% 5px,100% calc(100% - 5px),calc(100% - 5px) calc(100% - 5px),calc(100% - 5px) 100%,5px 100%,5px calc(100% - 5px),0 calc(100% - 5px))}
+.inventory-header,.help-header{border-bottom-style:solid!important}
 .inventory-slot{box-shadow:none!important}
 
 /* Reference-matched stage and item-acquired overlays */
 .tutorial-transition{position:fixed;inset:0;z-index:1000000;display:none;align-items:center;justify-content:center;background:#000;opacity:1;transition:opacity .45s steps(6,end);pointer-events:auto}
 .tutorial-transition.show{display:flex}.tutorial-transition.hide{opacity:0;pointer-events:none}
-.tutorial-transition-card{position:relative;width:min(350px,78vw);min-height:145px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px dotted #57dfff;color:#f5fbff;box-shadow:0 0 0 1px #143d4c,0 0 14px #00cfff22;letter-spacing:2px}
+.tutorial-transition-card{position:relative;width:min(350px,78vw);min-height:145px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px solid #57dfff;clip-path:polygon(0 6px,6px 6px,6px 0,calc(100% - 6px) 0,calc(100% - 6px) 6px,100% 6px,100% calc(100% - 6px),calc(100% - 6px) calc(100% - 6px),calc(100% - 6px) 100%,6px 100%,6px calc(100% - 6px),0 calc(100% - 6px));color:#f5fbff;box-shadow:0 0 0 1px #143d4c,0 0 14px #00cfff22;letter-spacing:2px}
 .tutorial-transition-card:before,.tutorial-transition-card:after{content:'';position:absolute;width:18px;height:18px;border-color:#78ecff;border-style:solid}
 .tutorial-transition-card:before{top:-2px;left:-2px;border-width:2px 0 0 2px}.tutorial-transition-card:after{right:-2px;bottom:-2px;border-width:0 2px 2px 0}
 .tutorial-transition-stage{font-size:clamp(25px,4vw,36px);line-height:1.6;text-shadow:0 0 5px #fff}.tutorial-transition-room{font-size:clamp(14px,2vw,20px);color:#a8f2ff;letter-spacing:1px}
-.item-acquired-notice{position:fixed;left:50%;bottom:5%;transform:translateX(-50%);z-index:500;display:none;grid-template-columns:minmax(120px,.78fr) minmax(240px,1.45fr);gap:14px;width:min(720px,92vw);padding:14px;background:#02070c;border:1px solid #48dfff;box-shadow:0 0 0 1px #123c4d,0 0 16px #00cfff22;cursor:pointer}
+.item-acquired-notice{position:fixed;left:50%;bottom:5%;transform:translateX(-50%);z-index:500;display:none;grid-template-columns:minmax(120px,.78fr) minmax(240px,1.45fr);gap:14px;width:min(720px,92vw);padding:14px;background:#02070c;border:2px solid #48dfff;clip-path:polygon(0 6px,6px 6px,6px 0,calc(100% - 6px) 0,calc(100% - 6px) 6px,100% 6px,100% calc(100% - 6px),calc(100% - 6px) calc(100% - 6px),calc(100% - 6px) 100%,6px 100%,6px calc(100% - 6px),0 calc(100% - 6px));box-shadow:0 0 0 1px #123c4d,0 0 16px #00cfff22;cursor:pointer}
 .item-acquired-notice.show{display:grid}.item-acquired-art{display:flex;align-items:center;justify-content:center;min-height:120px;position:relative}
 .item-acquired-art .pixel-card-item{width:94px;height:62px;transform:rotate(-10deg) scale(1.05);margin:0;box-shadow:3px 0 #bafaff,-3px 0 #bafaff,0 3px #bafaff,0 -3px #bafaff,0 0 16px #00dfff88}
 .item-acquired-dialog{border:1px solid #2587a7;padding:12px 14px;min-height:120px;position:relative}.item-acquired-tag{display:inline-block;background:#087aa1;color:#e8fbff;padding:4px 10px;font-size:12px;margin-bottom:10px}
@@ -2340,13 +2230,19 @@ input {
 
 
 .pause-overlay{background:rgba(0,0,0,.72)}
-.pause-overlay>div{width:min(390px,86vw);padding:30px 30px;background:#02070c;border:1px dotted #54dfff;box-shadow:0 0 0 1px #123c4d,0 0 18px #00cfff22}
+.pause-overlay>div{width:min(390px,86vw);padding:30px 30px;background:#02070c;border:2px solid #54dfff;clip-path:polygon(0 6px,6px 6px,6px 0,calc(100% - 6px) 0,calc(100% - 6px) 6px,100% 6px,100% calc(100% - 6px),calc(100% - 6px) calc(100% - 6px),calc(100% - 6px) 100%,6px 100%,6px calc(100% - 6px),0 calc(100% - 6px));box-shadow:0 0 0 1px #123c4d,0 0 18px #00cfff22}
 .pause-title,.pause-sub{display:none}
 .pause-actions{visibility:visible;pointer-events:auto;margin:0;display:flex;flex-direction:column;gap:16px;align-items:stretch}
 .pause-actions .pause-row{display:flex;align-items:center;gap:12px;width:100%}
 .pause-actions .pause-icon{width:28px;height:28px;flex:0 0 28px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #58dfff;border-radius:50%;color:#82eaff;font-size:10px}
 .pause-actions .pause-nav-link,.pause-actions .pause-menu-button{flex:1;display:flex;align-items:center;min-height:32px;padding:4px 0;border:0!important;background:transparent!important;color:#d8faff!important;font-size:17px;text-decoration:none;text-align:left;cursor:pointer}
 .pause-actions .pause-nav-link:hover,.pause-actions .pause-menu-button:hover{color:#fff!important;text-shadow:0 0 6px #54dfff}
+
+/* Single in-game pause/resume toggle. Pixel-cut corners, no host Streamlit duplicate. */
+.game-pause-button{position:fixed;top:18px;right:20px;z-index:1000;width:46px;height:46px;display:flex;align-items:center;justify-content:center;background:#02070c;color:#7cecff;border:2px solid #54dfff;clip-path:polygon(0 6px,6px 6px,6px 0,calc(100% - 6px) 0,calc(100% - 6px) 6px,100% 6px,100% calc(100% - 6px),calc(100% - 6px) calc(100% - 6px),calc(100% - 6px) 100%,6px 100%,6px calc(100% - 6px),0 calc(100% - 6px));font:20px NeoDungGeunMo,monospace;cursor:pointer}
+.game-pause-button:hover{background:#eafcff;color:#000}
+.pause-overlay>div{border:2px solid #54dfff;clip-path:polygon(0 6px,6px 6px,6px 0,calc(100% - 6px) 0,calc(100% - 6px) 6px,100% 6px,100% calc(100% - 6px),calc(100% - 6px) calc(100% - 6px),calc(100% - 6px) 100%,6px 100%,6px calc(100% - 6px),0 calc(100% - 6px))}
+@media(max-width:700px){.game-pause-button{top:10px;right:10px;width:40px;height:40px}}
 
 /* =====================================================
    MOBILE CONTROLS
@@ -3243,7 +3139,9 @@ input {
 <div class="item-acquired-notice" id="itemAcquiredNotice" role="button" tabindex="0" aria-label="아이템 획득 알림을 닫으려면 클릭"><div class="item-acquired-art"><img class="access-card-image" src="data:image/png;base64,__CARD_IMAGE_BASE64__" alt="Access card"></div><div class="item-acquired-dialog"><div class="item-acquired-tag">ECHO</div><div class="item-acquired-text">카드가 인벤토리에 추가되었습니다.
 이 카드는 특정 장비를 작동시키거나 인증할 때 사용됩니다.</div><div class="item-acquired-close">CLICK TO CLOSE</div></div></div>
 <div class="tutorial-transition" id="tutorialTransition" aria-hidden="true"><div class="tutorial-transition-card"><div class="tutorial-transition-stage">STAGE 00</div><div class="tutorial-transition-room">:TUTORIAL</div></div></div>
-<div class="pause-overlay" id="pauseOverlay"><div class="pause-menu-panel"><div class="pause-actions"><div class="pause-row"><span class="pause-icon">Ⅱ</span><a class="pause-nav-link" id="resumeButton" href="?action=resume" target="_top" rel="noopener">RESUME</a></div><div class="pause-row"><span class="pause-icon">↻</span><a class="pause-nav-link" id="restartButton" href="?action=restart" target="_top" rel="noopener">RESTART</a></div><div class="pause-row"><span class="pause-icon">⌂</span><a class="pause-nav-link" id="titleButton" href="?action=title" target="_top" rel="noopener">TITLE</a></div></div></div></div>
+<div class="pause-overlay" id="pauseOverlay"><div class="pause-menu-panel"><div class="pause-actions"><div class="pause-row"><span class="pause-icon">Ⅱ</span><button class="pause-nav-link pause-menu-button" id="resumeButton" type="button">RESUME</button></div><div class="pause-row"><span class="pause-icon">↻</span><a class="pause-nav-link" id="restartButton" href="?action=restart" target="_top" rel="noopener">RESTART</a></div><div class="pause-row"><span class="pause-icon">⌂</span><a class="pause-nav-link" id="titleButton" href="?action=title" target="_top" rel="noopener">TITLE</a></div></div></div></div>
+
+<button class="game-pause-button" id="gamePauseButton" type="button" aria-label="Pause">Ⅱ</button>
 
 <div
     class="status"
@@ -3268,7 +3166,7 @@ input {
    GAME STATE
    ===================================================== */
 
-const paused =
+let paused =
     __PAUSED__;
 
 
@@ -3460,6 +3358,26 @@ const pauseOverlay =
     document.getElementById(
         "pauseOverlay"
     );
+
+const gamePauseButton = document.getElementById("gamePauseButton");
+const resumeButton = document.getElementById("resumeButton");
+
+function setPaused(nextPaused) {
+    paused = nextPaused;
+    pauseOverlay.style.display = paused ? "flex" : "none";
+    gamePauseButton.textContent = paused ? "▶" : "Ⅱ";
+    gamePauseButton.setAttribute("aria-label", paused ? "Resume" : "Pause");
+    if (!paused) focusGame();
+}
+
+gamePauseButton.addEventListener("click", function () {
+    setPaused(!paused);
+});
+
+resumeButton.addEventListener("click", function (event) {
+    event.preventDefault();
+    setPaused(false);
+});
 
 
 const inventorySlots =
@@ -5029,6 +4947,12 @@ document.addEventListener(
 );
 
 
+/* Single in-game pause/resume toggle. Pixel-cut corners, no host Streamlit duplicate. */
+.game-pause-button{position:fixed;top:18px;right:20px;z-index:1000;width:46px;height:46px;display:flex;align-items:center;justify-content:center;background:#02070c;color:#7cecff;border:2px solid #54dfff;clip-path:polygon(0 6px,6px 6px,6px 0,calc(100% - 6px) 0,calc(100% - 6px) 6px,100% 6px,100% calc(100% - 6px),calc(100% - 6px) calc(100% - 6px),calc(100% - 6px) 100%,6px 100%,6px calc(100% - 6px),0 calc(100% - 6px));font:20px NeoDungGeunMo,monospace;cursor:pointer}
+.game-pause-button:hover{background:#eafcff;color:#000}
+.pause-overlay>div{border:2px solid #54dfff;clip-path:polygon(0 6px,6px 6px,6px 0,calc(100% - 6px) 0,calc(100% - 6px) 6px,100% 6px,100% calc(100% - 6px),calc(100% - 6px) calc(100% - 6px),calc(100% - 6px) 100%,6px 100%,6px calc(100% - 6px),0 calc(100% - 6px))}
+@media(max-width:700px){.game-pause-button{top:10px;right:10px;width:40px;height:40px}}
+
 /* =====================================================
    MOBILE CONTROLS
    ===================================================== */
@@ -5570,10 +5494,11 @@ window.addEventListener(
    ===================================================== */
 
 if (paused) {
-
-    pauseOverlay.style.display =
-        "flex";
-
+    pauseOverlay.style.display = "flex";
+    gamePauseButton.textContent = "▶";
+} else {
+    pauseOverlay.style.display = "none";
+    gamePauseButton.textContent = "Ⅱ";
 }
 
 
