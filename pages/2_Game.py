@@ -2699,6 +2699,37 @@ button,.game button,.code-button,.help-key{border-radius:0!important}
 .exit-arrow { display:none !important; }
 .player { z-index:8 !important; }
 
+
+
+/* Detailed hand-authored pixel-art room: keep the outer HUD black, room white. */
+.game { background:#02070c !important; color:#d9faff !important; }
+.game-area { background:#02070c !important; background-image:linear-gradient(#0a202b 1px,transparent 1px),linear-gradient(90deg,#0a202b 1px,transparent 1px) !important; background-size:40px 40px !important; }
+.room { background-color:#f2f6f8 !important; background-image:linear-gradient(90deg,transparent calc(100% - 1px),#c8d6de 100%),linear-gradient(transparent calc(100% - 1px),#c8d6de 100%),linear-gradient(180deg,#ffffff 0%,#eaf0f4 100%) !important; background-size:48px 48px,48px 48px,100% 100% !important; border:6px solid #263c4b !important; outline:2px solid #78dff2 !important; box-shadow:inset 0 0 0 3px #d4e1e7, inset 0 0 0 6px #f9fdff, 0 0 0 3px #06131d !important; }
+.room-line-horizontal,.room-line-vertical { display:none !important; }
+.room > .monitor { display:none !important; }
+
+/* Console: crisp stepped bezel, inset screen, pixel controls and pedestal. */
+.object.computer { left:40% !important; top:8% !important; width:20% !important; height:20% !important; box-sizing:border-box !important; overflow:visible !important; padding:0 !important; color:transparent !important; background:#b9cbd4 !important; border:4px solid #243c4d !important; outline:2px solid #effcff !important; box-shadow:inset 0 0 0 2px #eaf6fa,inset 0 0 0 5px #7996a5,4px 0 #263e4e,-4px 0 #263e4e,0 4px #263e4e,0 -4px #263e4e,6px 6px 0 #9aafb9 !important; }
+.object.computer::before { content:"" !important; position:absolute !important; left:7% !important; right:7% !important; top:7% !important; height:63% !important; box-sizing:border-box !important; background:linear-gradient(90deg,transparent 0 8%,#0a718a 8% 10%,transparent 10% 90%,#0a718a 90% 92%,transparent 92%),linear-gradient(180deg,#06344a 0%,#087b9c 52%,#04283c 100%) !important; border:3px solid #1d3545 !important; box-shadow:inset 0 0 0 2px #4de5ff,inset 0 0 0 5px #07506b,0 2px 0 #f4fdff !important; }
+.object.computer::after { content:"" !important; position:absolute !important; left:0 !important; right:0 !important; top:17% !important; height:42% !important; display:flex !important; align-items:center !important; justify-content:center !important; color:#7df3ff !important; font-size:clamp(20px,2.6vw,34px) !important; line-height:1 !important; text-shadow:2px 0 #17475b,-2px 0 #17475b,0 2px #17475b,0 -2px #17475b !important; content:"△" !important; z-index:2 !important; }
+.object.computer { background-image:linear-gradient(#eaf8fc 0 0),linear-gradient(#526e7d 0 0),linear-gradient(#dceaf0 0 0) !important; background-repeat:no-repeat !important; background-size:12% 5%,12% 5%,34% 7% !important; background-position:18% 83%,70% 83%,33% 86% !important; }
+.object.computer .object-label { display:none !important; }
+
+/* Desk sits below the player: pale metal top, dark pixel legs, small terminal. */
+.object.desk { left:43% !important; top:62% !important; width:14% !important; height:11% !important; box-sizing:border-box !important; padding:0 !important; color:transparent !important; background:linear-gradient(180deg,#f9fdff 0 15%,#d3e0e7 15% 100%) !important; border:3px solid #2b4556 !important; outline:2px solid #f7fdff !important; box-shadow:inset 0 0 0 2px #9fb8c4,inset 0 0 0 5px #edf6fa,3px 0 #2b4556,-3px 0 #2b4556,0 3px #2b4556,0 -3px #2b4556,5px 5px 0 #9bafb9 !important; }
+.object.desk::before { content:"" !important; position:absolute !important; left:27% !important; right:27% !important; top:10% !important; height:43% !important; background:linear-gradient(90deg,#183b4e 0 8%,#0b617c 8% 92%,#183b4e 92% 100%) !important; border:2px solid #263f50 !important; box-shadow:inset 0 0 0 2px #53e6ff,inset 0 0 0 5px #07516a !important; }
+.object.desk::after { left:9% !important; right:9% !important; bottom:-14px !important; height:11px !important; border:3px solid #2b4556 !important; background:linear-gradient(90deg,#8ca6b2 0 18%,#dce8ed 18% 28%,#8ca6b2 28% 72%,#dce8ed 72% 82%,#8ca6b2 82% 100%) !important; box-shadow:inset 0 0 0 2px #edf8fb !important; }
+.object.desk .object-label { display:none !important; }
+
+/* Exit remains at the existing right-wall coordinates; no idle floating arrow. */
+.exit-wall { right:0 !important; left:auto !important; top:35% !important; width:8% !important; height:30% !important; box-sizing:border-box !important; background:linear-gradient(90deg,#a5bac5 0 8%,#e9f2f6 8% 92%,#8ba6b4 92% 100%) !important; border:4px solid #263d4d !important; box-shadow:inset 0 0 0 3px #f8fdff,inset 0 0 0 6px #9cb7c3,-4px 0 #526f80,4px 0 #526f80 !important; }
+.exit-wall::before { top:7% !important; height:3px !important; background:#4c6979 !important; box-shadow:0 7px #a2b8c3,0 14px #a2b8c3 !important; }
+.exit-wall::after { bottom:8% !important; height:4px !important; background:#263f50 !important; box-shadow:0 -8px #9cb6c2,0 -16px #9cb6c2 !important; }
+.exit-sign { right:9% !important; left:auto !important; top:45% !important; color:#163a4c !important; text-shadow:1px 1px #fff !important; }
+.exit-arrow { display:none !important; }
+.player { z-index:8 !important; background:#173c50 !important; box-shadow:0 0 0 2px #071d2a,inset 0 0 0 3px #70e8fa !important; }
+.player::after { background:rgba(18,63,82,.22) !important; }
+
 </style>
 
 </head>
