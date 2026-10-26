@@ -2707,311 +2707,77 @@ button,.game button,.code-button,.help-key{border-radius:0!important}
 
 
 
-/* Detailed hand-authored pixel-art room: keep the outer HUD black, room white. */
-.game { background:#02070c !important; color:#d9faff !important; }
-.game-area { background:#02070c !important; background-image:linear-gradient(#0a202b 1px,transparent 1px),linear-gradient(90deg,#0a202b 1px,transparent 1px) !important; background-size:40px 40px !important; }
-.room { background-color:#f2f6f8 !important; background-image:linear-gradient(90deg,transparent calc(100% - 1px),#c8d6de 100%),linear-gradient(transparent calc(100% - 1px),#c8d6de 100%),linear-gradient(180deg,#ffffff 0%,#eaf0f4 100%) !important; background-size:48px 48px,48px 48px,100% 100% !important; border:6px solid #263c4b !important; outline:2px solid #78dff2 !important; box-shadow:inset 0 0 0 3px #d4e1e7, inset 0 0 0 6px #f9fdff, 0 0 0 3px #06131d !important; }
+/* PROJECT: LOGIC — layered pixel-art scene */
+.game { background:#02050a !important; color:#d9faff !important; }
+.game-area { background:#02050a !important; }
+.room {
+ position:absolute !important; overflow:visible !important; isolation:isolate !important;
+ background-color:#111c27 !important;
+ background-image:
+  radial-gradient(ellipse at 48% 48%,rgba(24,104,126,.18),transparent 58%),
+  linear-gradient(180deg,#263846 0%,#182a38 9%,#101d29 10%,#101d29 100%),
+  repeating-linear-gradient(0deg,transparent 0 47px,rgba(4,10,17,.95) 47px 49px),
+  repeating-linear-gradient(90deg,transparent 0 47px,rgba(4,10,17,.95) 47px 49px) !important;
+ background-size:100% 100%,100% 100%,48px 48px,48px 48px !important;
+ border:0 !important; outline:0 !important; box-shadow:none !important;
+}
+.room::before { content:""; position:absolute; z-index:0; inset:0; pointer-events:none;
+ background:linear-gradient(180deg,rgba(90,153,177,.13),transparent 15%),
+ repeating-linear-gradient(0deg,transparent 0 95px,rgba(71,123,146,.18) 95px 97px),
+ repeating-linear-gradient(90deg,transparent 0 95px,rgba(71,123,146,.15) 95px 97px);
+}
 .room-line-horizontal,.room-line-vertical { display:none !important; }
-.room > .monitor { display:none !important; }
-
-/* Console: crisp stepped bezel, inset screen, pixel controls and pedestal. */
-.object.computer { left:40% !important; top:8% !important; width:20% !important; height:20% !important; box-sizing:border-box !important; overflow:visible !important; padding:0 !important; color:transparent !important; background:#b9cbd4 !important; border:4px solid #243c4d !important; outline:2px solid #effcff !important; box-shadow:inset 0 0 0 2px #eaf6fa,inset 0 0 0 5px #7996a5,4px 0 #263e4e,-4px 0 #263e4e,0 4px #263e4e,0 -4px #263e4e,6px 6px 0 #9aafb9 !important; }
-.object.computer::before { content:"" !important; position:absolute !important; left:7% !important; right:7% !important; top:7% !important; height:63% !important; box-sizing:border-box !important; background:linear-gradient(90deg,transparent 0 8%,#0a718a 8% 10%,transparent 10% 90%,#0a718a 90% 92%,transparent 92%),linear-gradient(180deg,#06344a 0%,#087b9c 52%,#04283c 100%) !important; border:3px solid #1d3545 !important; box-shadow:inset 0 0 0 2px #4de5ff,inset 0 0 0 5px #07506b,0 2px 0 #f4fdff !important; }
-.object.computer::after { content:"" !important; position:absolute !important; left:0 !important; right:0 !important; top:17% !important; height:42% !important; display:flex !important; align-items:center !important; justify-content:center !important; color:#7df3ff !important; font-size:clamp(20px,2.6vw,34px) !important; line-height:1 !important; text-shadow:2px 0 #17475b,-2px 0 #17475b,0 2px #17475b,0 -2px #17475b !important; content:"△" !important; z-index:2 !important; }
-.object.computer { background-image:linear-gradient(#eaf8fc 0 0),linear-gradient(#526e7d 0 0),linear-gradient(#dceaf0 0 0) !important; background-repeat:no-repeat !important; background-size:12% 5%,12% 5%,34% 7% !important; background-position:18% 83%,70% 83%,33% 86% !important; }
-.object.computer .object-label { display:none !important; }
-
-/* Desk sits below the player: pale metal top, dark pixel legs, small terminal. */
-.object.desk { left:43% !important; top:62% !important; width:14% !important; height:11% !important; box-sizing:border-box !important; padding:0 !important; color:transparent !important; background:linear-gradient(180deg,#f9fdff 0 15%,#d3e0e7 15% 100%) !important; border:3px solid #2b4556 !important; outline:2px solid #f7fdff !important; box-shadow:inset 0 0 0 2px #9fb8c4,inset 0 0 0 5px #edf6fa,3px 0 #2b4556,-3px 0 #2b4556,0 3px #2b4556,0 -3px #2b4556,5px 5px 0 #9bafb9 !important; }
-.object.desk::before { content:"" !important; position:absolute !important; left:27% !important; right:27% !important; top:10% !important; height:43% !important; background:linear-gradient(90deg,#183b4e 0 8%,#0b617c 8% 92%,#183b4e 92% 100%) !important; border:2px solid #263f50 !important; box-shadow:inset 0 0 0 2px #53e6ff,inset 0 0 0 5px #07516a !important; }
-.object.desk::after { left:9% !important; right:9% !important; bottom:-14px !important; height:11px !important; border:3px solid #2b4556 !important; background:linear-gradient(90deg,#8ca6b2 0 18%,#dce8ed 18% 28%,#8ca6b2 28% 72%,#dce8ed 72% 82%,#8ca6b2 82% 100%) !important; box-shadow:inset 0 0 0 2px #edf8fb !important; }
+.room > * { image-rendering:pixelated !important; }
+/* Separate workstation base layer; detailed computer sits on top of the desk. */
+.object.desk { position:absolute !important; z-index:2 !important; left:34% !important; top:20% !important; width:32% !important; height:21% !important;
+ color:transparent !important; padding:0 !important; box-sizing:border-box !important; overflow:visible !important;
+ background:linear-gradient(180deg,#596b78 0 7%,#293c4b 7% 12%,#172733 12% 84%,#0b141e 84% 100%) !important;
+ border:3px solid #536d7d !important; box-shadow:inset 0 0 0 2px #263d4d, inset 0 5px #8ba6b4, 0 5px #080f17, 0 9px 0 #080d13 !important;
+}
+.object.desk::before { content:"" !important; position:absolute !important; left:5%; right:5%; top:14%; height:69%;
+ background:linear-gradient(180deg,#8ca3af 0 8%,#536d7b 8% 14%,#263b49 14% 100%);
+ border:2px solid #101e2a; box-shadow:inset 0 0 0 2px #607b89, inset 0 -5px #172733;
+}
+.object.desk::after { content:"" !important; position:absolute !important; left:12%; right:12%; bottom:-14%; height:14%;
+ background:linear-gradient(90deg,#0b141d 0 8%,#3b5260 8% 14%,transparent 14% 86%,#3b5260 86% 92%,#0b141d 92%);
+}
 .object.desk .object-label { display:none !important; }
-
-/* Exit remains at the existing right-wall coordinates; no idle floating arrow. */
-.exit-wall { right:0 !important; left:auto !important; top:35% !important; width:8% !important; height:30% !important; box-sizing:border-box !important; background:linear-gradient(90deg,#a5bac5 0 8%,#e9f2f6 8% 92%,#8ba6b4 92% 100%) !important; border:4px solid #263d4d !important; box-shadow:inset 0 0 0 3px #f8fdff,inset 0 0 0 6px #9cb7c3,-4px 0 #526f80,4px 0 #526f80 !important; }
-.exit-wall::before { top:7% !important; height:3px !important; background:#4c6979 !important; box-shadow:0 7px #a2b8c3,0 14px #a2b8c3 !important; }
-.exit-wall::after { bottom:8% !important; height:4px !important; background:#263f50 !important; box-shadow:0 -8px #9cb6c2,0 -16px #9cb6c2 !important; }
-.exit-sign { right:9% !important; left:auto !important; top:45% !important; color:#163a4c !important; text-shadow:1px 1px #fff !important; }
-.exit-arrow { display:none !important; }
-.player { z-index:8 !important; background:#173c50 !important; box-shadow:0 0 0 2px #071d2a,inset 0 0 0 3px #70e8fa !important; }
-.player::after { background:rgba(18,63,82,.22) !important; }
-
-
-/* Detailed hand-authored pixel SVG sprites: room stays white; outer game HUD remains black. */
-.game-area { background-color:#080808 !important; }
-.room { background:#f7fafc !important; border:2px solid #263f50 !important; box-shadow:inset 0 0 0 4px #e0e9ee,inset 0 0 0 6px #9fb6c1 !important; }
-.room-line-horizontal,.room-line-vertical { display:none !important; }
-.object.monitor { display:none !important; }
-.object.computer { left:42% !important; top:13% !important; width:16% !important; height:14% !important; padding:0 !important; color:transparent !important; border:0 !important; background:transparent url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTIiIGhlaWdodD0iMTU2IiB2aWV3Qm94PSIwIDAgMTkyIDE1NiIgc2hhcGUtcmVuZGVyaW5nPSJjcmlzcEVkZ2VzIj4KPHJlY3QgeD0iMTIiIHk9IjEwIiB3aWR0aD0iMTY4IiBoZWlnaHQ9IjEwMiIgZmlsbD0iI2I1YzZjZSIvPjxyZWN0IHg9IjgiIHk9IjYiIHdpZHRoPSIxNjgiIGhlaWdodD0iMTAyIiBmaWxsPSIjMTgyZDNiIi8+PHJlY3QgeD0iMTIiIHk9IjEwIiB3aWR0aD0iMTYwIiBoZWlnaHQ9Ijk0IiBmaWxsPSIjNTI2Yjc5Ii8+PHJlY3QgeD0iMTYiIHk9IjE0IiB3aWR0aD0iMTUyIiBoZWlnaHQ9Ijg2IiBmaWxsPSIjZGNlN2ViIi8+PHJlY3QgeD0iMjAiIHk9IjE4IiB3aWR0aD0iMTQ0IiBoZWlnaHQ9Ijc4IiBmaWxsPSIjMDcxNzIzIi8+PHJlY3QgeD0iMjQiIHk9IjIyIiB3aWR0aD0iMTM2IiBoZWlnaHQ9IjcwIiBmaWxsPSIjMGIyYjNhIi8+CjxyZWN0IHg9IjI4IiB5PSIyNiIgd2lkdGg9IjEyOCIgaGVpZ2h0PSI4IiBmaWxsPSIjMTUzZjUwIi8+PHJlY3QgeD0iMzIiIHk9IjI5IiB3aWR0aD0iMjgiIGhlaWdodD0iMiIgZmlsbD0iIzhiZjNmZiIvPjxyZWN0IHg9IjEzNiIgeT0iMjgiIHdpZHRoPSI1IiBoZWlnaHQ9IjQiIGZpbGw9IiM2MmU0ZWYiLz48cmVjdCB4PSIxNDUiIHk9IjI4IiB3aWR0aD0iNSIgaGVpZ2h0PSI0IiBmaWxsPSIjNGJhNWI3Ii8+CjxyZWN0IHg9IjI4IiB5PSIzOCIgd2lkdGg9IjEyOCIgaGVpZ2h0PSI0OCIgZmlsbD0iIzA4MjAyZCIvPjxyZWN0IHg9IjM0IiB5PSI0NCIgd2lkdGg9IjQ1IiBoZWlnaHQ9IjMiIGZpbGw9IiM0NWQ4ZWQiLz48cmVjdCB4PSIzNCIgeT0iNTIiIHdpZHRoPSIyOCIgaGVpZ2h0PSIyIiBmaWxsPSIjMzk4NzliIi8+PHJlY3QgeD0iMzQiIHk9IjU4IiB3aWR0aD0iMzkiIGhlaWdodD0iMiIgZmlsbD0iIzM5ODc5YiIvPjxyZWN0IHg9IjM0IiB5PSI2NCIgd2lkdGg9IjIzIiBoZWlnaHQ9IjIiIGZpbGw9IiMzOTg3OWIiLz48cmVjdCB4PSIzNCIgeT0iNzIiIHdpZHRoPSI0MSIgaGVpZ2h0PSIzIiBmaWxsPSIjMWY4MTk1Ii8+CjxyZWN0IHg9Ijg4IiB5PSI0MyIgd2lkdGg9IjU4IiBoZWlnaHQ9IjM1IiBmaWxsPSIjMGUzYzRiIi8+PHJlY3QgeD0iOTQiIHk9IjY4IiB3aWR0aD0iNiIgaGVpZ2h0PSI3IiBmaWxsPSIjMWFhNmI5Ii8+PHJlY3QgeD0iMTA0IiB5PSI1OSIgd2lkdGg9IjYiIGhlaWdodD0iMTYiIGZpbGw9IiMyN2M1ZDUiLz48cmVjdCB4PSIxMTQiIHk9IjUxIiB3aWR0aD0iNiIgaGVpZ2h0PSIyNCIgZmlsbD0iIzcwZWRmMSIvPjxyZWN0IHg9IjEyNCIgeT0iNTYiIHdpZHRoPSI2IiBoZWlnaHQ9IjE5IiBmaWxsPSIjMmZhN2JkIi8+PHJlY3QgeD0iMTM0IiB5PSI0NyIgd2lkdGg9IjYiIGhlaWdodD0iMjgiIGZpbGw9IiM3Y2Y0ZjUiLz48cmVjdCB4PSI5MCIgeT0iNzkiIHdpZHRoPSI1NCIgaGVpZ2h0PSIyIiBmaWxsPSIjNGI4YzlkIi8+CjxyZWN0IHg9IjQiIHk9IjIiIHdpZHRoPSI4IiBoZWlnaHQ9IjgiIGZpbGw9IiM1ZGU2ZjUiLz48cmVjdCB4PSIxNjQiIHk9IjIiIHdpZHRoPSI4IiBoZWlnaHQ9IjgiIGZpbGw9IiM1ZGU2ZjUiLz48cmVjdCB4PSI0IiB5PSIxMDQiIHdpZHRoPSI4IiBoZWlnaHQ9IjgiIGZpbGw9IiM1ZGU2ZjUiLz48cmVjdCB4PSIxNjQiIHk9IjEwNCIgd2lkdGg9IjgiIGhlaWdodD0iOCIgZmlsbD0iIzVkZTZmNSIvPjxyZWN0IHg9IjE2IiB5PSIxMTIiIHdpZHRoPSIxNDQiIGhlaWdodD0iOCIgZmlsbD0iIzI2M2U0YyIvPjxyZWN0IHg9IjI0IiB5PSIxMTIiIHdpZHRoPSIxMjgiIGhlaWdodD0iNCIgZmlsbD0iIzc4OTZhNCIvPjxyZWN0IHg9IjgwIiB5PSIxMjAiIHdpZHRoPSIyNCIgaGVpZ2h0PSIxNCIgZmlsbD0iIzQxNWM2YiIvPjxyZWN0IHg9IjcyIiB5PSIxMzIiIHdpZHRoPSI0MCIgaGVpZ2h0PSI2IiBmaWxsPSIjMjMzYjQ5Ii8+PHJlY3QgeD0iNjQiIHk9IjEzOCIgd2lkdGg9IjU2IiBoZWlnaHQ9IjYiIGZpbGw9IiMxODJlM2IiLz48cmVjdCB4PSI1NiIgeT0iMTQ0IiB3aWR0aD0iNzIiIGhlaWdodD0iNiIgZmlsbD0iIzlmYjRiZCIvPjxyZWN0IHg9IjUyIiB5PSIxNDgiIHdpZHRoPSI4MCIgaGVpZ2h0PSI0IiBmaWxsPSIjMjUzZjRjIi8+CjxyZWN0IHg9IjIwIiB5PSIxMjIiIHdpZHRoPSI0MCIgaGVpZ2h0PSIyNCIgZmlsbD0iIzI0M2Q0YSIvPjxyZWN0IHg9IjI0IiB5PSIxMjYiIHdpZHRoPSIzMiIgaGVpZ2h0PSIxNiIgZmlsbD0iI2Q2ZTNlOCIvPjxyZWN0IHg9IjI4IiB5PSIxMzAiIHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiM3MThjOTgiLz48cmVjdCB4PSIzNiIgeT0iMTMwIiB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjNzE4Yzk4Ii8+PHJlY3QgeD0iNDQiIHk9IjEzMCIgd2lkdGg9IjQiIGhlaWdodD0iNCIgZmlsbD0iIzcxOGM5OCIvPjxyZWN0IHg9IjI4IiB5PSIxMzgiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyIiBmaWxsPSIjNDVjOWRjIi8+CjxyZWN0IHg9IjY4IiB5PSIxMjQiIHdpZHRoPSI1NiIgaGVpZ2h0PSIyMiIgZmlsbD0iIzE5MmUzYiIvPjxyZWN0IHg9IjcyIiB5PSIxMjgiIHdpZHRoPSI0OCIgaGVpZ2h0PSIxNCIgZmlsbD0iIzUyNmQ3YSIvPjxyZWN0IHg9Ijc2IiB5PSIxMzAiIHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiNkNGU0ZTkiLz48cmVjdCB4PSI4NCIgeT0iMTMwIiB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZDRlNGU5Ii8+PHJlY3QgeD0iOTIiIHk9IjEzMCIgd2lkdGg9IjQiIGhlaWdodD0iNCIgZmlsbD0iI2Q0ZTRlOSIvPjxyZWN0IHg9IjEwMCIgeT0iMTMwIiB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjZDRlNGU5Ii8+PHJlY3QgeD0iMTA4IiB5PSIxMzAiIHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiNkNGU0ZTkiLz48cmVjdCB4PSI3NiIgeT0iMTM2IiB3aWR0aD0iNCIgaGVpZ2h0PSIzIiBmaWxsPSIjZDRlNGU5Ii8+PHJlY3QgeD0iODQiIHk9IjEzNiIgd2lkdGg9IjQiIGhlaWdodD0iMyIgZmlsbD0iI2Q0ZTRlOSIvPjxyZWN0IHg9IjkyIiB5PSIxMzYiIHdpZHRoPSI0IiBoZWlnaHQ9IjMiIGZpbGw9IiNkNGU0ZTkiLz48cmVjdCB4PSIxMDAiIHk9IjEzNiIgd2lkdGg9IjQiIGhlaWdodD0iMyIgZmlsbD0iI2Q0ZTRlOSIvPjxyZWN0IHg9IjEwOCIgeT0iMTM2IiB3aWR0aD0iNCIgaGVpZ2h0PSIzIiBmaWxsPSIjZDRlNGU5Ii8+PHJlY3QgeD0iMTM2IiB5PSIxMjYiIHdpZHRoPSIyOCIgaGVpZ2h0PSIxOCIgZmlsbD0iIzIwM2E0OCIvPjxyZWN0IHg9IjE0MCIgeT0iMTMwIiB3aWR0aD0iMjAiIGhlaWdodD0iMyIgZmlsbD0iIzNjNjU3NiIvPjxyZWN0IHg9IjE0MCIgeT0iMTM2IiB3aWR0aD0iMTIiIGhlaWdodD0iMyIgZmlsbD0iIzU2ZDllOCIvPgo8L3N2Zz4=") center/100% 100% no-repeat !important; image-rendering:pixelated !important; filter:none !important; box-shadow:none !important; }
-.object.computer::before,.object.computer::after { content:none !important; }
-.object.desk { left:35% !important; top:62% !important; width:30% !important; height:12% !important; padding:0 !important; color:transparent !important; border:0 !important; background:transparent url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNDAiIGhlaWdodD0iMTEyIiB2aWV3Qm94PSIwIDAgMjQwIDExMiIgc2hhcGUtcmVuZGVyaW5nPSJjcmlzcEVkZ2VzIj4KPCEtLSBjYXN0IHNoYWRvdyBhbmQgbGVncyAtLT4gPHJlY3QgeD0iMjIiIHk9IjI0IiB3aWR0aD0iMjA0IiBoZWlnaHQ9Ijc4IiBmaWxsPSIjYWFiYWMyIi8+PHJlY3QgeD0iMzAiIHk9IjYyIiB3aWR0aD0iMTYiIGhlaWdodD0iNDIiIGZpbGw9IiMzMDQ5NTgiLz48cmVjdCB4PSIzNCIgeT0iNjYiIHdpZHRoPSI4IiBoZWlnaHQ9IjM0IiBmaWxsPSIjODA5OWE1Ii8+PHJlY3QgeD0iMTk0IiB5PSI2MiIgd2lkdGg9IjE2IiBoZWlnaHQ9IjQyIiBmaWxsPSIjMzA0OTU4Ii8+PHJlY3QgeD0iMTk4IiB5PSI2NiIgd2lkdGg9IjgiIGhlaWdodD0iMzQiIGZpbGw9IiM4MDk5YTUiLz48cmVjdCB4PSI0MiIgeT0iNjgiIHdpZHRoPSIxNTYiIGhlaWdodD0iOCIgZmlsbD0iIzUyNmI3OSIvPgo8IS0tIHRoaWNrIGRlc2sgZWRnZSAtLT4gPHJlY3QgeD0iMTAiIHk9IjEyIiB3aWR0aD0iMjIwIiBoZWlnaHQ9IjYyIiBmaWxsPSIjMjQzZDRiIi8+PHJlY3QgeD0iMTQiIHk9IjgiIHdpZHRoPSIyMTIiIGhlaWdodD0iNjAiIGZpbGw9IiM2Yjg3OTQiLz48cmVjdCB4PSIxOCIgeT0iMTIiIHdpZHRoPSIyMDQiIGhlaWdodD0iNDgiIGZpbGw9IiNkYmU3ZWIiLz48cmVjdCB4PSIyMiIgeT0iMTYiIHdpZHRoPSIxOTYiIGhlaWdodD0iNDAiIGZpbGw9IiNmN2ZiZmMiLz48cmVjdCB4PSIyMiIgeT0iNTYiIHdpZHRoPSIxOTYiIGhlaWdodD0iOCIgZmlsbD0iI2FmYzNjYyIvPjxyZWN0IHg9IjE4IiB5PSI2NCIgd2lkdGg9IjIwNCIgaGVpZ2h0PSI2IiBmaWxsPSIjMzA0YjU5Ii8+CjwhLS0gZGVzayBtYXQgLS0+IDxyZWN0IHg9IjQyIiB5PSIyMCIgd2lkdGg9IjkyIiBoZWlnaHQ9IjMwIiBmaWxsPSIjNzE4Yzk4Ii8+PHJlY3QgeD0iNDYiIHk9IjI0IiB3aWR0aD0iODQiIGhlaWdodD0iMjIiIGZpbGw9IiNkMmUyZTgiLz48cmVjdCB4PSI1MCIgeT0iMjgiIHdpZHRoPSI3NiIgaGVpZ2h0PSIxNCIgZmlsbD0iI2VhZjNmNiIvPgo8IS0tIHNtYWxsIHRlcm1pbmFsIC0tPiA8cmVjdCB4PSI1NCIgeT0iMjgiIHdpZHRoPSIzNiIgaGVpZ2h0PSIxMiIgZmlsbD0iIzFjMzY0NSIvPjxyZWN0IHg9IjU4IiB5PSIzMSIgd2lkdGg9IjI4IiBoZWlnaHQ9IjYiIGZpbGw9IiMwNzMzNDIiLz48cmVjdCB4PSI2MSIgeT0iMzMiIHdpZHRoPSIxMiIgaGVpZ2h0PSIyIiBmaWxsPSIjNTllNmYyIi8+PHJlY3QgeD0iNzYiIHk9IjMyIiB3aWR0aD0iNiIgaGVpZ2h0PSIzIiBmaWxsPSIjMzZiN2NiIi8+PHJlY3QgeD0iNjgiIHk9IjQwIiB3aWR0aD0iOCIgaGVpZ2h0PSIzIiBmaWxsPSIjNTI2ZTdiIi8+CjwhLS0gcGFwZXIgc3RhY2sgLS0+IDxyZWN0IHg9IjEwMCIgeT0iMjgiIHdpZHRoPSIyNiIgaGVpZ2h0PSIxNCIgZmlsbD0iI2I3YzlkMCIvPjxyZWN0IHg9IjEwNCIgeT0iMjQiIHdpZHRoPSIyNiIgaGVpZ2h0PSIxNCIgZmlsbD0iI2RjZThlYyIvPjxyZWN0IHg9IjEwOCIgeT0iMjgiIHdpZHRoPSIxOCIgaGVpZ2h0PSIyIiBmaWxsPSIjNmU4YTk4Ii8+PHJlY3QgeD0iMTA4IiB5PSIzMiIgd2lkdGg9IjE0IiBoZWlnaHQ9IjIiIGZpbGw9IiM2ZThhOTgiLz4KPCEtLSBrZXlib2FyZCAtLT4gPHJlY3QgeD0iMTQ0IiB5PSIyMiIgd2lkdGg9IjYwIiBoZWlnaHQ9IjI0IiBmaWxsPSIjMjUzZTRjIi8+PHJlY3QgeD0iMTQ4IiB5PSIyNiIgd2lkdGg9IjUyIiBoZWlnaHQ9IjE2IiBmaWxsPSIjOGJhMmFkIi8+PGcgZmlsbD0iI2VhZjJmNSI+PHJlY3QgeD0iMTUxIiB5PSIyOCIgd2lkdGg9IjUiIGhlaWdodD0iNCIvPjxyZWN0IHg9IjE1OSIgeT0iMjgiIHdpZHRoPSI1IiBoZWlnaHQ9IjQiLz48cmVjdCB4PSIxNjciIHk9IjI4IiB3aWR0aD0iNSIgaGVpZ2h0PSI0Ii8+PHJlY3QgeD0iMTc1IiB5PSIyOCIgd2lkdGg9IjUiIGhlaWdodD0iNCIvPjxyZWN0IHg9IjE4MyIgeT0iMjgiIHdpZHRoPSI1IiBoZWlnaHQ9IjQiLz48cmVjdCB4PSIxOTEiIHk9IjI4IiB3aWR0aD0iNSIgaGVpZ2h0PSI0Ii8+PHJlY3QgeD0iMTUxIiB5PSIzNSIgd2lkdGg9IjUiIGhlaWdodD0iNCIvPjxyZWN0IHg9IjE1OSIgeT0iMzUiIHdpZHRoPSI1IiBoZWlnaHQ9IjQiLz48cmVjdCB4PSIxNjciIHk9IjM1IiB3aWR0aD0iNSIgaGVpZ2h0PSI0Ii8+PHJlY3QgeD0iMTc1IiB5PSIzNSIgd2lkdGg9IjUiIGhlaWdodD0iNCIvPjxyZWN0IHg9IjE4MyIgeT0iMzUiIHdpZHRoPSIxMyIgaGVpZ2h0PSI0Ii8+PC9nPgo8IS0tIGluZGljYXRvciBwYW5lbCAtLT4gPHJlY3QgeD0iMTU0IiB5PSI0OSIgd2lkdGg9IjQ2IiBoZWlnaHQ9IjUiIGZpbGw9IiMzMDRjNWEiLz48cmVjdCB4PSIxNTgiIHk9IjUwIiB3aWR0aD0iNCIgaGVpZ2h0PSIzIiBmaWxsPSIjNjVlNmYwIi8+PHJlY3QgeD0iMTY2IiB5PSI1MCIgd2lkdGg9IjQiIGhlaWdodD0iMyIgZmlsbD0iIzVlOGI5YSIvPjxyZWN0IHg9IjE3NCIgeT0iNTAiIHdpZHRoPSI0IiBoZWlnaHQ9IjMiIGZpbGw9IiM1ZThiOWEiLz4KPCEtLSBjb3JuZXIgY2FwcyAtLT4gPHJlY3QgeD0iNiIgeT0iOCIgd2lkdGg9IjgiIGhlaWdodD0iOCIgZmlsbD0iIzRiZDhlYiIvPjxyZWN0IHg9IjIyNiIgeT0iOCIgd2lkdGg9IjgiIGhlaWdodD0iOCIgZmlsbD0iIzRiZDhlYiIvPjxyZWN0IHg9IjYiIHk9IjY0IiB3aWR0aD0iOCIgaGVpZ2h0PSI2IiBmaWxsPSIjMWIzNTQzIi8+PHJlY3QgeD0iMjI2IiB5PSI2NCIgd2lkdGg9IjgiIGhlaWdodD0iNiIgZmlsbD0iIzFiMzU0MyIvPgo8L3N2Zz4=") center/100% 100% no-repeat !important; image-rendering:pixelated !important; box-shadow:none !important; }
-.object.desk::before,.object.desk::after { content:none !important; }
-.object.desk .access-key { z-index:4 !important; }
-.exit-wall { right:0 !important; left:auto !important; top:35% !important; width:8% !important; height:30% !important; background:transparent url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5NiIgaGVpZ2h0PSIyMDgiIHZpZXdCb3g9IjAgMCA5NiAyMDgiIHNoYXBlLXJlbmRlcmluZz0iY3Jpc3BFZGdlcyI+CjwhLS0gd2FsbCByZWNlc3MgLS0+IDxyZWN0IHg9IjQiIHk9IjIiIHdpZHRoPSI4OCIgaGVpZ2h0PSIyMDQiIGZpbGw9IiMyNjNlNGMiLz48cmVjdCB4PSI4IiB5PSI2IiB3aWR0aD0iODAiIGhlaWdodD0iMTk2IiBmaWxsPSIjOGRhNWIwIi8+PHJlY3QgeD0iMTIiIHk9IjEwIiB3aWR0aD0iNzIiIGhlaWdodD0iMTg4IiBmaWxsPSIjZTVlZWYyIi8+PHJlY3QgeD0iMTYiIHk9IjE0IiB3aWR0aD0iNjQiIGhlaWdodD0iMTgwIiBmaWxsPSIjYjljYmQyIi8+PHJlY3QgeD0iMjAiIHk9IjE4IiB3aWR0aD0iNTYiIGhlaWdodD0iMTcyIiBmaWxsPSIjZjZmYWZiIi8+CjwhLS0gZG9vciBzbGFiIC0tPiA8cmVjdCB4PSIyNCIgeT0iMjIiIHdpZHRoPSI0OCIgaGVpZ2h0PSIxNjQiIGZpbGw9IiM4ZGE2YjIiLz48cmVjdCB4PSIyOCIgeT0iMjYiIHdpZHRoPSI0MCIgaGVpZ2h0PSIxNTYiIGZpbGw9IiNkOGU1ZTkiLz48cmVjdCB4PSIzMiIgeT0iMzAiIHdpZHRoPSIzMiIgaGVpZ2h0PSIxNDgiIGZpbGw9IiNlZGY0ZjYiLz4KPCEtLSBpbnNldCB1cHBlci9sb3dlciBwYW5lbHMgLS0+IDxyZWN0IHg9IjM2IiB5PSIzOCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjU2IiBmaWxsPSIjYjZjYmQzIi8+PHJlY3QgeD0iNDAiIHk9IjQyIiB3aWR0aD0iMTYiIGhlaWdodD0iNDgiIGZpbGw9IiNlNGVlZjEiLz48cmVjdCB4PSIzNiIgeT0iMTA2IiB3aWR0aD0iMjQiIGhlaWdodD0iNjAiIGZpbGw9IiNiNmNiZDMiLz48cmVjdCB4PSI0MCIgeT0iMTEwIiB3aWR0aD0iMTYiIGhlaWdodD0iNTIiIGZpbGw9IiNlNGVlZjEiLz4KPCEtLSBwYW5lbCBoaWdobGlnaHQgYW5kIGVkZ2Ugc2hhZGUgLS0+IDxyZWN0IHg9IjM2IiB5PSIzOCIgd2lkdGg9IjQiIGhlaWdodD0iNTYiIGZpbGw9IiNmOWZjZmQiLz48cmVjdCB4PSI1NiIgeT0iMzgiIHdpZHRoPSI0IiBoZWlnaHQ9IjU2IiBmaWxsPSIjOGJhNGIwIi8+PHJlY3QgeD0iMzYiIHk9IjEwNiIgd2lkdGg9IjQiIGhlaWdodD0iNjAiIGZpbGw9IiNmOWZjZmQiLz48cmVjdCB4PSI1NiIgeT0iMTA2IiB3aWR0aD0iNCIgaGVpZ2h0PSI2MCIgZmlsbD0iIzhiYTRiMCIvPgo8IS0tIGtleXBhZCAtLT4gPHJlY3QgeD0iNTgiIHk9Ijg4IiB3aWR0aD0iMTAiIGhlaWdodD0iMjQiIGZpbGw9IiMyNDNmNGQiLz48cmVjdCB4PSI2MCIgeT0iOTAiIHdpZHRoPSI2IiBoZWlnaHQ9IjIwIiBmaWxsPSIjNDE2NTc0Ii8+PHJlY3QgeD0iNjEiIHk9IjkyIiB3aWR0aD0iNCIgaGVpZ2h0PSI0IiBmaWxsPSIjNjlmMGY0Ii8+PHJlY3QgeD0iNjEiIHk9Ijk5IiB3aWR0aD0iNCIgaGVpZ2h0PSIyIiBmaWxsPSIjYjJmYWZmIi8+PHJlY3QgeD0iNjEiIHk9IjEwNCIgd2lkdGg9IjQiIGhlaWdodD0iMiIgZmlsbD0iI2IyZmFmZiIvPgo8IS0tIGhhbmRsZSBhbmQgbG9jayAtLT4gPHJlY3QgeD0iNTQiIHk9IjExOCIgd2lkdGg9IjgiIGhlaWdodD0iMjAiIGZpbGw9IiMzMTRkNWEiLz48cmVjdCB4PSI1NiIgeT0iMTIyIiB3aWR0aD0iNCIgaGVpZ2h0PSIxMiIgZmlsbD0iIzZhODc5NCIvPjxyZWN0IHg9IjU2IiB5PSIxMjYiIHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiM1YmUzZWYiLz4KPCEtLSBoaW5nZXMgLS0+IDxyZWN0IHg9IjI4IiB5PSI0OCIgd2lkdGg9IjQiIGhlaWdodD0iMTAiIGZpbGw9IiM2ZTg5OTYiLz48cmVjdCB4PSIyOCIgeT0iMTQ4IiB3aWR0aD0iNCIgaGVpZ2h0PSIxMCIgZmlsbD0iIzZlODk5NiIvPgo8IS0tIGN5YW4gcGl4ZWwgY29ybmVyIG1hcmtlcnMgLS0+IDxyZWN0IHg9IjIiIHk9IjEyIiB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjNTJlNmYyIi8+PHJlY3QgeD0iODYiIHk9IjEyIiB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjNTJlNmYyIi8+PHJlY3QgeD0iMiIgeT0iMTg4IiB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjNTJlNmYyIi8+PHJlY3QgeD0iODYiIHk9IjE4OCIgd2lkdGg9IjgiIGhlaWdodD0iOCIgZmlsbD0iIzUyZTZmMiIvPgo8L3N2Zz4=") center/100% 100% no-repeat !important; border:0 !important; box-shadow:none !important; image-rendering:pixelated !important; }
-.exit-wall::before,.exit-wall::after { content:none !important; }
-.exit-sign { right:9% !important; color:#17394b !important; }
-.exit-arrow { display:none !important; }
-/* FINAL ART PASS: beveled sci-fi tiles and a dark, framed laboratory. */
-html, body, .game, .game-area {
-    background: #030509 !important;
-    background-image: none !important;
+.object.computer { position:absolute !important; z-index:4 !important; left:41% !important; top:8% !important; width:18% !important; height:23% !important;
+ padding:0 !important; color:transparent !important; overflow:visible !important; box-sizing:border-box !important;
+ background:linear-gradient(180deg,#9eb7c3 0 5%,#344b5a 5% 9%,#192b38 9% 72%,#526c7b 72% 79%,#243a49 79% 100%) !important;
+ border:3px solid #101d29 !important; box-shadow:inset 0 0 0 2px #7896a5, inset 0 0 0 5px #2b4352, 3px 3px #080f17 !important;
 }
-.game-area {
-    background: #030509 !important;
-    overflow: hidden !important;
+.object.computer::before { content:"" !important; position:absolute !important; left:9%; right:9%; top:8%; height:57%; box-sizing:border-box;
+ background:linear-gradient(180deg,#0b2436 0%,#07536b 48%,#0b3042 100%);
+ border:3px solid #101b28; box-shadow:inset 0 0 0 2px #47d8ed, inset 0 0 0 5px #16485c;
 }
-.room {
-    background-color: #7f8da3 !important;
-    background-image:
-        /* recessed tile seams */
-        linear-gradient(to right, transparent 0, transparent calc(100% - 2px), #59677e calc(100% - 2px), #59677e 100%),
-        linear-gradient(to bottom, transparent 0, transparent calc(100% - 2px), #59677e calc(100% - 2px), #59677e 100%),
-        /* upper-left bevel on every floor panel */
-        linear-gradient(to right, rgba(255,255,255,.42) 0, rgba(255,255,255,.12) 2px, transparent 5px),
-        linear-gradient(to bottom, rgba(255,255,255,.38) 0, rgba(255,255,255,.10) 2px, transparent 5px),
-        /* cool metallic variation */
-        linear-gradient(135deg, #cbd5e4 0%, #aebbd0 42%, #9aa9c0 100%) !important;
-    background-size: 64px 64px, 64px 64px, 64px 64px, 64px 64px, 100% 100% !important;
-    background-repeat: repeat, repeat, repeat, repeat, no-repeat !important;
-    border: 0 !important;
-    outline: 0 !important;
-    box-shadow:
-        inset 0 0 0 5px #182334,
-        inset 0 0 0 9px #52627a,
-        inset 0 0 0 12px #aab9ce,
-        inset 0 0 0 15px #3b4b62,
-        0 0 0 5px #070a10,
-        0 9px 0 #111927 !important;
+.object.computer::after { content:"" !important; position:absolute !important; left:18%; top:22%; width:64%; height:24%;
+ background:repeating-linear-gradient(0deg,#64f1ff 0 2px,transparent 2px 6px);
+ opacity:.85; clip-path:polygon(0 0,100% 0,100% 20%,65% 20%,65% 40%,100% 40%,100% 60%,25% 60%,25% 80%,75% 80%,75% 100%,0 100%);
 }
-/* Each tile has tiny corner fasteners, giving the floor a raised modular-panel look. */
-.room-line-horizontal, .room-line-vertical { display: none !important; }
-.room::after {
-    content: "" !important;
-    position: absolute !important;
-    inset: 15px !important;
-    pointer-events: none !important;
-    z-index: 1 !important;
-    background-image:
-        radial-gradient(circle at 4px 4px, #52617a 0 1.5px, #e0e8f3 1.6px 2.4px, transparent 2.5px),
-        radial-gradient(circle at calc(100% - 4px) 4px, #52617a 0 1.5px, #e0e8f3 1.6px 2.4px, transparent 2.5px),
-        radial-gradient(circle at 4px calc(100% - 4px), #52617a 0 1.5px, #e0e8f3 1.6px 2.4px, transparent 2.5px),
-        radial-gradient(circle at calc(100% - 4px) calc(100% - 4px), #52617a 0 1.5px, #e0e8f3 1.6px 2.4px, transparent 2.5px);
-    background-size: 64px 64px !important;
-    background-repeat: repeat !important;
-    opacity: .78 !important;
+.object.computer .object-label { display:none !important; }
+/* Exit is an independent, reachable object, not painted into the floor. */
+.exit-wall { position:absolute !important; z-index:3 !important; left:auto !important; right:3% !important; top:34% !important; width:13% !important; height:32% !important;
+ box-sizing:border-box !important; background:linear-gradient(90deg,#102b3a 0 12%,#236174 12% 19%,#0a1b28 19% 82%,#367e8b 82% 89%,#102b3a 89%) !important;
+ border:3px solid #5ceaff !important; outline:2px solid #153747 !important;
+ box-shadow:inset 0 0 0 3px #183c4d, inset 0 0 0 7px #0b202d, 0 0 12px rgba(37,222,255,.35) !important;
 }
-/* Keep the authored pixel sprites crisp and remove only CSS-added frames. */
-.object.computer, .object.desk, .exit-wall {
-    outline: 0 !important;
-    border: 0 !important;
-    filter: none !important;
-    image-rendering: pixelated !important;
-    clip-path: none !important;
+.exit-wall::before { content:"" !important; position:absolute !important; left:18%; right:18%; top:12%; height:8%; background:#62f4ff !important; box-shadow:0 0 5px #52eaff !important; }
+.exit-wall::after { content:"" !important; position:absolute !important; right:12%; top:47%; width:7%; height:12%; background:#8af7ff !important; }
+.exit-sign { z-index:4 !important; right:3% !important; left:auto !important; top:27% !important; color:#74efff !important; text-shadow:0 0 4px #21b8d2 !important; }
+.exit-arrow { display:inline !important; }
+/* Character stays on its actual JS-controlled position; no fake overlay on top. */
+.player { z-index:8 !important; width:22px !important; height:28px !important; image-rendering:pixelated !important;
+ background:#d5e7ee !important; border:0 !important; border-radius:0 !important;
+ box-shadow:inset 0 0 0 4px #7895a5, inset 0 -7px #263d4d, -4px 0 #152a39, 4px 0 #152a39, 0 -3px #152a39, 0 3px #152a39 !important;
 }
-.object.computer, .object.desk, .exit-wall {
-    z-index: 3 !important;
+.player::before { content:"" !important; position:absolute !important; left:4px !important; right:4px !important; top:-7px !important; height:8px !important; background:#c5d8e0 !important; border:2px solid #142b3a !important; box-shadow:inset 0 -3px #7896a5 !important; }
+.player::after { content:"" !important; position:absolute !important; left:6px !important; right:6px !important; top:2px !important; height:3px !important; background:#5ceaff !important; box-shadow:0 0 3px #5ceaff !important; }
+@media (max-width:700px) {
+ .object.desk { left:27% !important; width:43% !important; }
+ .object.computer { left:39% !important; width:22% !important; }
+ .exit-wall { width:16% !important; }
 }
-.object.computer { 
-    filter: drop-shadow(4px 6px 0 rgba(12, 20, 35, .45)) !important;
-}
-.object.desk {
-    filter: drop-shadow(4px 7px 0 rgba(12, 20, 35, .40)) !important;
-}
-.exit-wall {
-    filter: drop-shadow(-4px 5px 0 rgba(12, 20, 35, .42)) !important;
-}
-.object.computer::before, .object.computer::after,
-.object.desk::before, .object.desk::after,
-.exit-wall::before, .exit-wall::after {
-    outline: 0 !important;
-}
-.exit-sign {
-    background: transparent !important;
-    box-shadow: none !important;
-    outline: none !important;
-    z-index: 4 !important;
-    color: #c6f7ff !important;
-    text-shadow: 2px 2px #172b42 !important;
-}
-.player { z-index: 8 !important; }
-
-/* FINAL ART DIRECTION: isometric lab, detailed props, raised metal tiles */
-html, body, .game, .game-area {
-  background:#05070d !important; background-image:none !important; color:#dcecff !important;
-}
-.game-area { overflow:hidden !important; }
-/* Cut-corner room footprint instead of a flat rectangular box. */
-.room {
-  left:8% !important; top:7% !important; width:84% !important; height:83% !important;
-  overflow:hidden !important;
-  clip-path:polygon(10% 0, 90% 0, 100% 13%, 100% 83%, 90% 100%, 10% 100%, 0 86%, 0 14%) !important;
-  border:0 !important; outline:0 !important; border-radius:0 !important;
-  background-color:#64748b !important;
-  background-image:
-    linear-gradient(135deg,rgba(255,255,255,.30) 0 2%,transparent 2.5% 82%,rgba(8,17,33,.22) 83% 100%),
-    linear-gradient(90deg,transparent 0 96%,#35465d 96% 100%),
-    linear-gradient(180deg,transparent 0 95%,#34445b 95% 100%),
-    linear-gradient(180deg,#d8e1ed 0%,#aebdd0 54%,#8294ad 100%) !important;
-  background-size:64px 64px,64px 64px,64px 64px,100% 100% !important;
-  box-shadow:inset 0 0 0 5px #29364c,inset 0 0 0 10px #8798b0,0 10px 0 #1a2232,0 17px 0 #080b12 !important;
-}
-.room::before {
-  content:"" !important; position:absolute !important; inset:0 !important; pointer-events:none !important; z-index:0 !important;
-  background:
-    linear-gradient(90deg,rgba(15,24,40,.62),transparent 8%,transparent 91%,rgba(15,24,40,.52)),
-    linear-gradient(180deg,rgba(18,28,45,.68),transparent 18%,transparent 80%,rgba(18,28,45,.45)),
-    repeating-linear-gradient(0deg,transparent 0 62px,rgba(26,39,59,.65) 62px 65px),
-    repeating-linear-gradient(90deg,transparent 0 62px,rgba(26,39,59,.65) 62px 65px) !important;
-  box-shadow:inset 0 0 0 14px rgba(28,41,62,.55) !important;
-}
-.room::after {
-  content:"" !important; position:absolute !important; inset:14px !important; z-index:1 !important; pointer-events:none !important;
-  background-image:
-    radial-gradient(circle at 4px 4px,#26374f 0 2px,#d7e5f3 2.5px 3.5px,transparent 4px),
-    radial-gradient(circle at calc(100% - 4px) 4px,#26374f 0 2px,#d7e5f3 2.5px 3.5px,transparent 4px),
-    radial-gradient(circle at 4px calc(100% - 4px),#26374f 0 2px,#d7e5f3 2.5px 3.5px,transparent 4px),
-    radial-gradient(circle at calc(100% - 4px) calc(100% - 4px),#26374f 0 2px,#d7e5f3 2.5px 3.5px,transparent 4px) !important;
-  background-size:64px 64px !important; background-repeat:repeat !important; opacity:.85 !important;
-}
-.room-line-horizontal,.room-line-vertical,.monitor { display:none !important; }
-/* Detailed, layered terminal housing and luminous screen. */
-.object.computer {
-  left:35% !important; top:7% !important; width:30% !important; height:25% !important;
-  padding:0 !important; color:transparent !important; border:0 !important; outline:0 !important;
-  background-color:transparent !important; background-size:100% 100% !important;
-  filter:drop-shadow(5px 8px 0 rgba(8,13,25,.68)) drop-shadow(0 0 8px rgba(55,201,255,.13)) !important;
-  image-rendering:pixelated !important; z-index:4 !important;
-}
-.object.computer::before { content:"" !important; position:absolute !important; left:20% !important; top:8% !important; width:60% !important; height:48% !important;
-  background:
-    linear-gradient(90deg,transparent 0 7%,#5deaff 7% 9%,transparent 9% 91%,#5deaff 91% 93%,transparent 93%),
-    linear-gradient(180deg,#06111f 0 12%,#0b2940 12% 100%) !important;
-  border:4px solid #263c58 !important; box-shadow:inset 0 0 0 2px #7598b8,inset 0 0 0 5px #122a42, inset 0 0 14px #00c8ff,0 4px 0 #0b1729 !important;
-}
-.object.computer::after { content:"" !important; position:absolute !important; left:27% !important; top:18% !important; width:46% !important; height:25% !important;
-  background:
-    radial-gradient(circle at 22% 45%,#b1ffff 0 2px,#37dfff 3px 5px,transparent 6px),
-    linear-gradient(90deg,transparent 0 46%,#4ee8ff 46% 49%,transparent 49%),
-    repeating-linear-gradient(0deg,transparent 0 5px,#4bdcf2 5px 7px,transparent 7px 10px) !important;
-  opacity:.92 !important; box-shadow:0 0 9px #12d8ff !important;
-}
-.object.computer .object-label,.object.desk .object-label { display:none !important; }
-/* Desk becomes a layered workstation: thick beveled top, drawers, keyboard, papers and equipment. */
-.object.desk {
-  left:27% !important; top:58% !important; width:46% !important; height:23% !important;
-  padding:0 !important; color:transparent !important; border:0 !important; outline:0 !important;
-  background-color:transparent !important; background-size:100% 100% !important;
-  filter:drop-shadow(5px 8px 0 rgba(8,13,25,.62)) !important; image-rendering:pixelated !important; z-index:5 !important;
-}
-.object.desk::before { content:"" !important; position:absolute !important; left:9% !important; top:8% !important; width:82% !important; height:42% !important;
-  background:
-    linear-gradient(90deg,transparent 0 8%,#314761 8% 10%,transparent 10% 90%,#314761 90% 92%,transparent 92%),
-    linear-gradient(180deg,#f1f6ff 0 9%,#a9bbd2 9% 17%,#3e5877 17% 24%,#cbd8e8 24% 82%,#667f9c 82% 100%) !important;
-  border:3px solid #26374e !important; box-shadow:inset 0 0 0 2px #f3f7ff,inset 0 -5px 0 #637b97,0 4px 0 #18283d !important;
-}
-.object.desk::after { content:"" !important; position:absolute !important; left:15% !important; top:16% !important; width:70% !important; height:27% !important;
-  background:
-    linear-gradient(90deg,#0a1729 0 3%,transparent 3% 38%,#0a1729 38% 41%,transparent 41% 100%),
-    repeating-linear-gradient(90deg,#d9e8f8 0 3px,#7189a5 3px 5px),
-    linear-gradient(#20334b,#0d1a2c) !important;
-  border:3px solid #26374e !important; box-shadow:inset 0 0 0 2px #b7d5ec,0 2px 0 #19283d !important;
-}
-.object.desk .access-key { z-index:7 !important; }
-/* Security door: recessed segmented panels, illuminated scanner, hinges and thick sill. */
-.exit-wall {
-  left:auto !important; right:4% !important; top:28% !important; width:13% !important; height:39% !important;
-  border:0 !important; outline:0 !important; background-color:transparent !important; background-size:100% 100% !important;
-  filter:drop-shadow(-5px 7px 0 rgba(8,13,25,.65)) !important; image-rendering:pixelated !important; z-index:4 !important;
-}
-.exit-wall::before { content:"" !important; position:absolute !important; left:12% !important; top:7% !important; width:72% !important; height:86% !important;
-  background:
-    linear-gradient(90deg,#f0f6ff 0 8%,#829ab7 8% 13%,#243a55 13% 17%,transparent 17% 83%,#263a54 83% 88%,#8ca4bf 88% 94%,#e7f1ff 94% 100%),
-    repeating-linear-gradient(180deg,#d2dfed 0 22px,#8fa5c0 22px 25px,#334b67 25px 29px) !important;
-  border:4px solid #1d2c43 !important; box-shadow:inset 0 0 0 3px #c8d9ed,inset 0 0 0 7px #617c9d,0 0 0 2px #8ea8c8 !important;
-}
-.exit-wall::after { content:"" !important; position:absolute !important; right:16% !important; top:42% !important; width:17% !important; height:18% !important;
-  background:linear-gradient(180deg,#a4ffff 0 15%,#14cce8 15% 80%,#08718f 80% 100%) !important;
-  border:2px solid #14263d !important; box-shadow:0 0 8px #00dfff,0 0 0 2px #7898b9 !important;
-}
-.exit-sign { z-index:6 !important; color:#d4f7ff !important; text-shadow:2px 2px #132239,0 0 6px #00bde9 !important; background:transparent !important; }
-.player { z-index:8 !important; filter:drop-shadow(3px 5px 0 rgba(8,13,25,.5)) !important; }
-
-
-/* REBUILT SCENE LAYERS: pixel-art floor, independent SVG props, original movable player */
-html, body, .game, .game-area {
-  background: #030509 !important;
-  background-image: none !important;
-  color: #eafaff !important;
-}
-.game-area { overflow: hidden !important; background-color:#030509 !important; }
-.room {
-  position:absolute !important;
-  left:7% !important; top:7% !important; width:86% !important; height:84% !important;
-  overflow:visible !important; clip-path:none !important;
-  border:0 !important; outline:0 !important; border-radius:0 !important;
-  /* Small, quiet pixel blocks create a shaded floor without a metal frame/grid overlay. */
-  background-color:#202735 !important;
-  background-image:
-    linear-gradient(180deg, rgba(8,13,25,.82) 0%, rgba(12,19,32,.30) 20%, rgba(4,8,15,.10) 100%),
-    repeating-linear-gradient(0deg, transparent 0 47px, rgba(5,10,19,.36) 47px 49px),
-    repeating-linear-gradient(90deg, transparent 0 47px, rgba(5,10,19,.36) 47px 49px),
-    repeating-linear-gradient(135deg, rgba(80,100,128,.08) 0 4px, transparent 4px 12px) !important;
-  background-size:100% 100%,48px 48px,48px 48px,100% 100% !important;
-  box-shadow:none !important;
-}
-.room::before {
-  content:"" !important; position:absolute !important; inset:0 !important;
-  pointer-events:none !important; z-index:0 !important;
-  background:linear-gradient(90deg,rgba(0,0,0,.28),transparent 14%,transparent 86%,rgba(0,0,0,.30)),
-             linear-gradient(180deg,transparent 60%,rgba(0,0,0,.18)) !important;
-}
-.room::after { content:none !important; display:none !important; }
-.room-line-horizontal,.room-line-vertical,.room > .monitor { display:none !important; }
-/* These elements keep their already-authored embedded pixel SVGs. They are separate from .room. */
-.object.computer {
-  display:block !important; left:42% !important; top:13% !important; width:16% !important; height:14% !important;
-  z-index:5 !important; position:absolute !important; padding:0 !important; color:transparent !important;
-  border:0 !important; outline:0 !important; background-color:transparent !important;
-  background-size:100% 100% !important; background-position:center !important; background-repeat:no-repeat !important;
-  image-rendering:pixelated !important; filter:none !important; box-shadow:none !important;
-}
-.object.desk {
-  display:block !important; left:35% !important; top:62% !important; width:30% !important; height:12% !important;
-  z-index:6 !important; position:absolute !important; padding:0 !important; color:transparent !important;
-  border:0 !important; outline:0 !important; background-color:transparent !important;
-  background-size:100% 100% !important; background-position:center !important; background-repeat:no-repeat !important;
-  image-rendering:pixelated !important; filter:none !important; box-shadow:none !important;
-}
-.object.computer::before,.object.computer::after,.object.desk::before,.object.desk::after { content:none !important; display:none !important; }
-.object.computer .object-label,.object.desk .object-label { display:none !important; }
-.object.desk .access-key { z-index:7 !important; }
-.exit-wall {
-  display:block !important; position:absolute !important; left:auto !important; right:0 !important; top:35% !important;
-  width:8% !important; height:30% !important; z-index:5 !important; cursor:pointer !important;
-  border:0 !important; outline:0 !important; background-color:transparent !important;
-  background-size:100% 100% !important; background-position:center !important; background-repeat:no-repeat !important;
-  image-rendering:pixelated !important; filter:none !important; box-shadow:none !important;
-}
-.exit-wall::before,.exit-wall::after { content:none !important; display:none !important; }
-.exit-sign { z-index:7 !important; pointer-events:none !important; background:transparent !important; box-shadow:none !important; }
-/* No invented overlay sprite: keep the existing movable player element and its JS coordinates. */
-.player {
-  position:absolute !important; z-index:8 !important;
-  width:24px !important; height:24px !important;
-  background:#ffffff !important; background-image:none !important;
-  border:0 !important; border-radius:0 !important; outline:0 !important;
-  box-shadow:0 0 0 1px #000 !important; filter:none !important;
-  image-rendering:pixelated !important;
-}
-.player::before { content:none !important; display:none !important; }
-.player::after {
-  content:"" !important; display:block !important; position:absolute !important;
-  left:4px !important; right:4px !important; bottom:-5px !important; height:4px !important;
-  background:rgba(255,255,255,.15) !important; box-shadow:none !important;
-}
-.interaction-message { z-index:20 !important; }
-.project-title,.stage-title { color:#eafaff !important; }
-
 </style>
 
 </head>
