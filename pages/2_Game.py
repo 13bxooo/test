@@ -2561,6 +2561,85 @@ button,.game button,.code-button,.help-key{border-radius:0!important}
 
 }
 
+
+
+/* ===== TUTORIAL ROOM: CLEAN WHITE PIXEL-ART ENVIRONMENT ===== */
+.game, .game-area {
+    background: #f7fbff !important;
+    color: #102b3a !important;
+}
+.game-area {
+    background-image:
+      linear-gradient(rgba(35,104,132,.10) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(35,104,132,.10) 1px, transparent 1px) !important;
+    background-size: 32px 32px !important;
+}
+.room {
+    background: #f4f8fb !important;
+    border: 4px solid #1b3544 !important;
+    box-shadow: inset 0 0 0 4px #d0e4ec, 0 0 0 2px #8bbacb !important;
+}
+.room-line-horizontal, .room-line-vertical { display:none !important; }
+/* The old standalone monitor is now part of the main computer object. */
+.monitor { display:none !important; }
+.object.computer {
+    left:42% !important; top:13% !important; width:16% !important; height:14% !important;
+    box-sizing:border-box !important; overflow:visible !important;
+    background:#1a3443 !important; color:#d8fbff !important;
+    border:4px solid #203d4e !important; outline:3px solid #70d9ee !important;
+    box-shadow: inset 0 0 0 3px #426d80, 4px 4px 0 #9bb7c2 !important;
+    font-size:11px !important; letter-spacing:1px !important;
+    align-items:flex-end !important; padding-bottom:5px !important;
+}
+.object.computer::before {
+    content:""; position:absolute; left:8%; right:8%; top:8%; height:62%;
+    background:#06202d; border:3px solid #75eaff;
+    box-shadow:inset 0 0 0 2px #187d9a;
+    background-image:linear-gradient(90deg,transparent 48%,#087d99 49%,#087d99 51%,transparent 52%),linear-gradient(transparent 48%,#087d99 49%,#087d99 51%,transparent 52%);
+    background-size:14px 12px;
+}
+.object.computer::after {
+    content:"▲"; position:absolute; top:15%; left:0; right:0; text-align:center;
+    color:#55eaff; font-size:24px; text-shadow:2px 2px #12617b;
+}
+.object.computer .object-label { bottom:-24px !important; color:#23495b !important; font-size:10px !important; }
+.object.desk {
+    left:35% !important; top:62% !important; width:30% !important; height:12% !important;
+    box-sizing:border-box !important; padding-top:10px !important;
+    background:#dce8ee !important; color:#23485a !important;
+    border:4px solid #324e5b !important; outline:3px solid #a8cbd7 !important;
+    box-shadow:inset 0 0 0 3px #f9fdff, 5px 5px 0 #a9bec7 !important;
+    font-size:11px !important; letter-spacing:1px !important;
+}
+.object.desk::before {
+    content:""; position:absolute; left:5%; right:5%; top:15%; height:35%;
+    background:repeating-linear-gradient(90deg,#b4cbd5 0 12px,#d8e8ef 12px 16px);
+    border:2px solid #789aa8;
+}
+.object.desk::after {
+    left:5% !important; right:5% !important; bottom:-13px !important; height:10px !important;
+    border:3px solid #324e5b !important; background:#9db5c0 !important;
+    box-shadow:inset 0 0 0 2px #dcebf0 !important;
+}
+.object.desk .object-label { color:#23495b !important; }
+.exit-wall {
+    right:0 !important; top:35% !important; width:8% !important; height:30% !important;
+    background:#e3edf2 !important; border:4px solid #263f4d !important;
+    box-shadow:inset 0 0 0 3px #a8cbd7, -4px 0 0 #7899a7 !important;
+}
+.exit-wall::before, .exit-wall::after { height:4px !important; background:#7899a7 !important; }
+.exit-sign {
+    right:9% !important; top:45% !important; color:#254b5c !important;
+    font-size:11px !important; font-weight:normal !important;
+    text-shadow:1px 1px #fff !important;
+}
+/* Remove the always-floating thin arrow; the task arrow is controlled separately by tutorial step. */
+.exit-arrow { display:none !important; }
+.player { background:#193c50 !important; box-shadow:0 0 0 2px #071d2a, inset 0 0 0 4px #70e8fa !important; }
+.player::after { background:rgba(18,63,82,.22) !important; }
+.project-title { color:#123b50 !important; text-shadow:1px 1px #fff !important; }
+.stage-title { color:#426b7d !important; }
+
 </style>
 
 </head>
@@ -3557,7 +3636,7 @@ const messages = [
 
     "좋습니다. COMPUTER에 접근했습니다. 가까운 물체에서는 E 키를 사용하여 상호작용할 수 있습니다. COMPUTER를 조사하십시오.",
 
-    "확인되었습니다. 이제 COMPUTER 화면에 표시된 접근 코드를 입력하십시오.",
+    "단말 인증 절차가 시작되었습니다. COMPUTER 화면에 표시된 숫자 코드를 확인한 뒤 입력창에 입력하고 ENTER를 선택하십시오.",
 
     "코드가 확인되었습니다. 책상 위에 ACCESS KEY가 생성되었습니다. 책상으로 이동하여 키를 획득하십시오.",
 
