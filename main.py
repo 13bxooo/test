@@ -113,9 +113,16 @@ html, body, [class*="css"], button, input, textarea, [data-testid="stMarkdownCon
   margin:0 !important; padding:0 !important; background:transparent !important;
   border:0 !important; box-shadow:none !important;
   color:#f2fbff !important; font-family:NeoDungGeunMo,monospace !important;
-  font-size:clamp(24px,4.2vw,52px) !important; letter-spacing:0.04em !important;
-  text-align:center !important; text-shadow:0 0 5px #00dfff, 0 0 14px #00dfff88 !important;
+  font-size:clamp(28px,4.8vw,60px) !important; letter-spacing:0.04em !important;
+  text-align:center !important;
+  text-shadow:0 0 3px #fff, 0 0 8px #00dfff, 0 0 18px #00dfff, 0 0 32px #008cff !important;
+  animation:title-neon-flicker 4.5s infinite !important;
   pointer-events:none !important; white-space:nowrap !important;
+}}
+@keyframes title-neon-flicker {{
+  0%, 18%, 20%, 22%, 55%, 57%, 100% {{ opacity:1; filter:brightness(1); }}
+  19%, 56% {{ opacity:0.78; filter:brightness(0.78); }}
+  21% {{ opacity:0.92; filter:brightness(1.2); }}
 }}
 .subtitle-overlay {{
   position:fixed !important; top:36vh !important; left:50% !important;
@@ -129,7 +136,7 @@ html, body, [class*="css"], button, input, textarea, [data-testid="stMarkdownCon
   pointer-events:none !important;
 }}
 @media(max-width:600px) {{
-  .title-overlay {{ top:24vh !important; font-size:clamp(19px,6vw,30px) !important; }}
+  .title-overlay {{ top:24vh !important; font-size:clamp(22px,6.5vw,34px) !important; }}
   .subtitle-overlay {{ top:34vh !important; font-size:10px !important; letter-spacing:0.04em !important; }}
 }}
 .st-key-start_button, .st-key-how_to_play_button {{
