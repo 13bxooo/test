@@ -232,8 +232,8 @@ footer {{
 
 
 /* Pixel-dot UI finish shared by inventory, pause and item panels. */
-.inventory-panel,.inventory-slot,.item-description,.help-panel,.computer-panel,.pause-overlay>div,.item-acquired-notice,.item-acquired-dialog,.tutorial-transition-card{border-style:dotted!important}
-.inventory-header,.help-header{border-bottom-style:dotted!important}
+.inventory-panel,.inventory-slot,.item-description,.help-panel,.computer-panel,.pause-overlay>div,.item-acquired-notice,.item-acquired-dialog,.tutorial-transition-card{{border-style:dotted!important}}
+.inventory-header,.help-header{{border-bottom-style:dotted!important}}
 
 /* White-led inventory skin: preserve existing inventory behavior and card artwork. */
 .inventory-panel{{background:#f4f7f8!important;color:#101820!important;border:2px dotted #48dfff!important;box-shadow:0 0 0 1px #123c4d!important}}
