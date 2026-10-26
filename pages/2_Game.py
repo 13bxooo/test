@@ -2751,46 +2751,89 @@ button,.game button,.code-button,.help-key{border-radius:0!important}
 .exit-wall::before,.exit-wall::after { content:none !important; }
 .exit-sign { right:9% !important; color:#17394b !important; }
 .exit-arrow { display:none !important; }
-/* FINAL OVERRIDE: white tiled floor, black outside, consistent object viewpoint. */
+/* FINAL ART PASS: beveled sci-fi tiles and a dark, framed laboratory. */
 html, body, .game, .game-area {
-    background: #000 !important;
+    background: #030509 !important;
     background-image: none !important;
 }
 .game-area {
-    background: #000 !important;
-    background-image: none !important;
+    background: #030509 !important;
+    overflow: hidden !important;
 }
 .room {
-    background-color: #fff !important;
+    background-color: #7f8da3 !important;
     background-image:
-        linear-gradient(to right, transparent calc(100% - 1px), #dfe4e7 calc(100% - 1px)),
-        linear-gradient(to bottom, transparent calc(100% - 1px), #dfe4e7 calc(100% - 1px)),
-        linear-gradient(180deg, #fff 0%, #f9fafb 100%) !important;
-    background-size: 48px 48px, 48px 48px, 100% 100% !important;
-    background-repeat: repeat, repeat, no-repeat !important;
+        /* recessed tile seams */
+        linear-gradient(to right, transparent 0, transparent calc(100% - 2px), #59677e calc(100% - 2px), #59677e 100%),
+        linear-gradient(to bottom, transparent 0, transparent calc(100% - 2px), #59677e calc(100% - 2px), #59677e 100%),
+        /* upper-left bevel on every floor panel */
+        linear-gradient(to right, rgba(255,255,255,.42) 0, rgba(255,255,255,.12) 2px, transparent 5px),
+        linear-gradient(to bottom, rgba(255,255,255,.38) 0, rgba(255,255,255,.10) 2px, transparent 5px),
+        /* cool metallic variation */
+        linear-gradient(135deg, #cbd5e4 0%, #aebbd0 42%, #9aa9c0 100%) !important;
+    background-size: 64px 64px, 64px 64px, 64px 64px, 64px 64px, 100% 100% !important;
+    background-repeat: repeat, repeat, repeat, repeat, no-repeat !important;
     border: 0 !important;
     outline: 0 !important;
-    box-shadow: none !important;
+    box-shadow:
+        inset 0 0 0 5px #182334,
+        inset 0 0 0 9px #52627a,
+        inset 0 0 0 12px #aab9ce,
+        inset 0 0 0 15px #3b4b62,
+        0 0 0 5px #070a10,
+        0 9px 0 #111927 !important;
 }
-/* Remove CSS-added halos/outlines; retain only each sprite's own shading. */
+/* Each tile has tiny corner fasteners, giving the floor a raised modular-panel look. */
+.room-line-horizontal, .room-line-vertical { display: none !important; }
+.room::after {
+    content: "" !important;
+    position: absolute !important;
+    inset: 15px !important;
+    pointer-events: none !important;
+    z-index: 1 !important;
+    background-image:
+        radial-gradient(circle at 4px 4px, #52617a 0 1.5px, #e0e8f3 1.6px 2.4px, transparent 2.5px),
+        radial-gradient(circle at calc(100% - 4px) 4px, #52617a 0 1.5px, #e0e8f3 1.6px 2.4px, transparent 2.5px),
+        radial-gradient(circle at 4px calc(100% - 4px), #52617a 0 1.5px, #e0e8f3 1.6px 2.4px, transparent 2.5px),
+        radial-gradient(circle at calc(100% - 4px) calc(100% - 4px), #52617a 0 1.5px, #e0e8f3 1.6px 2.4px, transparent 2.5px);
+    background-size: 64px 64px !important;
+    background-repeat: repeat !important;
+    opacity: .78 !important;
+}
+/* Keep the authored pixel sprites crisp and remove only CSS-added frames. */
 .object.computer, .object.desk, .exit-wall {
     outline: 0 !important;
     border: 0 !important;
     filter: none !important;
-    box-shadow: none !important;
     image-rendering: pixelated !important;
+    clip-path: none !important;
+}
+.object.computer, .object.desk, .exit-wall {
+    z-index: 3 !important;
+}
+.object.computer { 
+    filter: drop-shadow(4px 6px 0 rgba(12, 20, 35, .45)) !important;
+}
+.object.desk {
+    filter: drop-shadow(4px 7px 0 rgba(12, 20, 35, .40)) !important;
+}
+.exit-wall {
+    filter: drop-shadow(-4px 5px 0 rgba(12, 20, 35, .42)) !important;
 }
 .object.computer::before, .object.computer::after,
 .object.desk::before, .object.desk::after,
 .exit-wall::before, .exit-wall::after {
     outline: 0 !important;
+}
+.exit-sign {
+    background: transparent !important;
     box-shadow: none !important;
+    outline: none !important;
+    z-index: 4 !important;
+    color: #c6f7ff !important;
+    text-shadow: 2px 2px #172b42 !important;
 }
-/* Crop the sprite canvas edge so no decorative white frame reads as an outer halo. */
-.object.computer, .object.desk, .exit-wall {
-    clip-path: inset(2px);
-}
-.exit-sign { background: transparent !important; box-shadow: none !important; outline: none !important; }
+.player { z-index: 8 !important; }
 </style>
 
 </head>
