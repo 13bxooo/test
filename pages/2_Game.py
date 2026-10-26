@@ -2228,10 +2228,25 @@ input {
 .pause-toggle:before,.pause-toggle:after{content:"";position:absolute;width:7px;height:7px;border-color:#8af0ff;border-style:solid}
 .pause-toggle:before{left:-2px;top:-2px;border-width:2px 0 0 2px}.pause-toggle:after{right:-2px;bottom:-2px;border-width:0 2px 2px 0}
 .pause-toggle:hover{background:#d9faff;color:#001018}
-.tutorial-direction-arrow{position:absolute;z-index:1500;display:none;left:50%;top:25%;transform:translateX(-50%);color:#8defff;font-size:58px;line-height:1;font-weight:900;text-shadow:0 0 5px #00dfff,0 0 14px #00dfff;animation:arrowFloat 1s ease-in-out infinite;pointer-events:none;-webkit-text-stroke:1px #d9faff}
+.tutorial-direction-arrow{position:absolute;z-index:10;display:none;left:50%;top:25%;transform:translateX(-50%);color:#8defff;font-size:58px;line-height:1;font-weight:900;text-shadow:0 0 5px #00dfff,0 0 14px #00dfff;animation:arrowFloat 1s ease-in-out infinite;pointer-events:none;-webkit-text-stroke:1px #d9faff}
 .tutorial-direction-arrow.show{display:block}
 @keyframes arrowFloat{0%,100%{translate:0 0}50%{translate:0 12px}}
 .inventory-card-image{animation:none!important;filter:none!important;box-shadow:none!important}
+
+/* Unified SF interface theme based on the supplied PROJECT: LOGIC reference. */
+.game{background:#02070c;color:#d9faff}
+.overlay,.computer-overlay,.card-overlay{background:rgba(0,5,10,.94)!important;backdrop-filter:blur(2px)}
+.inventory-panel,.computer-panel,.help-panel,.item-description,.card-panel,.pause-overlay>div{background:linear-gradient(135deg,#030b12 0%,#061722 100%)!important;color:#d9faff!important;border:1px solid #35dfff!important;border-radius:0!important;box-shadow:0 0 0 1px #123c4d,0 0 18px #00cfff24!important}
+.inventory-title,.help-title,.computer-title,.card-title,.item-name,.echo-name{color:#70eaff!important;text-shadow:0 0 7px #00cfff55}
+.inventory-slot{background:#020a10!important;border:1px solid #17647b!important;border-radius:0!important}
+.inventory-slot:hover{border-color:#70eaff!important;box-shadow:0 0 8px #00dfff44!important}
+button,.game button,.code-button,.help-key{border-radius:0!important}
+.echo-bar{background:rgba(1,8,14,.96)!important;border:1px solid #2587a7!important;color:#d9faff!important;box-shadow:0 0 12px #00cfff18!important}
+.echo-message{color:#c8f7ff!important}
+.interaction-message,.status-bar,.computer-subtitle,.help-row{color:#a6edff!important}
+.item-acquired-notice{z-index:10000!important;background:rgba(0,5,10,.98)!important}
+.item-acquired-notice.show~.echo-bar{visibility:hidden!important}
+
 /* Reference-matched stage and item-acquired overlays */
 .tutorial-transition{position:fixed;inset:0;z-index:1000000;display:none;align-items:center;justify-content:center;background:#000;opacity:1;transition:opacity .45s steps(6,end);pointer-events:auto}
 .tutorial-transition.show{display:flex}.tutorial-transition.hide{opacity:0;pointer-events:none}
@@ -3476,6 +3491,14 @@ function updateTutorialArrow() {
     if (!target) { arrow.classList.remove("show"); return; }
     const gameRect = document.querySelector(".game").getBoundingClientRect();
     const rect = target.getBoundingClientRect();
+    const modalSelectors = ["#inventoryOverlay", "#helpOverlay", "#computerOverlay", "#cardOverlay", "#pauseOverlay", "#itemAcquiredNotice", "#tutorialTransition"];
+    const modalOpen = modalSelectors.some((selector) => {
+        const el = document.querySelector(selector);
+        if (!el) return false;
+        const style = getComputedStyle(el);
+        return style.display !== "none" && style.visibility !== "hidden" && (selector !== "#itemAcquiredNotice" || el.classList.contains("show"));
+    });
+    if (modalOpen) { arrow.classList.remove("show"); return; }
     arrow.style.left = (rect.left + rect.width / 2 - gameRect.left) + "px";
     arrow.style.top = (rect.top - gameRect.top - 58) + "px";
     arrow.classList.add("show");
@@ -4542,21 +4565,40 @@ function interact() {
 
         renderInventory();
         const itemNotice = document.getElementById("itemAcquiredNotice");
+        const echoBar = document.querySelector(".echo-bar");
+        // Stop the current ECHO typewriter before displaying the item-acquired dialog.
+        clearTimeout(typingTimer);
+        typingDone = false;
+        echoNext.classList.remove("ready");
+        if (echoBar) {
+            echoBar.style.visibility = "hidden";
+            echoBar.style.pointerEvents = "none";
+        }
         playCardAcquireSound();
         if (itemNotice) {
             let noticeDismissed = false;
             itemNotice.classList.add("show");
-            const dismissItemNotice = () => {
+            itemNotice.style.display = "grid";
+            itemNotice.style.visibility = "visible";
+            itemNotice.style.pointerEvents = "auto";
+            const dismissItemNotice = (event) => {
+                if (event) { event.preventDefault(); event.stopPropagation(); }
                 if (noticeDismissed) return;
                 noticeDismissed = true;
                 itemNotice.classList.remove("show");
-                // ECHO speaks only after the acquisition notice has disappeared.
-                window.setTimeout(() => typeEcho(5), 180);
+                itemNotice.style.display = "none";
+                if (echoBar) {
+                    echoBar.style.visibility = "visible";
+                    echoBar.style.pointerEvents = "auto";
+                }
+                // Start the next ECHO line only after the acquisition notice is fully closed.
+                typeEcho(5);
+                updateTutorialArrow();
             };
             itemNotice.onclick = dismissItemNotice;
-            itemNotice.onkeydown = (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); dismissItemNotice(); } };
-            // Wait for the player to dismiss the card notice before ECHO resumes.
+            itemNotice.onkeydown = (event) => { if (event.key === "Enter" || event.key === " ") dismissItemNotice(event); };
         } else {
+            if (echoBar) { echoBar.style.visibility = "visible"; echoBar.style.pointerEvents = "auto"; }
             typeEcho(5);
         }
 
@@ -5644,3 +5686,4 @@ components.html(
     height=1000,
     scrolling=False,
 )
+
