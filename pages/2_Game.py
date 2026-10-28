@@ -2921,6 +2921,25 @@ button,.game button,.code-button,.help-key{border-radius:0!important}
 .exit-wall { left:81.4% !important; top:25% !important; width:17.2% !important; height:47% !important; z-index:7 !important; opacity:0 !important; pointer-events:none !important; }
 .room .access-key { left:49% !important; top:69% !important; z-index:8 !important; }
 .project-title { color:#fff !important; text-shadow:none !important; }
+
+
+/* Restored classic diamond D-pad */
+.mobile-controls { width: 166px !important; height: 166px !important; position:absolute !important; left:24px !important; bottom:28px !important; z-index:40 !important; }
+.control-button { width:58px !important; height:58px !important; border:2px solid #7189a8 !important; border-radius:9px !important; background:rgba(2,8,18,.94) !important; color:#d8eaff !important; font-size:25px !important; font-weight:700 !important; display:flex !important; align-items:center !important; justify-content:center !important; box-shadow:inset 0 0 0 1px rgba(170,210,255,.08) !important; clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%) !important; border-radius:0 !important; }
+.control-button { line-height:1 !important; }
+.control-up { top:0 !important; left:54px !important; }
+.control-left { top:54px !important; left:0 !important; }
+.control-right { top:54px !important; right:0 !important; }
+.control-down { bottom:0 !important; left:54px !important; }
+.control-button:active { background:#d8eaff !important; color:#06101e !important; }
+.control-button > *, .control-button { text-shadow:none !important; }
+.control-button { image-rendering:pixelated !important; }
+.placed-art { background:transparent !important; border:0 !important; outline:0 !important; box-shadow:none !important; filter:none !important; }
+.placed-desk { left:33.5% !important; top:62% !important; width:33% !important; height:auto !important; max-height:26% !important; object-fit:contain !important; }
+.placed-computer { left:28.5% !important; top:4.2% !important; width:42% !important; height:auto !important; max-height:30.7% !important; object-fit:contain !important; }
+.placed-exit { left:81.4% !important; top:25% !important; width:17.2% !important; height:47% !important; object-fit:fill !important; transform-origin:100% 50% !important; transition:transform 520ms steps(6,end), opacity 180ms linear !important; }
+.placed-exit.door-opening { transform:scaleX(.72) skewY(-3deg) !important; opacity:.72 !important; }
+.placed-exit.door-open { transform:scaleX(.08) skewY(-3deg) !important; opacity:0 !important; }
 </style>
 
 </head>
@@ -4107,10 +4126,10 @@ const obstacles = [
 
     {
         id: "computer",
-        x: 35,
-        y: 12,
-        w: 30,
-        h: 20
+        x: 34,
+        y: 11,
+        w: 32,
+        h: 18
     },
 
     {
@@ -4137,19 +4156,19 @@ const interactables = [
     {
         id: "computer",
         name: "ECHO TERMINAL",
-        x: 42,
-        y: 13,
-        w: 16,
-        h: 14
+        x: 34,
+        y: 25,
+        w: 32,
+        h: 12
     },
 
     {
         id: "desk",
         name: "RESEARCH DESK",
-        x: 35,
-        y: 62,
-        w: 30,
-        h: 12
+        x: 33,
+        y: 60,
+        w: 34,
+        h: 27
     },
 
     {
