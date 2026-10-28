@@ -181,19 +181,19 @@ footer {{
 .inventory-panel:after,.pause-menu-panel:after,.item-acquired-dialog:after,.tutorial-transition-card:after{{content:"";position:absolute;right:-2px;bottom:-2px;width:12px;height:12px;border-right:2px solid #8af0ff;border-bottom:2px solid #8af0ff;pointer-events:none}}
 
 /* FINAL PATCH: separate true-alpha sprites on the empty room; no baked-in furniture remains. */
-.room { aspect-ratio:877 / 870 !important; background-size:100% 100% !important; background-color:transparent !important; overflow:visible !important; }
-.room > .placed-art { position:absolute !important; display:block !important; max-width:none !important; height:auto; object-fit:contain !important; image-rendering:pixelated !important; pointer-events:none !important; border:0 !important; outline:0 !important; box-shadow:none !important; filter:none !important; background:transparent !important; }
-.placed-computer { left:27.2% !important; top:1.5% !important; width:42% !important; height:33.1% !important; }
-.placed-desk { left:34.7% !important; top:65.0% !important; width:31.2% !important; height:23.2% !important; }
-.placed-exit,.placed-exit-open { left:86.2% !important; top:27.0% !important; width:12.2% !important; height:38.5% !important; transform-origin:90% 50%; transition:opacity 160ms steps(2,end), transform 420ms steps(5,end); }
-.placed-exit-open { opacity:0 !important; transform:translateX(3%) scaleX(.1) !important; }
-.placed-exit.door-opening { transform:translateX(12%) scaleX(.72) skewY(-3deg) !important; filter:brightness(1.12) !important; }
-.placed-exit.door-open { opacity:0 !important; transform:translateX(18%) scaleX(.05) skewY(-3deg) !important; }
-.placed-exit-open.door-open { opacity:1 !important; transform:translateX(0) scaleX(1) !important; }
-.room .object.computer,.room .object.desk,.room .exit-wall,.room .exit-sign,.room .monitor { opacity:0 !important; pointer-events:none !important; background:transparent !important; border:0 !important; box-shadow:none !important; color:transparent !important; }
-.room .object.computer::before,.room .object.computer::after,.room .object.desk::before,.room .object.desk::after,.room .exit-wall::before,.room .exit-wall::after { content:none !important; display:none !important; }
-.room .access-key { position:absolute !important; left:49% !important; top:69% !important; z-index:7 !important; }
-.project-title { color:#fff !important; }
+.room {{ aspect-ratio:877 / 870 !important; background-size:100% 100% !important; background-color:transparent !important; overflow:visible !important; }}
+.room > .placed-art {{ position:absolute !important; display:block !important; max-width:none !important; height:auto; object-fit:contain !important; image-rendering:pixelated !important; pointer-events:none !important; border:0 !important; outline:0 !important; box-shadow:none !important; filter:none !important; background:transparent !important; }}
+.placed-computer {{ left:27.2% !important; top:1.5% !important; width:42% !important; height:33.1% !important; }}
+.placed-desk {{ left:34.7% !important; top:65.0% !important; width:31.2% !important; height:23.2% !important; }}
+.placed-exit,.placed-exit-open {{ left:86.2% !important; top:27.0% !important; width:12.2% !important; height:38.5% !important; transform-origin:90% 50%; transition:opacity 160ms steps(2,end), transform 420ms steps(5,end); }}
+.placed-exit-open {{ opacity:0 !important; transform:translateX(3%) scaleX(.1) !important; }}
+.placed-exit.door-opening {{ transform:translateX(12%) scaleX(.72) skewY(-3deg) !important; filter:brightness(1.12) !important; }}
+.placed-exit.door-open {{ opacity:0 !important; transform:translateX(18%) scaleX(.05) skewY(-3deg) !important; }}
+.placed-exit-open.door-open {{ opacity:1 !important; transform:translateX(0) scaleX(1) !important; }}
+.room .object.computer,.room .object.desk,.room .exit-wall,.room .exit-sign,.room .monitor {{ opacity:0 !important; pointer-events:none !important; background:transparent !important; border:0 !important; box-shadow:none !important; color:transparent !important; }}
+.room .object.computer::before,.room .object.computer::after,.room .object.desk::before,.room .object.desk::after,.room .exit-wall::before,.room .exit-wall::after {{ content:none !important; display:none !important; }}
+.room .access-key {{ position:absolute !important; left:49% !important; top:69% !important; z-index:7 !important; }}
+.project-title {{ color:#fff !important; }}
 
 </style>
 """,
