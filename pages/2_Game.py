@@ -4978,6 +4978,12 @@ function submitCode() {
     else {
 
         playErrorSound();
+        // Two-second fine vibration, without interrupting the existing error sound.
+        computerOverlay.classList.remove("terminal-shake");
+        void computerOverlay.offsetWidth;
+        computerOverlay.classList.add("terminal-shake");
+        clearTimeout(window._terminalShakeTimer);
+        window._terminalShakeTimer = setTimeout(() => computerOverlay.classList.remove("terminal-shake"), 2000);
         codeError.textContent =
             "ACCESS DENIED // 화면의 4자리 숫자를 입력하십시오.";
 
@@ -6435,6 +6441,9 @@ _object_style = """<style>
 _object_style = _object_style.replace("__COMPUTER__",_object_uri("computer_transparent.png")).replace("__DESK__",_object_uri("desk_transparent.png"))
 html = html.replace("</head>", _object_style + "</head>", 1)
 
+# CSS-only pixel card: no extra image dependency.
+html = html.replace("</head>", '<style id="access-key-animated-fix">\n@keyframes terminalMicroShake {\n  0%,100% {transform:translate(0,0)}\n  10%,30%,50%,70%,90% {transform:translate(-2px,1px)}\n  20%,40%,60%,80% {transform:translate(2px,-1px)}\n}\n.computer-overlay.terminal-shake .computer-panel {\n  animation:terminalMicroShake .105s steps(2,end) 19 !important;\n}\n/* Position over the actual desk center (left 28.44%, width 34%). */\n.room .access-key {\n  left:45.44% !important; top:66.8% !important;\n  width:38px !important;height:54px !important;\n  background:transparent !important;border:0 !important;\n  box-shadow:none !important;z-index:40 !important;\n  pointer-events:none !important;\n  transform:translate(-50%,-50%) !important;\n  perspective:180px !important;\n}\n.room .access-key::before {content:none !important;display:none !important}\n.room .access-key::after {content:none !important;display:none !important}\n.room .access-key.visible {display:block !important;animation:none !important}\n.room .access-key .key-rotator {\n  position:absolute;left:0;top:0;width:38px;height:50px;\n  transform-style:preserve-3d;\n  animation:keyFloat 2s ease-in-out infinite, keyTurn 3.8s linear infinite;\n  image-rendering:pixelated;\n  filter:drop-shadow(0 0 5px #36dfff);\n}\n.room .access-key .key-face {\n  position:absolute;inset:0;\n  backface-visibility:hidden;\n  border:3px solid #aeefff;\n  outline:2px solid #1e426e;\n  background:\n    linear-gradient(90deg,transparent 10%,#65c5f0 10% 15%,transparent 15% 85%,#65c5f0 85% 90%,transparent 90%),\n    repeating-linear-gradient(0deg,#d9edff 0 4px,#a5bfe7 4px 6px);\n  box-shadow:inset 0 0 0 3px #5278af,inset 0 0 0 5px #e6f6ff;\n}\n.room .access-key .key-face.back {transform:rotateY(180deg);background:repeating-linear-gradient(0deg,#9dbbe3 0 5px,#cfe8ff 5px 8px)}\n.room .access-key .key-face.front::before {\n  content:"";position:absolute;left:10px;top:12px;width:12px;height:12px;\n  background:#1d538a;border:2px solid #65dfff;box-shadow:0 0 0 3px #effaff;\n}\n.room .access-key .key-face.front::after {\n  content:"";position:absolute;left:8px;bottom:7px;width:18px;height:3px;\n  background:#22538c;box-shadow:0 -5px #5a96d0;\n}\n.room .access-key .key-shadow {\n  position:absolute;top:56px;left:0;width:38px;height:8px;\n  border-radius:50%;background:#071b34;opacity:.5;filter:blur(3px);\n  animation:keyShadow 2s ease-in-out infinite;\n}\n@keyframes keyFloat {0%,100%{translate:0 0}50%{translate:0 -11px}}\n@keyframes keyTurn {from{rotate:y 0deg}to{rotate:y 360deg}}\n@keyframes keyShadow {0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(.7);opacity:.25}}\n</style>' + "</head>", 1)
+html = html.replace('room.appendChild(accessKey);', 'accessKey.innerHTML = \'<div class="key-shadow"></div><div class="key-rotator"><div class="key-face front"></div><div class="key-face back"></div></div>\'; room.appendChild(accessKey);', 1)
 components.html(
     html,
     height=1000,
