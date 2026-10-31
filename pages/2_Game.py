@@ -4510,11 +4510,58 @@ function floorAt(x,y) {
     // The embedded collision PNG is opaque everywhere: white marks floor, black marks wall.
     return pixel[0] > 128 && pixel[1] > 128 && pixel[2] > 128;
 }
+// Pixel-accurate object collision: sample the same transparent PNG shown in CSS.
+const objectCollisionImages = {};
+function loadObjectCollision(name) {
+    const el = document.querySelector('.room .object.' + name);
+    if (!el) return;
+    const bg = getComputedStyle(el).backgroundImage;
+    const match = bg.match(/^url\(["']?(.*?)["']?\)$/);
+    if (!match || !match[1] || match[1] === 'none') return;
+    const image = new Image();
+    image.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = image.naturalWidth;
+        canvas.height = image.naturalHeight;
+        const ctx = canvas.getContext('2d', {willReadFrequently:true});
+        ctx.drawImage(image, 0, 0);
+        objectCollisionImages[name] = {el, width:canvas.width, height:canvas.height,
+            alpha:ctx.getImageData(0,0,canvas.width,canvas.height).data};
+    };
+    image.src = match[1];
+}
+function objectAt(x,y) {
+    const room = document.querySelector('.room');
+    if (!room) return false;
+    const bounds = room.getBoundingClientRect();
+    if (!bounds.width || !bounds.height) return false;
+    const px = bounds.left + x/100*bounds.width;
+    const py = bounds.top + y/100*bounds.height;
+    for (const name of ['computer','desk']) {
+        const item = objectCollisionImages[name];
+        if (!item) continue;
+        const box = item.el.getBoundingClientRect();
+        // CSS background-size:contain preserves aspect ratio and centers the PNG.
+        const scale = Math.min(box.width/item.width,box.height/item.height);
+        const w = item.width*scale, h = item.height*scale;
+        const left = box.left+(box.width-w)/2, top=box.top+(box.height-h)/2;
+        const ix=Math.floor((px-left)/scale), iy=Math.floor((py-top)/scale);
+        if(ix>=0 && iy>=0 && ix<item.width && iy<item.height &&
+           item.alpha[(iy*item.width+ix)*4+3] > 32) return true;
+    }
+    return false;
+}
+// Wait until CSS assets have loaded; keep wall collision independently active.
+window.addEventListener('load', () => {
+    loadObjectCollision('computer'); loadObjectCollision('desk');
+});
 function blocked(x,y) {
     // Check player foot position and nearby footprint against the exact floor layer.
     const r=Math.max(0.5,playerRadius*0.65);
     if(!floorAt(x,y)||!floorAt(x-r,y)||!floorAt(x+r,y)||!floorAt(x,y-r*.55)||!floorAt(x,y+r*.55)) return true;
-    return false; // Movement is restricted by the floor mask only.
+    if (objectAt(x,y) || objectAt(x-r,y) || objectAt(x+r,y) ||
+        objectAt(x,y-r*.55) || objectAt(x,y+r*.55)) return true;
+    return false;
 }
 
 /* =====================================================
@@ -6310,7 +6357,7 @@ _object_style = """<style>
  background-position:center !important; background-size:contain !important;
  image-rendering:pixelated !important; z-index:22 !important;
 }
-.room .object.computer {left:24% !important;top:3% !important;width:52% !important;height:34% !important;background-image:__COMPUTER__ !important;}
+.room .object.computer {left:30.5% !important;top:3% !important;width:39% !important;height:34% !important;background-image:__COMPUTER__ !important;}
 .room .object.desk {left:33% !important;top:64% !important;width:34% !important;height:22% !important;background-image:__DESK__ !important;}
 .room .object.computer::before,.room .object.computer::after,.room .object.desk::before,.room .object.desk::after {content:none !important;display:none !important;}
 .room .object.computer .object-label,.room .object.desk .object-label {display:none !important;}
