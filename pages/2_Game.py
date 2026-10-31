@@ -6291,6 +6291,33 @@ html = html.replace("__RESET_TUTORIAL_SAVE__", "true" if st.session_state.pop("t
 # RENDER
 # =========================================================
 
+# External PNG assets: keep images outside the Python source file.
+from pathlib import Path as _AssetPath
+import base64 as _asset_b64
+_asset_root = _AssetPath(__file__).resolve().parent.parent / "assets"
+def _object_uri(name):
+    asset = _asset_root / name
+    if not asset.is_file():
+        return "none"
+    return "url(data:image/png;base64," + _asset_b64.b64encode(asset.read_bytes()).decode("ascii") + ")"
+
+_object_style = """<style>
+.room .object.computer, .room .object.desk {
+ display:block !important; visibility:visible !important; opacity:1 !important;
+ pointer-events:auto !important; position:absolute !important;
+ border:0 !important; box-shadow:none !important; color:transparent !important;
+ background-color:transparent !important; background-repeat:no-repeat !important;
+ background-position:center !important; background-size:contain !important;
+ image-rendering:pixelated !important; z-index:22 !important;
+}
+.room .object.computer {left:20% !important;top:2% !important;width:60% !important;height:35% !important;background-image:__COMPUTER__ !important;}
+.room .object.desk {left:33% !important;top:62% !important;width:34% !important;height:23% !important;background-image:__DESK__ !important;}
+.room .object.computer::before,.room .object.computer::after,.room .object.desk::before,.room .object.desk::after {content:none !important;display:none !important;}
+.room .object.computer .object-label,.room .object.desk .object-label {display:none !important;}
+</style>"""
+_object_style = _object_style.replace("__COMPUTER__",_object_uri("computer.png")).replace("__DESK__",_object_uri("desk.png"))
+html = html.replace("</head>", _object_style + "</head>", 1)
+
 components.html(
     html,
     height=1000,
