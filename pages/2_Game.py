@@ -4608,6 +4608,10 @@ function checkInteraction() {
 
     interactables.forEach(
         function (object) {
+            // Select the object required by the active tutorial step.
+            const required = tutorialStep === 3 ? "desk" :
+                tutorialStep === 5 ? "exit" : "computer";
+            if (object.id !== required) return;
 
             const distance =
                 distanceToObject(
@@ -4616,7 +4620,7 @@ function checkInteraction() {
 
 
             if (
-                distance < 12 &&
+                distance < 15 &&
                 distance < closest
             ) {
 
@@ -4924,7 +4928,7 @@ function closeComputer() {
 function submitCode() {
 
     const entered =
-        codeInput.value.trim();
+        codeInput.value.replace(/\D/g, "").slice(0, 4);
 
 
     if (
@@ -4948,11 +4952,15 @@ function submitCode() {
 
         tutorialStep =
             3;
+        keyCollected = false;
+        codeError.textContent = "ACCESS GRANTED";
+        accessKey.classList.add("visible");
         saveTutorialState();
 
 
         typeEcho(4);
         checkInteraction();
+        updateTutorialArrow();
 
 
         status.textContent =
@@ -5100,9 +5108,8 @@ function interact() {
 
 
     if (!nearby) {
-
+        status.textContent = "ECHO // 목표 오브제 가까이 이동한 후 E를 누르십시오.";
         return;
-
     }
 
 
