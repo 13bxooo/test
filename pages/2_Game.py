@@ -4126,7 +4126,7 @@ function updateTutorialArrow() {
     });
     if (modalOpen) { arrow.classList.remove("show"); return; }
     arrow.style.left = (rect.left + rect.width / 2 - gameRect.left) + "px";
-    arrow.style.top = (rect.top - gameRect.top - 76) + "px";
+    arrow.style.top = (rect.top - gameRect.top - (tutorialStep === 3 ? 55 : 76)) + "px";
     arrow.classList.add("show");
 }
 
@@ -4983,7 +4983,7 @@ function submitCode() {
         void computerOverlay.offsetWidth;
         computerOverlay.classList.add("terminal-shake");
         clearTimeout(window._terminalShakeTimer);
-        window._terminalShakeTimer = setTimeout(() => computerOverlay.classList.remove("terminal-shake"), 500);
+        window._terminalShakeTimer = setTimeout(() => computerOverlay.classList.remove("terminal-shake"), 300);
         codeInput.value = "";
         codeInput.focus();
         codeError.textContent =
@@ -6454,3 +6454,5 @@ components.html(
 )
 
 
+
+html = html.replace("</head>", '<style id="card-repair-2026">\n/* Correctly shaped, chunky pixel sprite with visible physical thickness. */\n.room .access-key {left:45.44% !important;top:66.8% !important;width:82px !important;height:65px !important;transform:translate(-50%,-50%) !important;perspective:340px !important;}\n.room .access-key .key-rotator {width:82px !important;height:56px !important;left:0 !important;top:0 !important;animation:itemBob 2s ease-in-out infinite !important;filter:none !important;}\n.room .access-key .key-spin {position:absolute;inset:0;transform-style:preserve-3d;animation:pixelCardSpin 4s linear infinite !important;}\n.room .access-key .key-face {width:80px !important;height:54px !important;inset:0 !important;background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAA2CAYAAABQvB7qAAACqUlEQVR4nO2aPU4CQRSAH8aAhyChgQtwAtDExMKE0mhLPAONFtrIFQylEAsLEgsTI0JnxwUWCxIPoTZYrdksOzNvZt6bmSXzdZBldvny/nZ2ASKRSGR3+PrdbHSO3+e6kFDQFaJL6QRyC9HFq8BQZCQAMFz/wKhRAwCAg8bh5nv9XsH8llSgbyEJ0TqrZAb1KsqfXKBPIaYyhusfreOXoxdo908Mz+YghV2JSFmOXgzPaAZaoE16lEVG36AOSgXWq5VKNo1NRaS4FiJjcdcDAIDOYGq1DjoCW7nPIcmwxaYO7ukcnIZ32Ti/PN76rjOYSqNvlcxQawc/SBf9+ZAgEUhVT0RM7l9Z1lWBaSRaKZzFZnbSwZc8LMoIzHfiIrgizwfZUQaDcQRS8HzT83ZuqtqqXQNHjRr0JfMgtRTfTURVB9m78O18tfXdVbeptYaLOlg0C66SGTRbR9LfeU1hDKE3ESuBRZ349Hpqs2TpQAmsVyu4zbGAcFU7vd+JPN/0pFHro4nkRxlZIzESqOrE1IRcB2MTsYQ9hXVHltBQjTLWEbhLnVi2x3nQOCy8nUULLGMnFrG46/3vINnCmsI2kej7Fg6LsUBVJ6ZIY64GMkEcg92V8T4HiuCSp9rHnJ9dQPdxjF4vWIGmYATpknbiooGaRGC7f+LkKR1Gzvztgf06smgJxOxO2zwf4YiePGl6Uj1hdJrCMkFU0dN9HDt9/Ko92+UjMO3EqofTVNHDJUe1cZolWwdJIjCVYxtBnx9PFJcjREcSFmcpzC0HgEeQCjKBLgQBuJWEeTvL6P6W88VLH1GEfZ23CC+DdNkkyWAR6ENQCpcoEcYCfUoCcC9KhNFFiDYXOQhFlIhgNhNCFyXC+KJNorCskmSwROAuiiLHZR2MRCKRSJj8AaPQF0zoQBOgAAAAAElFTkSuQmCC") !important;background-size:80px 54px !important;image-rendering:pixelated !important;border:0 !important;outline:0 !important;box-shadow:none !important;backface-visibility:hidden !important;}\n.room .access-key .key-face.front {transform:translateZ(4px) !important;}\n.room .access-key .key-face.back {transform:rotateY(180deg) translateZ(4px) !important;}\n.room .access-key .key-spin::after {content:"";position:absolute;left:2px;top:3px;width:76px;height:48px;background:#082d54;transform:rotateY(90deg);border:3px solid #69dfff;box-sizing:border-box;}\n/* Small soft-edged pixel shadow; no striped/barcode appearance. */\n.room .access-key .key-shadow {position:absolute !important;top:61px !important;left:23px !important;width:38px !important;height:7px !important;border-radius:0 !important;filter:none !important;opacity:.35 !important;background:#17375a !important;box-shadow:4px 0 #17375a,-4px 0 #17375a,8px 2px #254566,-8px 2px #254566 !important;animation:pixelShadowBob 2s ease-in-out infinite !important;}\n/* Card and its pointer have exactly the same floating period and phase. */\n.tutorial-direction-arrow {animation:itemBob 2s ease-in-out infinite !important;}\n.computer-overlay.terminal-shake .computer-panel {animation:terminalMicroShake .03s steps(2,end) 10 !important;}\n</style>' + "</head>", 1)
