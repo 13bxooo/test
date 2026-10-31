@@ -2998,7 +2998,8 @@ button,.game button,.code-button,.help-key{border-radius:0!important}
 .object.computer { left:28.5% !important; top:4.2% !important; width:42% !important; height:30.7% !important; z-index:7 !important; opacity:0 !important; pointer-events:none !important; }
 .object.desk { left:33.5% !important; top:62% !important; width:33% !important; height:26% !important; z-index:7 !important; opacity:0 !important; pointer-events:none !important; }
 .exit-wall { left:81.4% !important; top:25% !important; width:17.2% !important; height:47% !important; z-index:7 !important; opacity:0 !important; pointer-events:none !important; }
-.room .access-key { left:49% !important; top:69% !important; z-index:8 !important; }
+.room .access-key { left:50% !important; top:67% !important; z-index:35 !important; }
+.room .access-key.visible { display:block !important; }
 .project-title { color:#fff !important; text-shadow:none !important; }
 
 
@@ -3933,10 +3934,16 @@ const status =
     );
 
 
-const accessKey =
-    document.getElementById(
-        "accessKey"
-    );
+// The access-key element was referenced by JavaScript but was missing
+// from the rendered room HTML. Create it before restoring saved state.
+let accessKey = document.getElementById("accessKey");
+if (!accessKey) {
+    accessKey = document.createElement("div");
+    accessKey.id = "accessKey";
+    accessKey.className = "access-key";
+    accessKey.setAttribute("aria-label", "ACCESS KEY");
+    room.appendChild(accessKey);
+}
 
 
 const computerOverlay =
