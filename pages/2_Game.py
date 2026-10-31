@@ -6357,8 +6357,8 @@ _object_style = """<style>
  background-position:center !important; background-size:contain !important;
  image-rendering:pixelated !important; z-index:22 !important;
 }
-.room .object.computer {left:30.5% !important;top:3% !important;width:39% !important;height:34% !important;background-image:__COMPUTER__ !important;}
-.room .object.desk {left:33% !important;top:64% !important;width:34% !important;height:22% !important;background-image:__DESK__ !important;}
+.room .object.computer {left:27.86% !important;top:3% !important;width:42% !important;height:34% !important;background-image:__COMPUTER__ !important;}
+.room .object.desk {left:33% !important;top:62.85% !important;width:34% !important;height:22% !important;background-image:__DESK__ !important;}
 .room .object.computer::before,.room .object.computer::after,.room .object.desk::before,.room .object.desk::after {content:none !important;display:none !important;}
 .room .object.computer .object-label,.room .object.desk .object-label {display:none !important;}
 </style>"""
