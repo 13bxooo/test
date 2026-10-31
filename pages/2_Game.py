@@ -6315,7 +6315,7 @@ _object_style = """<style>
 .room .object.computer::before,.room .object.computer::after,.room .object.desk::before,.room .object.desk::after {content:none !important;display:none !important;}
 .room .object.computer .object-label,.room .object.desk .object-label {display:none !important;}
 </style>"""
-_object_style = _object_style.replace("__COMPUTER__",_object_uri("computer.png")).replace("__DESK__",_object_uri("desk.png"))
+_object_style = _object_style.replace("__COMPUTER__",_object_uri("computer_transparent.png")).replace("__DESK__",_object_uri("desk_transparent.png"))
 html = html.replace("</head>", _object_style + "</head>", 1)
 
 components.html(
