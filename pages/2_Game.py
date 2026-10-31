@@ -4506,13 +4506,15 @@ function floorAt(x,y) {
     if (!floorMaskReady) return false;
     const px=Math.floor(x/100*floorMaskCanvas.width),py=Math.floor(y/100*floorMaskCanvas.height);
     if(px<0||py<0||px>=floorMaskCanvas.width||py>=floorMaskCanvas.height) return false;
-    return floorMaskContext.getImageData(px,py,1,1).data[3]>128;
+    const pixel = floorMaskContext.getImageData(px,py,1,1).data;
+    // The embedded collision PNG is opaque everywhere: white marks floor, black marks wall.
+    return pixel[0] > 128 && pixel[1] > 128 && pixel[2] > 128;
 }
 function blocked(x,y) {
     // Check player foot position and nearby footprint against the exact floor layer.
     const r=Math.max(0.5,playerRadius*0.65);
     if(!floorAt(x,y)||!floorAt(x-r,y)||!floorAt(x+r,y)||!floorAt(x,y-r*.55)||!floorAt(x,y+r*.55)) return true;
-    return obstacles.some(object=>circleHitsRect(x,y,playerRadius,object));
+    return false; // Movement is restricted by the floor mask only.
 }
 
 /* =====================================================
