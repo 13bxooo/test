@@ -197,14 +197,14 @@ footer {{
 
 
 /* === TUTORIAL ROOM LAYERS: generated from the supplied two-piece sprite sheet === */
-.room {
+.room {{
   position: relative !important;
   aspect-ratio: 672 / 652 !important;
   background: transparent !important;
   background-image: none !important;
   overflow: visible !important;
-}
-.tutorial-floor-layer {
+}}
+.tutorial-floor-layer {{
   position: absolute !important;
   inset: 0 !important;
   width: 100% !important;
@@ -213,8 +213,8 @@ footer {{
   pointer-events: none !important;
   z-index: 1 !important;
   image-rendering: pixelated !important;
-}
-.tutorial-wall-overlay {
+}}
+.tutorial-wall-overlay {{
   position: absolute !important;
   inset: 0 !important;
   width: 100% !important;
@@ -223,13 +223,13 @@ footer {{
   pointer-events: none !important;
   z-index: 30 !important;
   image-rendering: pixelated !important;
-}
+}}
 .placed-computer, .placed-desk,
 .object.computer, .object.desk, .exit-wall,
-.scene-object, .logic-art-layer {
+.scene-object, .logic-art-layer {{
   display: none !important;
-}
-.placed-exit {
+}}
+.placed-exit {{
   left: 84.8% !important;
   top: 21.8% !important;
   width: 13.8% !important;
@@ -238,21 +238,21 @@ footer {{
   z-index: 31 !important;
   transform-origin: 50% 50% !important;
   transition: transform 520ms steps(6,end), opacity 180ms linear !important;
-}
-.placed-exit.door-opening {
+}}
+.placed-exit.door-opening {{
   transform: scaleX(.72) skewY(-3deg) !important;
   opacity: .72 !important;
-}
-.placed-exit.door-open {
+}}
+.placed-exit.door-open {{
   transform: scaleX(.08) skewY(-3deg) !important;
   opacity: 0 !important;
-}
-.player {
+}}
+.player {{
   z-index: 32 !important;
-}
+}}
 
-.placed-art.placed-exit { display:none !important; }
-.door-frame-source { display:none !important; }
+.placed-art.placed-exit {{ display:none !important; }}
+.door-frame-source {{ display:none !important; }}
 </style>
 """,
     unsafe_allow_html=True,
