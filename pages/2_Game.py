@@ -192,7 +192,7 @@ footer {{
 .placed-exit-open.door-open {{ opacity:1 !important; transform:translateX(0) scaleX(1) !important; }}
 .room .object.computer,.room .object.desk,.room .exit-wall,.room .exit-sign,.room .monitor {{ opacity:0 !important; pointer-events:none !important; background:transparent !important; border:0 !important; box-shadow:none !important; color:transparent !important; }}
 .room .object.computer::before,.room .object.computer::after,.room .object.desk::before,.room .object.desk::after,.room .exit-wall::before,.room .exit-wall::after {{ content:none !important; display:none !important; }}
-.room .access-key {{ position:absolute !important; left:49% !important; top:69% !important; z-index:7 !important; }}
+.room .access-key {{ position:absolute !important; left:43% !important; top:62% !important; z-index:35 !important; }}
 .project-title {{ color:#fff !important; }}
 
 
@@ -4327,9 +4327,9 @@ function restoreTutorialState() {
         typingDone = true; // iframe 재생성 후에는 현재 문장을 보존하고 타이핑 완료 상태로 복구
         echoNext.classList.add("ready");
         renderInventory();
-        if (keyCollected) {
-            const keyNode = document.getElementById("accessKey");
-            if (keyNode) keyNode.classList.remove("visible");
+        const keyNode = document.getElementById("accessKey");
+        if (keyNode) {
+            keyNode.classList.toggle("visible", tutorialStep === 3 && !keyCollected);
         }
         return true;
     } catch (e) { return false; }
@@ -4572,20 +4572,22 @@ function distanceToObject(
     object
 ) {
 
-    const centerX =
-        object.x +
-        object.w / 2;
-
-
-    const centerY =
-        object.y +
-        object.h / 2;
-
-
-    return Math.hypot(
-        playerX - centerX,
-        playerY - centerY
-    );
+    // Measure distance to the nearest edge, not the center of an
+    // impassable sprite. This lets E work while standing beside it.
+    const element = document.querySelector(".room .object." + object.id);
+    if (element) {
+        const bounds = room.getBoundingClientRect();
+        const box = element.getBoundingClientRect();
+        const px = bounds.left + playerX / 100 * bounds.width;
+        const py = bounds.top + playerY / 100 * bounds.height;
+        return Math.hypot(
+            Math.max(box.left - px, 0, px - box.right) / bounds.width * 100,
+            Math.max(box.top - py, 0, py - box.bottom) / bounds.height * 100
+        );
+    }
+    const dx = Math.max(object.x-playerX, 0, playerX-(object.x+object.w));
+    const dy = Math.max(object.y-playerY, 0, playerY-(object.y+object.h));
+    return Math.hypot(dx,dy);
 
 }
 
@@ -4946,9 +4948,11 @@ function submitCode() {
 
         tutorialStep =
             3;
+        saveTutorialState();
 
 
         typeEcho(4);
+        checkInteraction();
 
 
         status.textContent =
