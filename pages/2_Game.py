@@ -4941,6 +4941,7 @@ function submitCode() {
         accessKey.classList.add(
             "visible"
         );
+        playKeySpawnSound();
 
 
         tutorialStep =
@@ -4972,9 +4973,40 @@ codeButton.addEventListener(
 );
 
 
+function playTerminalBeep() {
+    try {
+        const C = window.AudioContext || window.webkitAudioContext;
+        if (!C) return;
+        const ctx = new C(), o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = "square"; o.frequency.value = 850;
+        g.gain.setValueAtTime(0.035, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.065);
+        o.connect(g); g.connect(ctx.destination);
+        o.start(); o.stop(ctx.currentTime + 0.07);
+        o.onended = () => ctx.close().catch(() => {});
+    } catch(e) {}
+}
+function playKeySpawnSound() {
+    try {
+        const C = window.AudioContext || window.webkitAudioContext;
+        if (!C) return;
+        const ctx = new C();
+        [740, 988, 1480].forEach((hz,i) => {
+            const o=ctx.createOscillator(),g=ctx.createGain(),t=ctx.currentTime+i*0.09;
+            o.type="sine";o.frequency.value=hz;
+            g.gain.setValueAtTime(0.0001,t);
+            g.gain.exponentialRampToValueAtTime(0.075,t+0.012);
+            g.gain.exponentialRampToValueAtTime(0.0001,t+0.22);
+            o.connect(g);g.connect(ctx.destination);o.start(t);o.stop(t+0.23);
+        });
+        setTimeout(()=>ctx.close().catch(()=>{}),800);
+    } catch(e) {}
+}
+
 codeInput.addEventListener(
     "input",
     function () {
+        playTerminalBeep();
 
         codeInput.value =
             codeInput.value
@@ -6136,7 +6168,27 @@ function finishCardDrag(
                 if (fadeMessage) fadeMessage.innerHTML = '<span class="fade-stage">STAGE 01</span><span class="fade-room">:ARCHIVE ACCESS</span>';
                 if (fadeScreen) fadeScreen.classList.add("active");
                 // Leave the black screen and flickering stage sign visible for 3 seconds.
-                setTimeout(function () { parentAction("stage01"); }, 3000);
+                setTimeout(function () {
+                    parentAction("stage01");
+                    // Sandboxed iframe may prohibit timer-initiated top navigation.
+                    // Always provide a direct user-click fallback on the fade screen.
+                    const next = document.createElement("a");
+                    next.href = "?action=stage01";
+                    next.target = "_top";
+                    next.textContent = "CONTINUE  ▶  STAGE 01";
+                    next.style.cssText = "position:absolute;left:50%;top:65%;transform:translateX(-50%);z-index:999999;color:#8defff;background:#020b13;border:1px solid #54dfff;padding:14px 24px;font:18px monospace;text-decoration:none;cursor:pointer;";
+                    next.onclick = function(e) {
+                        e.preventDefault();
+                        try {
+                            const u = new URL(window.parent.location.href);
+                            u.searchParams.set("action","stage01");
+                            window.parent.location.assign(u.toString());
+                        } catch(err) {
+                            window.open("?action=stage01","_top");
+                        }
+                    };
+                    document.body.appendChild(next);
+                }, 3000);
             }, 1000);
         }, 700);
 
