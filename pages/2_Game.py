@@ -259,12 +259,12 @@ footer {{
    Never paint another door leaf over it or deform the source artwork. */
 #rightWallDoor, #rightWallDoor.door-opening, #rightWallDoor.door-open,
 .tutorial-right-door, .placed-exit, .placed-exit-open,
-.placed-art.placed-exit, .placed-art.placed-exit-open {
+.placed-art.placed-exit, .placed-art.placed-exit-open {{
   display:none !important;
   background:none !important;
   box-shadow:none !important;
   border:0 !important;
-}
+}}
 </style>
 """,
     unsafe_allow_html=True,
