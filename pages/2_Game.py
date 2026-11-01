@@ -4292,7 +4292,7 @@ const tutorialTransition = document.getElementById("tutorialTransition");
 if (!tutorialWasRestored && tutorialTransition) {
     tutorialTransition.classList.add("show");
     window.setTimeout(() => tutorialTransition.classList.add("hide"), 2700);
-    window.setTimeout(() => tutorialTransition.remove(), 3150);
+    window.setTimeout(() => { tutorialTransition.classList.remove("show","hide"); tutorialTransition.style.opacity="1"; }, 3150);
 }
 if (!tutorialWasRestored) typeEcho(0);
 setInterval(saveTutorialState, 250);
@@ -5901,9 +5901,9 @@ function unlockSecurityDoor() {
     if(readerLight) readerLight.classList.add("green");
     document.getElementById("swipeDisplay").textContent="ACCESS GRANTED";
     cardStatus.textContent="인증 성공 // 보안문 개방";
-    room.classList.add("security-door-opening");
-    document.querySelectorAll(".placed-exit,.placed-exit-open").forEach(el=>el.classList.add("door-opening"));
-    window.setTimeout(()=>{room.classList.remove("security-door-opening");room.classList.add("security-door-open");document.querySelectorAll(".placed-exit,.placed-exit-open").forEach(el=>{el.classList.remove("door-opening");el.classList.add("door-open");});},1800);
+    room.classList.add("security-door-open");
+    const wallArt=document.querySelector(".tutorial-wall-overlay");
+    if(wallArt) wallArt.src=window.WALL_OPEN_IMAGE;
     saveTutorialState();
     window.setTimeout(()=>{
         closeCardAccess();
@@ -5917,8 +5917,12 @@ function unlockSecurityDoor() {
 function goToStageOne() {
     const fadeMessage=document.getElementById("fadeMessage");
     if(fadeMessage) fadeMessage.innerHTML='<span class="fade-stage">STAGE 01</span><span class="fade-room">:ARCHIVE ACCESS</span>';
-    if(fadeScreen) fadeScreen.classList.add("active");
-    window.setTimeout(()=>parentAction("stage01"),2800);
+    const loading=document.getElementById("tutorialTransition");
+    if(loading){
+        loading.innerHTML='<div class="tutorial-transition-card"><div class="tutorial-transition-stage">STAGE 01</div><div class="tutorial-transition-room">: ARCHIVE ACCESS</div></div>';
+        loading.classList.remove("hide");loading.classList.add("show");loading.style.opacity="1";
+    } else if(fadeScreen) fadeScreen.classList.add("active");
+    window.setTimeout(()=>parentAction("stage01"),3150);
 }
 
 dragCard.addEventListener(
@@ -6352,22 +6356,28 @@ def _external_png_uri(filename):
 _card_uri = _external_png_uri("card_front.png")
 _computer_uri = _external_png_uri("computer_transparent.png")
 _desk_uri = _external_png_uri("desk_transparent.png")
-_door_uri = _external_png_uri("door_closed.png")
+_wall_closed_uri = _external_png_uri("wall_closed.png")
+_wall_open_uri = _external_png_uri("wall_open.png")
 html = html.replace("__EXTERNAL_CARD_PNG__", _card_uri)
-# Override earlier object background image rules with the external files.
-_external_png_css = """<style id="external-png-assets-final">
+html = html.replace('class="tutorial-wall-overlay" alt="" aria-hidden="true" src="__GAME_IMAGE_24640e7970c6__"', 'class="tutorial-wall-overlay" alt="" aria-hidden="true" src="' + _wall_closed_uri + '"')
+# The previous placeholder may already have been resolved above.
+html = html.replace('class="tutorial-wall-overlay" alt="" aria-hidden="true" src="' + _GAME_ASSET_URIS_WALL + '"', 'class="tutorial-wall-overlay" alt="" aria-hidden="true" src="' + _wall_closed_uri + '"') if False else html
+html = html.replace("</head>", '<script>window.WALL_OPEN_IMAGE=' + repr(_wall_open_uri) + ';</script></head>', 1)
+_external_css = """<style id="external-wall-png-final">
 .room .object.computer {background-image:url('__COMPUTER_PNG__') !important;}
 .room .object.desk {background-image:url('__DESK_PNG__') !important;}
-/* Static door: no slide animation; leave original frame artwork in place. */
-.room #securityDoorLayer,.room #pixelInsetDoor,.room #doorExactSvg {display:none!important;}
-.room .placed-exit,.room .placed-exit-open {display:none!important;}
-.room::after {content:"";position:absolute;left:89.5%;top:31%;width:8%;height:28%;background:url('__DOOR_PNG__') center / contain no-repeat;pointer-events:none;z-index:9;image-rendering:pixelated;}
-.room.security-door-opening::after,.room.security-door-open::after {transform:none!important;opacity:1!important;}
+.room #securityDoorLayer,.room #pixelInsetDoor,.room #doorExactSvg,.room #doorOpening {display:none!important;}
+.room .placed-exit,.room .placed-exit-open,.room .tutorial-right-door {display:none!important;}
+.room:before,.room:after {content:none!important;display:none!important;}
+.room .tutorial-wall-overlay {display:block!important;z-index:30!important;}
 </style>"""
-_external_png_css = (_external_png_css.replace("__COMPUTER_PNG__", _computer_uri)
-                     .replace("__DESK_PNG__", _desk_uri)
-                     .replace("__DOOR_PNG__", _door_uri))
-html = html.replace("</head>", _external_png_css + "</head>", 1)
+_external_css = _external_css.replace("__COMPUTER_PNG__",_computer_uri).replace("__DESK_PNG__",_desk_uri)
+html=html.replace("</head>",_external_css+"</head>",1)
+# Replace the actual resolved original wall data URI only within wall img tag
+import re
+html=re.sub(r'(<img class="tutorial-wall-overlay"[^>]*src=")[^"]+("[^>]*>)',lambda m:m.group(1)+_wall_closed_uri+m.group(2),html,count=1)
+# restored sessions start with the correct image
+html=html.replace('if (doorUnlocked) room.classList.add("security-door-open");','if (doorUnlocked) { room.classList.add("security-door-open"); const w=document.querySelector(".tutorial-wall-overlay"); if(w)w.src=window.WALL_OPEN_IMAGE; }')
 
 components.html(
     html,
