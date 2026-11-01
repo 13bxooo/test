@@ -3324,6 +3324,7 @@ button,.game button,.code-button,.help-key{border-radius:0!important}
     id="exitDoor"
 >
 </div>
+<div id="securityDoorLayer" class="security-door-layer" aria-hidden="true"><div class="security-door-panel"></div><div class="security-door-gap"></div></div>
 
 
 <div class="exit-sign">
@@ -3718,76 +3719,16 @@ button,.game button,.code-button,.help-key{border-radius:0!important}
     id="cardOverlay"
 >
 
-<div class="card-panel">
-
-
-<div class="card-header">
-
-    <div class="card-title">
-        SECURITY ROOM // ACCESS
-    </div>
-
-    <div class="card-help">
-        DRAG CARD TO READER
-    </div>
-
-</div>
-
-
-<div
-    class="card-stage"
-    id="cardStage"
->
-
-
-<div class="reader" id="cardReader">
-
-    <div class="reader-light" id="readerLight"></div>
-    <div class="reader-slot"></div>
-
-    CARD READER
-
-</div>
-
-
-<div class="card-arrow">
-    →
-</div>
-
-
-<div
-    class="card"
-    id="dragCard"
->
-
-    <div class="card-chip"></div>
-
-    ACCESS KEY
-
-    <br>
-
-    <span style="color:#666">
-        SECURITY AUTHORIZATION
-    </span>
-
-</div>
-
-
-</div>
-
-
-<div
-    class="card-status"
-    id="cardStatus"
->
-    카드를 리더기까지 끌어다 놓으십시오.
-</div>
-
-
-</div>
-
-</div>
-
+<div class="card-panel swipe-panel">
+ <div class="card-header"><div class="card-title">SECURITY ROOM // ACCESS</div><div class="card-help">SWIPE TO UNLOCK</div></div>
+ <div class="swipe-screen"><span id="swipeDisplay">PLEASE INSERT CARD</span><span class="swipe-led" id="readerLight"></span></div>
+ <div class="card-stage" id="cardStage">
+   <div class="reader" id="cardReader"><div class="reader-slot"></div><div class="reader-track"></div><div class="reader-text">ACCESS CARD READER</div></div>
+   <div class="card" id="dragCard"><img id="swipeCardImage" alt="ACCESS KEY"></div>
+ </div>
+ <div class="card-status" id="cardStatus">카드를 리더기 왼쪽 삽입구에 넣으세요.</div>
+ <button type="button" class="swipe-close" id="swipeClose">CLOSE ×</button>
+</div></div>
 
 <!-- =====================================================
      PAUSE
@@ -3862,6 +3803,9 @@ let keyCollected =
     false;
 
 let cardConsumed = false;
+let doorUnlocked = false;
+let cardInserted = false;
+let swipeStartX = 0;
 
 
 let echoIndex =
@@ -4301,7 +4245,7 @@ function saveTutorialState() {
     try {
         localStorage.setItem(TUTORIAL_SAVE_KEY, JSON.stringify({
             tutorialStep, echoIndex, echoText: echoMessage.textContent,
-            typingDone, playerX, playerY, keyCollected, cardConsumed,
+            typingDone, playerX, playerY, keyCollected, cardConsumed, doorUnlocked,
             accessCode: ACCESS_CODE,
             inventory: inventory.map(item => item ? {name: item.name, description: item.description} : null)
         }));
@@ -4317,6 +4261,7 @@ function restoreTutorialState() {
         if (Number.isFinite(saved.playerY)) playerY = saved.playerY;
         keyCollected = !!saved.keyCollected;
         cardConsumed = !!saved.cardConsumed;
+        doorUnlocked = !!saved.doorUnlocked || cardConsumed;
         if (Array.isArray(saved.inventory)) {
             for (let i = 0; i < inventory.length; i++) {
                 const item = saved.inventory[i];
@@ -4343,6 +4288,7 @@ function restoreTutorialState() {
 }
 
 const tutorialWasRestored = restoreTutorialState();
+if (doorUnlocked) room.classList.add("security-door-open");
 const tutorialTransition = document.getElementById("tutorialTransition");
 if (!tutorialWasRestored && tutorialTransition) {
     tutorialTransition.classList.add("show");
@@ -5335,17 +5281,8 @@ function interact() {
         }
 
 
-        if (
-            !keyCollected
-        ) {
-
-            inaccessible();
-
-            return;
-
-        }
-
-
+        if (doorUnlocked) { goToStageOne(); return; }
+        if (!keyCollected) { inaccessible(); return; }
         openCardAccess();
 
     }
@@ -5861,375 +5798,128 @@ document
    ===================================================== */
 
 function openCardAccess() {
-
-    if (
-        !keyCollected || cardConsumed
-    ) {
-
-        inaccessible();
-
-        return;
-
-    }
-
-
-    cardOpen =
-        true;
-
-
+    if (!keyCollected || cardConsumed) { inaccessible(); return; }
+    cardOpen = true;
     clearKeys();
-
-
-    interactionMessage.classList.remove(
-        "visible"
-    );
-
-
-    cardOverlay.style.display =
-        "flex";
-
-
+    interactionMessage.classList.remove("visible");
+    cardOverlay.style.display = "flex";
+    // Reuse the inventory card artwork, not the animated room item.
+    const art = document.querySelector(".item-acquired-art .access-card-image") || document.querySelector(".access-card-image");
+    const image = document.getElementById("swipeCardImage");
+    if (art && image) image.src = art.src;
     resetCard();
-
 }
-
-
 function closeCardAccess() {
-
-    cardOpen =
-        false;
-
-
-    cardOverlay.style.display =
-        "none";
-
-
+    cardOpen = false;
+    cardOverlay.style.display = "none";
     resetCard();
-
-
     root.focus();
-
 }
-
-
+document.getElementById("swipeClose").addEventListener("click",closeCardAccess);
 function resetCard() {
-
-    dragCard.style.left =
-        "12%";
-
-
-    dragCard.style.top =
-        "50%";
-
-
-    dragCard.style.transform =
-        "translateY(-50%)";
-
-
-    cardDragging =
-        false;
-
-
-    cardStatus.textContent =
-        "카드를 리더기까지 끌어다 놓으십시오.";
-
+    cardInserted = false;
+    cardDragging = false;
+    dragCard.classList.remove("inserted");
+    dragCard.style.left = "";
+    dragCard.style.top = "";
+    dragCard.style.transform = "";
+    if (readerLight) readerLight.classList.remove("green");
+    document.getElementById("swipeDisplay").textContent = "PLEASE INSERT CARD";
+    cardStatus.textContent = "카드를 리더기 왼쪽 삽입구에 넣으세요.";
 }
-
-
-function getCardStagePoint(
-    event
-) {
-
-    const rect =
-        cardStage.getBoundingClientRect();
-
-
-    return {
-
-        x:
-            event.clientX -
-            rect.left,
-
-        y:
-            event.clientY -
-            rect.top
-
-    };
-
+function cardStagePoint(event) {
+    const r = cardStage.getBoundingClientRect();
+    return {x:event.clientX-r.left,y:event.clientY-r.top};
 }
-
-
-function startCardDrag(
-    event
-) {
-
-    if (
-        !cardOpen
-    ) {
-
-        return;
-
-    }
-
-
+function startCardDrag(event) {
+    if (!cardOpen) return;
     event.preventDefault();
-
-
-    const rect =
-        dragCard.getBoundingClientRect();
-
-
-    cardOffsetX =
-        event.clientX -
-        rect.left;
-
-
-    cardOffsetY =
-        event.clientY -
-        rect.top;
-
-
-    cardDragging =
-        true;
-
-
-    try {
-
-        dragCard.setPointerCapture(
-            event.pointerId
-        );
-
-    }
-
-    catch (error) {}
-
+    const r = dragCard.getBoundingClientRect();
+    cardOffsetX = event.clientX-r.left;
+    cardOffsetY = event.clientY-r.top;
+    cardDragging = true;
+    dragCard.setPointerCapture(event.pointerId);
+    if (cardInserted) swipeStartX = cardStagePoint(event).x;
 }
-
-
-function dragCardMove(
-    event
-) {
-
-    if (
-        !cardDragging
-    ) {
-
-        return;
-
-    }
-
-
+function dragCardMove(event) {
+    if (!cardDragging) return;
     event.preventDefault();
-
-
-    const point =
-        getCardStagePoint(
-            event
-        );
-
-
-    const stage =
-        cardStage.getBoundingClientRect();
-
-
-    let x =
-        point.x -
-        cardOffsetX;
-
-
-    let y =
-        point.y -
-        cardOffsetY;
-
-
-    x =
-        Math.max(
-            0,
-            Math.min(
-                stage.width -
-                dragCard.offsetWidth,
-                x
-            )
-        );
-
-
-    y =
-        Math.max(
-            0,
-            Math.min(
-                stage.height -
-                dragCard.offsetHeight,
-                y
-            )
-        );
-
-
-    dragCard.style.left =
-        x + "px";
-
-
-    dragCard.style.top =
-        y + "px";
-
-
-    dragCard.style.transform =
-        "none";
-
-}
-
-
-function finishCardDrag(
-    event
-) {
-
-    if (
-        !cardDragging
-    ) {
-
-        return;
-
+    const p = cardStagePoint(event);
+    const w=cardStage.clientWidth,h=cardStage.clientHeight;
+    if (cardInserted) {
+        const reader=document.getElementById("cardReader");
+        const left=reader.offsetLeft+8;
+        const x=Math.min(reader.offsetLeft+reader.offsetWidth-12,Math.max(left,p.x-cardOffsetX));
+        dragCard.style.left=x+"px";
+        dragCard.style.top=(reader.offsetTop+reader.offsetHeight/2-dragCard.offsetHeight/2)+"px";
+    } else {
+        const x=Math.max(0,Math.min(w-dragCard.offsetWidth,p.x-cardOffsetX));
+        const y=Math.max(0,Math.min(h-dragCard.offsetHeight,p.y-cardOffsetY));
+        dragCard.style.left=x+"px";
+        dragCard.style.top=y+"px";
     }
-
-
-    cardDragging =
-        false;
-
-
-    const cardRect =
-        dragCard.getBoundingClientRect();
-
-
-    const reader =
-        document.querySelector(
-            ".reader"
-        );
-
-
-    const readerRect =
-        reader.getBoundingClientRect();
-
-
-    const correctPosition =
-        cardRect.right >
-        readerRect.left + 25 &&
-
-        cardRect.left <
-        readerRect.right - 25 &&
-
-        cardRect.bottom >
-        readerRect.top + 18 &&
-
-        cardRect.top <
-        readerRect.bottom - 18;
-
-
-    if (
-        correctPosition
-    ) {
-
-        dragCard.style.left =
-            "72%";
-
-
-        dragCard.style.top =
-            "50%";
-
-
-        cardStatus.textContent =
-            "SECURITY ACCESS // VERIFIED";
-
-        status.textContent =
-            "SECURITY ROOM // ACCESS GRANTED";
-
-        // 카드키는 일회용: 인벤토리에서 제거하고 리더기를 녹색으로 변경한다.
-        inventory[0] = null;
-        keyCollected = false;
-        cardConsumed = true;
-        renderInventory();
-        if (readerLight) readerLight.classList.add("green");
-        cardStatus.textContent = "ACCESS GRANTED // CARD CONSUMED";
-        // Animate the existing angled door in the right wall after the card is accepted.
-        const gameRoom = document.querySelector(".room");
-        if (gameRoom) {
-            gameRoom.classList.remove("door-animating","door-finished");
-            void gameRoom.offsetWidth;
-            gameRoom.classList.add("door-animating");
-            window.setTimeout(() => {
-                gameRoom.classList.remove("door-animating");
-                gameRoom.classList.add("door-finished");
-            }, 740);
+    dragCard.style.transform="none";
+}
+function finishCardDrag(event) {
+    if (!cardDragging) return;
+    cardDragging=false;
+    const reader=document.getElementById("cardReader");
+    const r=reader.getBoundingClientRect();
+    const c=dragCard.getBoundingClientRect();
+    if (!cardInserted) {
+        // The card must be placed at the LEFT entrance, aligned with the track.
+        const entryX=r.left+18;
+        const centerX=c.left+c.width/2,centerY=c.top+c.height/2;
+        const valid=Math.abs(centerX-entryX)<45 && Math.abs(centerY-(r.top+r.height/2))<40;
+        if (!valid) {
+            playErrorSound();
+            cardStatus.textContent="ERROR // 왼쪽 삽입구에 카드를 맞춰주세요.";
+            dragCard.style.left="";dragCard.style.top="";dragCard.style.transform="";
+            return;
         }
-
-        // 짧은 문 개방 효과음(Web Audio, 별도 파일 불필요)
-        try {
-            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-            if (AudioContextClass) {
-                const audio = new AudioContextClass();
-                const now = audio.currentTime;
-                [440, 660, 880].forEach((frequency, index) => {
-                    const oscillator = audio.createOscillator();
-                    const gain = audio.createGain();
-                    oscillator.type = "square";
-                    oscillator.frequency.value = frequency;
-                    gain.gain.setValueAtTime(0.0001, now + index * 0.12);
-                    gain.gain.exponentialRampToValueAtTime(0.08, now + index * 0.12 + 0.02);
-                    gain.gain.exponentialRampToValueAtTime(0.0001, now + index * 0.12 + 0.18);
-                    oscillator.connect(gain);
-                    gain.connect(audio.destination);
-                    oscillator.start(now + index * 0.12);
-                    oscillator.stop(now + index * 0.12 + 0.2);
-                });
-                setTimeout(() => audio.close(), 900);
-            }
-        } catch (error) {}
-
-        setTimeout(function () {
-            closeCardAccess();
-            clearTimeout(typingTimer);
-            echoMessage.textContent = "이제 다음 스테이지로 넘어가도록 합시다.";
-            typingDone = true;
-            echoNext.classList.add("ready");
-            setTimeout(function () {
-                const fadeMessage = document.getElementById("fadeMessage");
-                if (fadeMessage) fadeMessage.innerHTML = '<span class="fade-stage">STAGE 01</span><span class="fade-room">:ARCHIVE ACCESS</span>';
-                if (fadeScreen) fadeScreen.classList.add("active");
-                // Leave the black screen and flickering stage sign visible for 3 seconds.
-                setTimeout(function () {
-                    parentAction("stage01");
-                    // Sandboxed iframe may prohibit timer-initiated top navigation.
-                    // Always provide a direct user-click fallback on the fade screen.
-                    const next = document.createElement("a");
-                    next.href = "?action=stage01";
-                    next.target = "_top";
-                    next.textContent = "CONTINUE  ▶  STAGE 01";
-                    next.style.cssText = "position:absolute;left:50%;top:65%;transform:translateX(-50%);z-index:999999;color:#8defff;background:#020b13;border:1px solid #54dfff;padding:14px 24px;font:18px monospace;text-decoration:none;cursor:pointer;";
-                    next.onclick = function(e) {
-                        e.preventDefault();
-                        try {
-                            const u = new URL(window.parent.location.href);
-                            u.searchParams.set("action","stage01");
-                            window.parent.location.assign(u.toString());
-                        } catch(err) {
-                            window.open("?action=stage01","_top");
-                        }
-                    };
-                    document.body.appendChild(next);
-                }, 3000);
-            }, 1000);
-        }, 700);
-
+        cardInserted=true;
+        dragCard.classList.add("inserted");
+        dragCard.style.left=(reader.offsetLeft+8)+"px";
+        dragCard.style.top=(reader.offsetTop+reader.offsetHeight/2-dragCard.offsetHeight/2)+"px";
+        dragCard.style.transform="none";
+        document.getElementById("swipeDisplay").textContent="SWIPE CARD →";
+        cardStatus.textContent="카드를 오른쪽 끝까지 긁어주세요.";
+        return;
     }
-
-    else {
-
-        playErrorSound();
-        cardStatus.textContent =
-            "CARD NOT DETECTED // READER에 정확히 맞춰주세요.";
-
+    if (c.right>=r.right-12) {
+        unlockSecurityDoor();
+    } else {
+        cardStatus.textContent="오른쪽 끝까지 카드를 밀어주세요.";
     }
-
 }
-
+function unlockSecurityDoor() {
+    if (doorUnlocked) return;
+    doorUnlocked=true;
+    cardConsumed=true;
+    keyCollected=false;
+    inventory[0]=null;
+    renderInventory();
+    if(readerLight) readerLight.classList.add("green");
+    document.getElementById("swipeDisplay").textContent="ACCESS GRANTED";
+    cardStatus.textContent="인증 성공 // 보안문 개방";
+    room.classList.add("security-door-opening");
+    window.setTimeout(()=>{room.classList.remove("security-door-opening");room.classList.add("security-door-open");},1050);
+    saveTutorialState();
+    window.setTimeout(()=>{
+        closeCardAccess();
+        echoMessage.textContent="보안문이 열렸습니다. 출구로 이동해 E를 누르세요.";
+        typingDone=true;
+        echoNext.classList.add("ready");
+        status.textContent="SECURITY ROOM // DOOR OPEN // PRESS E TO EXIT";
+        checkInteraction();updateTutorialArrow();
+    },1350);
+}
+function goToStageOne() {
+    const fadeMessage=document.getElementById("fadeMessage");
+    if(fadeMessage) fadeMessage.innerHTML='<span class="fade-stage">STAGE 01</span><span class="fade-room">:ARCHIVE ACCESS</span>';
+    if(fadeScreen) fadeScreen.classList.add("active");
+    window.setTimeout(()=>parentAction("stage01"),2800);
+}
 
 dragCard.addEventListener(
     "pointerdown",
@@ -6561,6 +6251,8 @@ accessKey.innerHTML = '<canvas id="accessKeyCanvas" width="108" height="116" ari
 html = html.replace('room.appendChild(accessKey);', 'room.appendChild(accessKey);\n' + _canvas_js, 1)
 # Arrow tracks the fixed canvas center rather than changing card frame bounds.
 html = html.replace('(tutorialStep === 3 ? 55 : 76)', '(tutorialStep === 3 ? 82 : 76)', 1)
+
+html = html.replace('</head>', '<style>\n/* Card reader modal */\n.card-panel.swipe-panel{width:min(620px,90vw);min-height:520px;box-sizing:border-box;position:relative;display:flex;flex-direction:column;justify-content:space-between}\n.swipe-screen{height:68px;margin:14px 0 8px;background:#06140f;border:5px solid #39413d;box-shadow:inset 0 0 0 2px #0d3023;color:#7ee9b2;display:flex;align-items:center;justify-content:center;gap:20px;letter-spacing:2px;font-size:14px}\n.swipe-led{width:14px;height:14px;background:#fa3434;box-shadow:0 0 9px #fa3434;border-radius:50%}\n.swipe-led.green{background:#31ff76;box-shadow:0 0 12px #31ff76}\n.card-panel.swipe-panel .card-stage{height:280px;flex:none;background:#090e18;overflow:hidden}\n.card-panel.swipe-panel .reader{left:22%;right:auto;top:30%;width:70%;height:82px;transform:none;border:3px solid #536781;background:linear-gradient(#36485f,#17253b 40%,#101c30 65%,#3b4f69);box-sizing:border-box;display:block}\n.reader-track{position:absolute;top:25px;left:0;right:0;height:27px;background:#050a10;border-top:4px solid #0a1019;border-bottom:4px solid #8298a9;box-sizing:border-box}\n.reader-slot{position:absolute;left:-8px;top:15px;width:12px;height:49px;background:#02050a;border:3px solid #84a4c4;z-index:4;box-sizing:border-box}\n.reader-text{position:absolute;bottom:3px;left:0;right:0;text-align:center;font-size:9px;color:#9eb7cb;letter-spacing:1px}\n.card-panel.swipe-panel .card{width:98px;height:61px;box-sizing:border-box;left:8%;top:74%;padding:0;border:0;background:none;transform:translateY(-50%);box-shadow:none;filter:none;overflow:visible;touch-action:none}\n.card-panel.swipe-panel .card img{width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;filter:none}\n.card-panel.swipe-panel .card.inserted{z-index:6}\n.swipe-close{align-self:flex-end;background:#0a1826;color:#9de8ff;border:1px solid #406b83;padding:8px 18px;cursor:pointer}\n/* Independent opening door layer, not baked into the background */\n.room .security-door-layer{position:absolute;left:86.8%;top:38%;width:12%;height:28%;z-index:12;pointer-events:none;overflow:hidden;transform:skewY(-7deg);opacity:1}\n.room .security-door-panel{position:absolute;inset:0;background:linear-gradient(90deg,#0b182c 0%,#28435d 8%,#172a43 15%,#2a435d 83%,#081729 100%);border:3px solid #5c87a9;box-sizing:border-box;transform:translateX(0);transition:transform 1s steps(12,end)}\n.room .security-door-gap{position:absolute;inset:0;background:#020812;z-index:-1}\n.room.security-door-opening .security-door-panel,.room.security-door-open .security-door-panel{transform:translateX(110%)}\n</style>' + '</head>', 1)
 
 components.html(
     html,
