@@ -3324,7 +3324,7 @@ button,.game button,.code-button,.help-key{border-radius:0!important}
     id="exitDoor"
 >
 </div>
-<div id="securityDoorLayer" class="security-door-layer" aria-hidden="true"><div class="security-door-panel"></div><div class="security-door-gap"></div></div>
+<div id="securityDoorLayer" class="security-door-layer" aria-hidden="true"><div class="security-door-depth"></div><div class="security-door-half security-door-left"></div><div class="security-door-half security-door-right"></div></div>
 
 
 <div class="exit-sign">
@@ -3721,9 +3721,8 @@ button,.game button,.code-button,.help-key{border-radius:0!important}
 
 <div class="card-panel swipe-panel">
  <div class="card-header"><div class="card-title">SECURITY ROOM // ACCESS</div><div class="card-help">SWIPE TO UNLOCK</div></div>
- <div class="swipe-screen"><span id="swipeDisplay">PLEASE INSERT CARD</span><span class="swipe-led" id="readerLight"></span></div>
  <div class="card-stage" id="cardStage">
-   <div class="reader" id="cardReader"><div class="reader-slot"></div><div class="reader-track"></div><div class="reader-text">ACCESS CARD READER</div></div>
+   <div class="reader" id="cardReader"><div class="swipe-screen"><span id="swipeDisplay">PLEASE INSERT CARD</span><span class="swipe-led" id="readerLight"></span></div><div class="reader-slot"></div><div class="reader-track"></div><div class="reader-text">ACCESS CARD READER</div></div>
    <div class="card" id="dragCard"><img id="swipeCardImage" alt="ACCESS KEY"></div>
  </div>
  <div class="card-status" id="cardStatus">카드를 리더기 왼쪽 삽입구에 넣으세요.</div>
@@ -5806,7 +5805,7 @@ function openCardAccess() {
     // Reuse the inventory card artwork, not the animated room item.
     const art = document.querySelector(".item-acquired-art .access-card-image") || document.querySelector(".access-card-image");
     const image = document.getElementById("swipeCardImage");
-    if (art && image) image.src = art.src;
+    if (image) image.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAAA8CAYAAACZ1L+0AAAEbklEQVR4nO2cTWgTQRTH/63xUHK1Bw/FfoDWL1hDUGopWrxYqBQJeihCLYaCelBaIkgtFGovFkUPipSWtiC9SKkfhXqrUoyooS4oWlFs1UMpBsFDKGg/PCSTbLKzu9nM7E6Szu+SzJvdmZd5+97bnclOCSh4a1s3aHIJG7H58ZJMWakIRSQpPNoCufIHxgbFaFPkhNqwAaR7gsf4cOCk4nVap03BpBozrJMhSDAeQIYetyDjqw1F1BCkDT2N3a/c0K1omemvS44nLRTJECQY0ySsZdFb5qQeRUdlbCWr4zx24r/StJtNq02COv3JtH5gbBChtg54a1s3dB5A4pWM/Xwg40hyQWYekDlAMKYGaO+sQ3tnnVu6bEqyTsIAsPD1t1N6FCWLcy8BAJW+esNjZAgSjC0P+PNlGQCwp3ZbUvZxPpr8LuX2sWUAq86k3D4yBOVA31kFfWcVLm3l5AFaRQCgZ1TloErhwPP3MhkgHwb+eUgR2v/RAZXpfBmCBMPkAYRor8KjGSyvAnuvq7bOYb0CRcPFAE6STZ4pW/rmjjIJVrZXc2uLyQCrE/EZ1OVr9wAAQ9/0Cw7hWRWHGxTDMiFY7U1r0xPoAJAfecZJuHrA5Z36RfzwLM8e6PC8It0m70NQthzal3oqff0h6pqMlaIxQGT0CQBgzX84KaMNEm8ZKwVngEfnFao8cC7sriKc4GqA08MvqfLwrGpaBoBgNX3Kduv7SFr51IV4+W90KSl796wHbx9esKEpGweO96WVSxpP5NwWVwPQ7m6yvQsy4t9+P71i5mnya+aAFBLySVgwBZcDCCxun09IDxAMVw+gJVea3E4SLnaEJOGOk+mD/SFq/PdtK6Yu6/t0m+bbas7nyhAkmIJNwgSWqy8fEGIAlpBDOHdG0cmGH6jM7boNVwOQKeV0Wb1p2YotEfoUw2gkjLX1f7baYuLgEUea5WIApeUOj2agPr6kk2kn13S8ecGlX5FwMcDKj888msGuAzbncxy6KnMh13+IFHwSzhdyXbljMgBZNswn3lxRXO3v4A2V6Xz5HCCYogtBrFckYSHxV5uqXj7tGcFsgNWpEfyMpO6CKvyX4GluZ6pzA7Ok6dbgAxYGGLmVek9sPWNlygyzY9ffR9B/M4irU/bO4013F72v7xNBAMCOwBC1fiFRDwBVgSHTcs0x+gqhFiE5oLuL/uNEYzX4BP+12azKlb5607djAE45oMKvf4BirROB1cATItcbbJXN0BlgUo1Rd0kpTazNTlxU0uQtTfpBnLwfZKoTia88/jn3i16vauST94O6ck0ib9Be1KZtVWDoATP98bcjrd4XfjxtPA2Ra51I5n7FjeArNzaCHcg4GuGJzY+XeGtbN0JtHVm9LR+4q7JrVQAs9CrwlTtzJxRqiz/AGu6WQiPbvQ+KhcZQ3PMrHe6HagASq+SOWXww2zHL0gOsYpiEDQ+Q2kSO7OQkd85yBm3sJzJTDzBzHQkf5GyoYHQ7uQJy51ynkDvn5iH/Aap5yxAKMvIDAAAAAElFTkSuQmCC';
     resetCard();
 }
 function closeCardAccess() {
@@ -5851,7 +5850,7 @@ function dragCardMove(event) {
         const left=reader.offsetLeft+8;
         const x=Math.min(reader.offsetLeft+reader.offsetWidth-12,Math.max(left,p.x-cardOffsetX));
         dragCard.style.left=x+"px";
-        dragCard.style.top=(reader.offsetTop+reader.offsetHeight/2-dragCard.offsetHeight/2)+"px";
+        dragCard.style.top=(reader.offsetTop+110-dragCard.offsetHeight/2)+"px";
     } else {
         const x=Math.max(0,Math.min(w-dragCard.offsetWidth,p.x-cardOffsetX));
         const y=Math.max(0,Math.min(h-dragCard.offsetHeight,p.y-cardOffsetY));
@@ -5868,9 +5867,9 @@ function finishCardDrag(event) {
     const c=dragCard.getBoundingClientRect();
     if (!cardInserted) {
         // The card must be placed at the LEFT entrance, aligned with the track.
-        const entryX=r.left+18;
+        const entryX=r.left+reader.clientWidth*0.04+12;
         const centerX=c.left+c.width/2,centerY=c.top+c.height/2;
-        const valid=Math.abs(centerX-entryX)<45 && Math.abs(centerY-(r.top+r.height/2))<40;
+        const valid=Math.abs(centerX-entryX)<45 && Math.abs(centerY-(r.top+110))<40;
         if (!valid) {
             playErrorSound();
             cardStatus.textContent="ERROR // 왼쪽 삽입구에 카드를 맞춰주세요.";
@@ -5880,7 +5879,7 @@ function finishCardDrag(event) {
         cardInserted=true;
         dragCard.classList.add("inserted");
         dragCard.style.left=(reader.offsetLeft+8)+"px";
-        dragCard.style.top=(reader.offsetTop+reader.offsetHeight/2-dragCard.offsetHeight/2)+"px";
+        dragCard.style.top=(reader.offsetTop+110-dragCard.offsetHeight/2)+"px";
         dragCard.style.transform="none";
         document.getElementById("swipeDisplay").textContent="SWIPE CARD →";
         cardStatus.textContent="카드를 오른쪽 끝까지 긁어주세요.";
@@ -5903,7 +5902,8 @@ function unlockSecurityDoor() {
     document.getElementById("swipeDisplay").textContent="ACCESS GRANTED";
     cardStatus.textContent="인증 성공 // 보안문 개방";
     room.classList.add("security-door-opening");
-    window.setTimeout(()=>{room.classList.remove("security-door-opening");room.classList.add("security-door-open");},1050);
+    document.querySelectorAll(".placed-exit,.placed-exit-open").forEach(el=>el.classList.add("door-opening"));
+    window.setTimeout(()=>{room.classList.remove("security-door-opening");room.classList.add("security-door-open");document.querySelectorAll(".placed-exit,.placed-exit-open").forEach(el=>{el.classList.remove("door-opening");el.classList.add("door-open");});},1050);
     saveTutorialState();
     window.setTimeout(()=>{
         closeCardAccess();
@@ -6253,6 +6253,8 @@ html = html.replace('room.appendChild(accessKey);', 'room.appendChild(accessKey)
 html = html.replace('(tutorialStep === 3 ? 55 : 76)', '(tutorialStep === 3 ? 82 : 76)', 1)
 
 html = html.replace('</head>', '<style>\n/* Card reader modal */\n.card-panel.swipe-panel{width:min(620px,90vw);min-height:520px;box-sizing:border-box;position:relative;display:flex;flex-direction:column;justify-content:space-between}\n.swipe-screen{height:68px;margin:14px 0 8px;background:#06140f;border:5px solid #39413d;box-shadow:inset 0 0 0 2px #0d3023;color:#7ee9b2;display:flex;align-items:center;justify-content:center;gap:20px;letter-spacing:2px;font-size:14px}\n.swipe-led{width:14px;height:14px;background:#fa3434;box-shadow:0 0 9px #fa3434;border-radius:50%}\n.swipe-led.green{background:#31ff76;box-shadow:0 0 12px #31ff76}\n.card-panel.swipe-panel .card-stage{height:280px;flex:none;background:#090e18;overflow:hidden}\n.card-panel.swipe-panel .reader{left:22%;right:auto;top:30%;width:70%;height:82px;transform:none;border:3px solid #536781;background:linear-gradient(#36485f,#17253b 40%,#101c30 65%,#3b4f69);box-sizing:border-box;display:block}\n.reader-track{position:absolute;top:25px;left:0;right:0;height:27px;background:#050a10;border-top:4px solid #0a1019;border-bottom:4px solid #8298a9;box-sizing:border-box}\n.reader-slot{position:absolute;left:-8px;top:15px;width:12px;height:49px;background:#02050a;border:3px solid #84a4c4;z-index:4;box-sizing:border-box}\n.reader-text{position:absolute;bottom:3px;left:0;right:0;text-align:center;font-size:9px;color:#9eb7cb;letter-spacing:1px}\n.card-panel.swipe-panel .card{width:98px;height:61px;box-sizing:border-box;left:8%;top:74%;padding:0;border:0;background:none;transform:translateY(-50%);box-shadow:none;filter:none;overflow:visible;touch-action:none}\n.card-panel.swipe-panel .card img{width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;filter:none}\n.card-panel.swipe-panel .card.inserted{z-index:6}\n.swipe-close{align-self:flex-end;background:#0a1826;color:#9de8ff;border:1px solid #406b83;padding:8px 18px;cursor:pointer}\n/* Independent opening door layer, not baked into the background */\n.room .security-door-layer{position:absolute;left:86.8%;top:38%;width:12%;height:28%;z-index:12;pointer-events:none;overflow:hidden;transform:skewY(-7deg);opacity:1}\n.room .security-door-panel{position:absolute;inset:0;background:linear-gradient(90deg,#0b182c 0%,#28435d 8%,#172a43 15%,#2a435d 83%,#081729 100%);border:3px solid #5c87a9;box-sizing:border-box;transform:translateX(0);transition:transform 1s steps(12,end)}\n.room .security-door-gap{position:absolute;inset:0;background:#020812;z-index:-1}\n.room.security-door-opening .security-door-panel,.room.security-door-open .security-door-panel{transform:translateX(110%)}\n</style>' + '</head>', 1)
+
+html = html.replace("</head>", '<style id="security-door-reader-v2">\n/* Door opening is a narrow recess in the RIGHT-HAND frame, not a floating panel. */\n.room .security-door-layer{\n  position:absolute !important;left:92.8% !important;top:39.8% !important;\n  width:5.1% !important;height:22.2% !important;\n  transform:skewY(-7deg) !important;transform-origin:center !important;\n  z-index:19 !important;overflow:hidden !important;pointer-events:none !important;\n  background:#06121f !important;opacity:1 !important;border:0 !important;\n}\n.room .security-door-depth{position:absolute;inset:0;background:linear-gradient(90deg,#030811,#0d2238 49%,#020710);}\n.room .security-door-half{position:absolute;top:0;height:100%;width:50%;box-sizing:border-box;\n  background:repeating-linear-gradient(180deg,transparent 0 19px,rgba(140,188,224,.09) 20px 21px),\n  linear-gradient(90deg,#122941,#395676 20%,#253e60 80%,#101f35);\n  border:1px solid #5a80a0;transition:transform 1.05s steps(18,end);}\n.room .security-door-left{left:0;border-right:2px solid #06131f;}\n.room .security-door-right{right:0;border-left:2px solid #06131f;}\n.room.security-door-opening .security-door-left,.room.security-door-open .security-door-left{transform:translateX(-105%)}\n.room.security-door-opening .security-door-right,.room.security-door-open .security-door-right{transform:translateX(105%)}\n/* The original wall and its perspective frame stay in place; only panels move. */\n.room .placed-exit,.room .placed-exit-open{z-index:20 !important;transition:opacity .15s steps(2,end) !important;transform:none !important;filter:none !important;}\n.room .placed-exit.door-opening,.room .placed-exit.door-open{transform:none !important;filter:none !important;opacity:0 !important;}\n.room .placed-exit-open.door-opening,.room .placed-exit-open.door-open{transform:none !important;opacity:1 !important;}\n/* Card reader is the prominent upper machine, not a small bar below the display. */\n.card-panel.swipe-panel .card-stage{position:relative !important;height:340px !important;flex:none !important;overflow:hidden !important;}\n.card-panel.swipe-panel .reader{position:absolute !important;left:4% !important;top:6% !important;\n  width:92% !important;height:190px !important;right:auto !important;transform:none !important;\n  border:3px solid #496d85 !important;background:linear-gradient(#223449,#111d2d 40%,#0b1523 80%,#314c63) !important;\n  box-shadow:inset 0 0 0 3px #07121e !important;}\n.card-panel.swipe-panel .swipe-screen{position:absolute !important;top:10px !important;left:3% !important;\n  width:94% !important;height:52px !important;margin:0 !important;box-sizing:border-box !important;\n  color:#65eaff !important;border:3px solid #4d6773 !important;\n  background:#061c21 !important;box-shadow:inset 0 0 0 2px #0b353c !important;\n  font-size:14px !important;letter-spacing:2px !important;}\n.card-panel.swipe-panel .reader-track{left:4% !important;right:4% !important;top:89px !important;height:44px !important;\n  background:#030810 !important;border-top:5px solid #09101b !important;border-bottom:5px solid #7592aa !important;}\n.card-panel.swipe-panel .reader-slot{left:3% !important;top:79px !important;width:13px !important;height:64px !important;}\n.card-panel.swipe-panel .reader-text{bottom:16px !important;color:#7cbbd1 !important;font-size:11px !important;}\n.card-panel.swipe-panel .card{left:8%;top:79%;width:110px !important;height:69px !important;\n  padding:0 !important;border:0 !important;background:transparent !important;box-shadow:none !important;filter:none !important;}\n.card-panel.swipe-panel .card img{width:100% !important;height:100% !important;object-fit:contain !important;\n  transform:none !important;filter:none !important;image-rendering:pixelated !important;}\n\n</style>' + "</head>", 1)
 
 components.html(
     html,
