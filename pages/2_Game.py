@@ -3793,7 +3793,7 @@ button,.game button,.code-button,.help-key{border-radius:0!important}
      PAUSE
      ===================================================== -->
 
-<div class="item-acquired-notice" id="itemAcquiredNotice" role="button" tabindex="0" aria-label="아이템 획득 알림을 닫으려면 클릭"><div class="item-acquired-art"><img class="access-card-image" src="__SWIPE_IMAGE_38376344af10__" alt="Access card"></div><div class="item-acquired-dialog"><div class="item-acquired-tag">ECHO</div><div class="item-acquired-text">카드가 인벤토리에 추가되었습니다.
+<div class="item-acquired-notice" id="itemAcquiredNotice" role="button" tabindex="0" aria-label="아이템 획득 알림을 닫으려면 클릭"><div class="item-acquired-art"><img class="access-card-image" src="__SWIPE_IMAGE_795a41e9c430__" alt="Access card"></div><div class="item-acquired-dialog"><div class="item-acquired-tag">ECHO</div><div class="item-acquired-text">카드가 인벤토리에 추가되었습니다.
 이 카드는 특정 장비를 작동시키거나 인증할 때 사용됩니다.</div><div class="item-acquired-close">CLICK TO CLOSE</div></div></div>
 <div class="tutorial-transition" id="tutorialTransition" aria-hidden="true"><div class="tutorial-transition-card"><div class="tutorial-transition-stage">STAGE 00</div><div class="tutorial-transition-room">:TUTORIAL</div></div></div>
 <div class="pause-overlay" id="pauseOverlay"><div class="pause-menu-panel"><div class="pause-actions"><div class="pause-row"><span class="pause-icon">Ⅱ</span><button class="pause-nav-link pause-menu-button" id="resumeButton" type="button">RESUME</button></div><div class="pause-row"><span class="pause-icon">↻</span><a class="pause-nav-link" id="restartButton" href="?action=restart" target="_top" rel="noopener">RESTART</a></div><div class="pause-row"><span class="pause-icon">⌂</span><a class="pause-nav-link" id="titleButton" href="?action=title" target="_top" rel="noopener">TITLE</a></div></div></div></div>
@@ -4144,7 +4144,7 @@ function renderInventory() {
                 slot.innerHTML =
                     `
                     <div class="slot-number">${String(index + 1).padStart(2, "0")}</div>
-                    ${item.name === "ACCESS KEY" ? '<img class="access-card-image inventory-card-image" src="__SWIPE_IMAGE_38376344af10__" alt="Access card">' : '<div class="item-name">' + item.name + '</div>'}
+                    ${item.name === "ACCESS KEY" ? '<img class="access-card-image inventory-card-image" src="__SWIPE_IMAGE_795a41e9c430__" alt="Access card">' : '<div class="item-name">' + item.name + '</div>'}
                     `;
 
             }
@@ -5859,19 +5859,47 @@ document
 /* =====================================================
    CARD ACCESS
    ===================================================== */
+let stage01TransitionStarted = false;
 
+function startStage01Transition() {
+    if (stage01TransitionStarted) return;
+
+    stage01TransitionStarted = true;
+    clearKeys();
+
+    const transition = document.createElement("div");
+
+    transition.className = "tutorial-transition show";
+    transition.setAttribute("aria-hidden", "true");
+
+    transition.innerHTML = `
+        <div class="tutorial-transition-card">
+            <div class="tutorial-transition-stage">STAGE 01</div>
+            <div class="tutorial-transition-room">:ARCHIVE ACCESS</div>
+        </div>
+    `;
+
+    root.appendChild(transition);
+
+    window.setTimeout(function () {
+        transition.classList.add("hide");
+    }, 2700);
+
+    window.setTimeout(function () {
+        parentAction("stage01");
+    }, 3150);
+}
 function openCardAccess() {
 
-    if (
-        !keyCollected || cardConsumed
-    ) {
-
-        inaccessible();
-
+    if (cardConsumed) {
+        startStage01Transition();
         return;
-
     }
 
+    if (!keyCollected) {
+        inaccessible();
+        return;
+    }
 
     cardOpen =
         true;
@@ -6164,17 +6192,23 @@ function finishCardDrag(
         renderInventory();
         if (readerLight) readerLight.classList.add("green");
         cardStatus.textContent = "ACCESS GRANTED // CARD CONSUMED";
-        // Animate the existing angled door in the right wall after the card is accepted.
-        const gameRoom = document.querySelector(".room");
-        if (gameRoom) {
-            gameRoom.classList.remove("door-animating","door-finished");
-            void gameRoom.offsetWidth;
-            gameRoom.classList.add("door-animating");
-            window.setTimeout(() => {
-                gameRoom.classList.remove("door-animating");
-                gameRoom.classList.add("door-finished");
-            }, 740);
-        }
+        // 인증 완료 후 출입구에서 E키를 눌러 이동한다.
+        cardStatus.textContent =
+            "ACCESS GRANTED // 출입구에서 E키를 누르십시오.";
+
+        setTimeout(function () {
+            closeCardAccess();
+
+            clearTimeout(typingTimer);
+
+            echoMessage.textContent =
+                "보안 인증이 완료되었습니다. 출입구에서 E키를 눌러 다음 구역으로 이동하십시오.";
+
+            typingDone = true;
+            echoNext.classList.add("ready");
+
+            checkInteraction();
+        }, 850);
 
         // 짧은 문 개방 효과음(Web Audio, 별도 파일 불필요)
         try {
@@ -6591,7 +6625,7 @@ _SWIPE_ASSET_FILES = {
     "__SWIPE_IMAGE_24640e7970c6__": "swipe_24640e7970c6.png",
     "__SWIPE_IMAGE_a66cdbf2df2e__": "swipe_a66cdbf2df2e.png",
     "__SWIPE_IMAGE_f912e7818ae4__": "swipe_f912e7818ae4.png",
-    "__SWIPE_IMAGE_38376344af10__": "swipe_38376344af10.png",
+    "__SWIPE_IMAGE_795a41e9c430__": "swipe_38376344af10.png",
     "__SWIPE_IMAGE_795a41e9c430__": "swipe_795a41e9c430.png",
     "__SWIPE_IMAGE_fe15e5530ddd__": "swipe_fe15e5530ddd.png",
 }
