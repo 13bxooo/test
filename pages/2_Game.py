@@ -267,16 +267,16 @@ footer {{
 }}
 
 /* 2026-11 card reader: reference-inspired horizontal swipe device */
-.card-stage {{height:330px!important;background:#202428!important;border:2px solid #55626b!important;}}
-.card-stage .reader {{left:8%!important;right:auto!important;top:12px!important;transform:none!important;width:84%!important;height:152px!important;box-sizing:border-box!important;border:5px solid #828b90!important;border-radius:10px!important;background:linear-gradient(180deg,#a8adae,#747b80)!important;box-shadow:inset 0 0 0 3px #242c32,0 5px 0 #151719!important;color:transparent!important;font-size:0!important;display:block!important;}}
-.card-stage .reader::after {{content:"카드를 긁어주세요.";position:absolute;left:6%;top:9px;width:80%;height:35px;box-sizing:border-box;padding:6px 9px;background:#164b3c;border:3px solid #14211f;color:#b9efe0;font:17px 'NeoDungGeunMo',monospace;}}
-.card-stage .reader-slot {{left:5%!important;right:18%!important;top:80px!important;height:10px!important;background:#080d0f!important;border-radius:8px!important;box-shadow:inset 0 2px 3px #000!important;}}
-.card-stage .reader::before {{content:"";position:absolute;right:48px;bottom:12px;width:22px;height:22px;border-radius:50%;background:#a3131d;border:3px solid #161616;box-shadow:inset 2px 2px 3px #e66;}}
-.card-stage .reader-light {{top:auto!important;right:12px!important;bottom:12px!important;width:22px!important;height:22px!important;border:3px solid #161616!important;background:#17513d!important;box-shadow:none!important;}}
-.card-stage .reader-light.green {{background:#19e88b!important;box-shadow:0 0 12px #19e88b!important;}}
-.card-stage #dragCard {{top:205px;width:130px!important;height:86px!important;box-sizing:border-box!important;background-image:url("__CARD_BLUE__")!important;background-position:center!important;background-size:contain!important;background-repeat:no-repeat!important;background-color:transparent!important;border:none!important;color:transparent!important;font-size:0!important;padding:0!important;}}
-.card-stage #dragCard .card-chip,.card-stage #dragCard span {{display:none!important;}}
-.card-stage .card-arrow {{display:none!important;}}
+.card-stage {height:330px!important;background:#202428!important;border:2px solid #55626b!important;}
+.card-stage .reader {left:8%!important;right:auto!important;top:12px!important;transform:none!important;width:84%!important;height:152px!important;box-sizing:border-box!important;border:5px solid #828b90!important;border-radius:10px!important;background:linear-gradient(180deg,#a8adae,#747b80)!important;box-shadow:inset 0 0 0 3px #242c32,0 5px 0 #151719!important;color:transparent!important;font-size:0!important;display:block!important;}
+.card-stage .reader::after {content:"카드를 긁어주세요.";position:absolute;left:6%;top:9px;width:80%;height:35px;box-sizing:border-box;padding:6px 9px;background:#164b3c;border:3px solid #14211f;color:#b9efe0;font:17px 'NeoDungGeunMo',monospace;}
+.card-stage .reader-slot {left:5%!important;right:18%!important;top:80px!important;height:10px!important;background:#080d0f!important;border-radius:8px!important;box-shadow:inset 0 2px 3px #000!important;}
+.card-stage .reader::before {content:"";position:absolute;right:48px;bottom:12px;width:22px;height:22px;border-radius:50%;background:#a3131d;border:3px solid #161616;box-shadow:inset 2px 2px 3px #e66;}
+.card-stage .reader-light {top:auto!important;right:12px!important;bottom:12px!important;width:22px!important;height:22px!important;border:3px solid #161616!important;background:#17513d!important;box-shadow:none!important;}
+.card-stage .reader-light.green {background:#19e88b!important;box-shadow:0 0 12px #19e88b!important;}
+.card-stage #dragCard {top:205px;width:130px!important;height:86px!important;box-sizing:border-box!important;background-image:url("__CARD_BLUE__")!important;background-position:center!important;background-size:contain!important;background-repeat:no-repeat!important;background-color:transparent!important;border:none!important;color:transparent!important;font-size:0!important;padding:0!important;}
+.card-stage #dragCard .card-chip,.card-stage #dragCard span {display:none!important;}
+.card-stage .card-arrow {display:none!important;}
 </style>
 """,
     unsafe_allow_html=True,
@@ -6044,12 +6044,6 @@ function startCardDrag(
         true;
 
     swipeStartX = rect.left;
-    if (cardInserted) {
-        const slot = document.querySelector(".reader-slot").getBoundingClientRect();
-        const stage = cardStage.getBoundingClientRect();
-        const y = slot.top - stage.top + slot.height / 2 - dragCard.offsetHeight / 2;
-        dragCard.style.top = y + "px";
-    }
 
     try {
 
@@ -6176,9 +6170,8 @@ function finishCardDrag(
         if (leftSlot) {
             cardInserted = true;
             const stageRect = cardStage.getBoundingClientRect();
-            dragCard.style.left = (readerRect.left - stageRect.left + 8) + "px";
-            const slotRect = document.querySelector(".reader-slot").getBoundingClientRect();
-            dragCard.style.top = (slotRect.top - stageRect.top + slotRect.height / 2 - dragCard.offsetHeight / 2) + "px";
+            dragCard.style.left = (readerRect.left - stageRect.left - dragCard.offsetWidth * 0.4) + "px";
+            dragCard.style.top = (readerRect.top - stageRect.top + (readerRect.height - dragCard.offsetHeight) / 2) + "px";
             dragCard.style.transform = "none";
             cardStatus.textContent = "CARD INSERTED // 오른쪽으로 긁으십시오.";
         } else {
@@ -6189,7 +6182,7 @@ function finishCardDrag(
     }
 
     // 두 번째 동작: 삽입 위치에서 오른쪽으로 충분히 긁는다.
-    const correctPosition = cardRect.left - swipeStartX >= readerRect.width * 0.45 &&
+    const correctPosition = cardRect.left - swipeStartX >= readerRect.width * 0.55 &&
         cardRect.left < readerRect.right + 30 &&
         cardRect.bottom > readerRect.top && cardRect.top < readerRect.bottom;
 
@@ -6467,7 +6460,107 @@ _canvas_style = r"""<style id="access-key-canvas-v1">
 </style>"""
 html = html.replace("</head>", _canvas_style + "</head>", 1)
 _canvas_js = r"""
-accessKey.innerHTML = '<img src="__CARD_BLUE__" alt="ACCESS KEY" draggable="false" style="width:100%;height:100%;object-fit:contain;display:block;pointer-events:none">';
+accessKey.innerHTML = '<canvas id="accessKeyCanvas" width="108" height="116" aria-label="Rotating access card"></canvas>';
+(function startPixelCard() {
+  const cv = document.getElementById('accessKeyCanvas');
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  const TW=96,TH=60;
+  // Use the exact 96x60 pixel-art face textures supplied in the previous revision.
+  // Both textures are transparent PNGs, drawn with nearest-neighbor sampling.
+  const front=document.createElement('canvas'),back=document.createElement('canvas');
+  front.width=back.width=TW; front.height=back.height=TH;
+  const frontImg=new Image(),backImg=new Image();
+  frontImg.src='__SWIPE_IMAGE_795a41e9c430__';
+  backImg.src='__SWIPE_IMAGE_fe15e5530ddd__';
+  frontImg.onload=()=>{const g=front.getContext('2d');g.clearRect(0,0,TW,TH);g.drawImage(frontImg,0,0,TW,TH);};
+  backImg.onload=()=>{const g=back.getContext('2d');g.clearRect(0,0,TW,TH);g.drawImage(backImg,0,0,TW,TH);};
+  const period=2000, spinPeriod= (1000/0.375)*2 / 1.15; // 1.15x rotation speed
+  const epoch=performance.now();
+  function draw(now) {
+    const t=now-epoch;
+    const phase=2*Math.PI*t/period;
+    const yaw=2*Math.PI*t/spinPeriod+0.24;
+    const lift=(1+Math.sin(phase))/2;
+    const bob=-6-6*Math.sin(phase);
+    ctx.clearRect(0,0,108,116);
+    const spread=1+lift*.32, fade=1-lift*.44;
+    // pixel-stepped concentric shadow; the transparent canvas remains transparent
+    for(const [rx0,ry0,a] of [[39,10,.10],[32,8,.20],[24,6,.30],[15,4,.50]]) {
+      const rx=rx0*spread, ry=ry0*spread;
+      ctx.fillStyle='rgba(12,31,63,'+(a*fade)+')';
+      for(let yy=-Math.ceil(ry);yy<=ry;yy+=2) {
+        const half=Math.floor(rx*Math.sqrt(Math.max(0,1-yy*yy/(ry*ry)))/2)*2;
+        ctx.fillRect(54-half,91+yy,half*2,2);
+      }
+    }
+    // Draw the card as a single nearest-neighbor raster, not 96 overlapping
+    // canvas transforms. This removes seams, gray blending and stray lines.
+    const c=Math.cos(yaw), si=Math.sin(yaw);
+    const baseX=54,baseY=45+bob,scale=.82,depth=2.5;
+    const tex=c>=0?front:back;
+    const texCtx=tex.getContext('2d',{willReadFrequently:true});
+    const pixels=texCtx.getImageData(0,0,TW,TH).data;
+    const faceWidth=Math.max(Math.abs(c)*TW*scale,0.7);
+    // Keep perspective bounded near edge-on angles; no oversized quadrilateral.
+    const left=baseX-faceWidth/2, right=baseX+faceWidth/2;
+    const tilt=(x)=>-(x-baseX)*si*.14;
+    const topAt=(x)=>baseY-TH*scale/2+tilt(x);
+    const bottomAt=(x)=>topAt(x)+TH*scale;
+    // Draw only a narrow exposed side, following the actual rounded card
+    // silhouette. Never fill a rectangular polygon behind the texture.
+    const sideWidth=Math.min(3,Math.abs(si)*depth*scale);
+    if(sideWidth>0.25 && Math.abs(c)>0.06) {
+      const edgeX=si>0?right:left;
+      const outward=si>0?1:-1;
+      ctx.fillStyle='#173b73';
+      const edgeTop=topAt(edgeX);
+      for(let yy=0;yy<TH;yy++) {
+        const sourceRow=yy*TW*4;
+        const edgePixel=si>0?TW-1:0;
+        let sourceCol=edgePixel;
+        // Find the first opaque texel on this row at the exposed edge.
+        while(sourceCol>=0 && sourceCol<TW && pixels[sourceRow+sourceCol*4+3]<128) {
+          sourceCol-=outward;
+        }
+        if(sourceCol<0||sourceCol>=TW)continue;
+        const edgeInset=(si>0?TW-1-sourceCol:sourceCol)*Math.abs(c)*scale;
+        const x=edgeX-outward*edgeInset;
+        const y=edgeTop+yy*scale;
+        ctx.fillRect(Math.round(x+(outward>0?0:-sideWidth)),Math.round(y),Math.ceil(sideWidth),Math.ceil(scale)+1);
+      }
+    }
+    // Render the complete textured face into one pixel buffer. Every output
+    // pixel has exactly one source sample, so no seams or overdraw can occur.
+    const frame=ctx.createImageData(108,116);
+    const dst=frame.data;
+    for(let py=0;py<116;py++) {
+      for(let px=Math.max(0,Math.floor(left)-1);px<Math.min(108,Math.ceil(right)+1);px++) {
+        if(px<left||px>=right) continue;
+        const u=(px+.5-left)/faceWidth;
+        const sourceX=c>=0?Math.floor(u*TW):TW-1-Math.floor(u*TW);
+        const xSrc=Math.max(0,Math.min(TW-1,sourceX));
+        const top=topAt(px+.5);
+        const v=(py+.5-top)/(TH*scale);
+        if(v<0||v>=1)continue;
+        const ySrc=Math.max(0,Math.min(TH-1,Math.floor(v*TH)));
+        const src=(ySrc*TW+xSrc)*4, out=(py*108+px)*4;
+        if(pixels[src+3]<128)continue;
+        dst[out]=pixels[src];dst[out+1]=pixels[src+1];
+        dst[out+2]=pixels[src+2];dst[out+3]=pixels[src+3];
+      }
+    }
+    // A transparent intermediary preserves the already-rendered shadow.
+    if(!draw._faceCanvas){draw._faceCanvas=document.createElement('canvas');draw._faceCanvas.width=108;draw._faceCanvas.height=116;}
+    const faceCtx=draw._faceCanvas.getContext('2d');
+    faceCtx.putImageData(frame,0,0);
+    ctx.drawImage(draw._faceCanvas,0,0);
+    // No extra stroke: the pixel texture already contains its own border.
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
 """
 html = html.replace('room.appendChild(accessKey);', 'room.appendChild(accessKey);\n' + _canvas_js, 1)
 # Arrow tracks the fixed canvas center rather than changing card frame bounds.
@@ -6488,6 +6581,7 @@ _SWIPE_ASSET_FILES = {
     "__SWIPE_IMAGE_24640e7970c6__": "swipe_24640e7970c6.png",
     "__SWIPE_IMAGE_a66cdbf2df2e__": "swipe_a66cdbf2df2e.png",
     "__SWIPE_IMAGE_f912e7818ae4__": "swipe_f912e7818ae4.png",
+    "__CARD_BLUE__": "swipe_38376344af10.png",
     "__SWIPE_IMAGE_795a41e9c430__": "swipe_795a41e9c430.png",
     "__SWIPE_IMAGE_fe15e5530ddd__": "swipe_fe15e5530ddd.png",
 }
@@ -6499,7 +6593,6 @@ for _placeholder, _filename in _SWIPE_ASSET_FILES.items():
     _extension = _path.suffix.lstrip(".")
     _data = base64.b64encode(_path.read_bytes()).decode("ascii")
     html = html.replace(_placeholder, f"data:image/{_extension};base64,{_data}")
-html = html.replace("</head>", '\n<style id="reader-final-fix">\n.card-stage {background:#101820!important;}\n.card-stage .reader::after {content:"INSERT CARD"!important;background:#009cb8!important;color:#eaffff!important;border-color:#053a4b!important;text-align:center!important;letter-spacing:2px!important;}\n.card-stage .reader::before {right:37px!important;bottom:15px!important;width:14px!important;height:14px!important;box-sizing:border-box!important;border:2px solid #171b20!important;background:#f22d39!important;box-shadow:0 0 10px #fa364a,inset 0 0 2px #fff!important;}\n.card-stage .reader:has(.reader-light.green)::before {background:#4b171c!important;box-shadow:none!important;}\n.card-stage .reader-light {right:16px!important;bottom:15px!important;width:14px!important;height:14px!important;box-sizing:border-box!important;border:2px solid #171b20!important;background:#064452!important;box-shadow:none!important;}\n.card-stage .reader-light.green {background:#14e4e9!important;box-shadow:0 0 10px #12dff4!important;}\n.card-stage .reader-slot {left:6%!important;right:16%!important;top:88px!important;height:8px!important;}\n.card-stage #dragCard {background-image:url("__CARD_BLUE__")!important;background-color:transparent!important;opacity:1!important;filter:none!important;box-shadow:none!important;outline:none!important;border:0!important;padding:0!important;width:120px!important;height:80px!important;background-size:contain!important;background-repeat:no-repeat!important;background-position:center!important;transform:none!important;}\n.card-stage #dragCard::before,.card-stage #dragCard::after {content:none!important;display:none!important;}\n.card-stage #dragCard .card-chip,.card-stage #dragCard span {display:none!important;}\n.room .access-key img {image-rendering:pixelated!important;}\n.item-acquired-art .access-card-image {width:100%!important;height:100%!important;object-fit:contain!important;}\n.inventory-slot .access-card-image {width:100%!important;height:85%!important;object-fit:contain!important;}\n</style>\n' + "</head>", 1)
 html = html.replace("__CARD_BLUE__", _CARD_BLUE_URI)
 
 components.html(
