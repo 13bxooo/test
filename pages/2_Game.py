@@ -6445,7 +6445,7 @@ html = html.replace("</head>", _object_style + "</head>", 1)
 
 # Pixel-art card is drawn procedurally by Canvas, not a GIF or a generated image.
 _canvas_style = r"""<style id="access-key-canvas-v1">
-.room .access-key {left:45.44% !important;top:66.8% !important;width:108px !important;height:116px !important;transform:translate(-50%,-50%) !important;z-index:40 !important;background:none !important;border:0 !important;box-shadow:none !important;pointer-events:none !important;}
+.room .access-key {left:45.44% !important;top:71.55% !important;width:108px !important;height:116px !important;transform:translate(-50%,-50%) !important;z-index:40 !important;background:none !important;border:0 !important;box-shadow:none !important;pointer-events:none !important;}
 .room .access-key::before,.room .access-key::after {content:none !important;display:none !important;}
 .room .access-key.visible {display:block !important;animation:none !important;}
 .room .access-key canvas {width:108px;height:116px;display:block;image-rendering:pixelated;}
@@ -6473,6 +6473,9 @@ accessKey.innerHTML = '<canvas id="accessKeyCanvas" width="108" height="116" ari
     rect(9,9,78,3,reverse?'#d4ecff':'#28c5fc');rect(9,12,78,2,'#7cdbff');
     rect(7,48,82,3,'#06448f');rect(8,52,79,2,'#e1f4ff');
     rect(10,15,3,30,'#6edaff');rect(83,14,3,33,'#06438d');
+    // stepped enamel edge and fine circuitry keep the collectible's depth/readability
+    rect(5,7,2,44,'#f2faff');rect(89,8,2,42,'#123a80');
+    rect(12,13,70,1,'#d8f7ff');rect(13,45,69,1,'#105ca8');
     if(!reverse){
       // EMV chip: individually shaded pixels and gold/cyan contacts
       rect(15,24,24,19,'#032b65');rect(17,22,20,19,'#d8ffff');rect(19,25,16,14,'#83dfff');
@@ -6482,6 +6485,9 @@ accessKey.innerHTML = '<canvas id="accessKeyCanvas" width="108" height="116" ari
       rect(48,26,31,3,'#043b85');rect(50,27,24,1,'#b9efff');
       rect(47,33,33,2,'#b6ecff');rect(48,37,26,2,'#064b94');
       rect(47,42,29,2,'#e1f7ff');
+      rect(43,15,2,1,'#8eeeff');rect(45,15,2,1,'#d8faff');
+      rect(44,31,3,1,'#a6eaff');rect(80,32,3,1,'#6ad9ff');
+      rect(40,43,4,1,'#1461aa');rect(43,44,4,1,'#86dfff');
       for(let i=0;i<3;i++){rect(15+i*7,47,4,3,i===0?'#ecffff':'#154d99');rect(16+i*7,47,2,1,'#c8f7ff');}
       rect(65,47,5,4,'#f3ffff');rect(69,46,2,2,'#f3ffff');
       for(let i=0;i<3;i++){rect(75+i*4,47,3,3,'#f2ffff');rect(76+i*4,48,1,1,'#238ed4');}
@@ -6494,7 +6500,7 @@ accessKey.innerHTML = '<canvas id="accessKeyCanvas" width="108" height="116" ari
     return c;
   }
   const front=makeTexture(false),back=makeTexture(true);
-  const period=2000, spinPeriod=1000;
+  const period=2000, spinPeriod=1000/0.75;
   const epoch=performance.now();
   function draw(now){
     const t=now-epoch;
@@ -6502,8 +6508,15 @@ accessKey.innerHTML = '<canvas id="accessKeyCanvas" width="108" height="116" ari
     const yaw=2*Math.PI*(t%spinPeriod)/spinPeriod + 0.24;
     const bob=-6-6*Math.sin(phase);
     ctx.clearRect(0,0,108,116);
-    // fixed, four concentric pixel-art shadow bands, center 50% outward 30/20/10%
-    for(const [rx,ry,opacity] of [[39,10,.10],[32,8,.20],[24,6,.30],[15,4,.50]]){
+    // Card moves away from the desk: shadow spreads, lightens and visually recedes.
+    // Keep the shadow centered exactly beneath the card at the desk midpoint.
+    const lift=(1+Math.sin(phase))/2;
+    const shadowSpread=1+lift*.30;
+    const shadowFade=1-lift*.44;
+    for(const [rawRx,rawRy,rawOpacity] of [[39,10,.10],[32,8,.20],[24,6,.30],[15,4,.50]]){
+      const rx=Math.round(rawRx*shadowSpread);
+      const ry=Math.max(2,Math.round(rawRy*shadowSpread));
+      const opacity=rawOpacity*shadowFade;
       ctx.fillStyle='rgba(12,31,63,'+opacity+')';
       for(let yy=-ry;yy<=ry;yy+=2){
         const half=Math.floor(rx*Math.sqrt(Math.max(0,1-(yy*yy)/(ry*ry)))/2)*2;
@@ -6518,7 +6531,7 @@ accessKey.innerHTML = '<canvas id="accessKeyCanvas" width="108" height="116" ari
     const xOf=(x,z=0)=>baseX+(x-TW/2)*c*scale+z*si*scale;
     const yOf=(x,y,z=0)=>baseY+(y-TH/2)*scale-((x-TW/2)*si+z*c)*.19;
     // 3-pixel thickness, rendered as the edge between front/back surfaces
-    const depth=3;
+    const depth=5;
     const corners=[[0,0],[TW,0],[TW,TH],[0,TH]];
     ctx.fillStyle='#173d77';ctx.beginPath();
     for(let j=0;j<4;j++){const [x,y]=corners[j];const X=xOf(x,depth),Y=yOf(x,y,depth);j?ctx.lineTo(X,Y):ctx.moveTo(X,Y);}
