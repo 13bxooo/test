@@ -4342,7 +4342,8 @@ function restoreTutorialState() {
     } catch (e) { return false; }
 }
 
-const tutorialWasRestored = restoreTutorialState();
+const tutorialWasRestored = false;
+localStorage.removeItem(TUTORIAL_SAVE_KEY);
 const tutorialTransition = document.getElementById("tutorialTransition");
 if (!tutorialWasRestored && tutorialTransition) {
     tutorialTransition.classList.add("show");
