@@ -5107,7 +5107,6 @@ function playCardAcquireSound() {
 /* =====================================================
    INTERACTION
    ===================================================== */
-let stage01TransitionStarted = false;
 
 function startStage01Transition() {
     if (stage01TransitionStarted) return;
