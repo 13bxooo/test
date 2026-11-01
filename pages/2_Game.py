@@ -6328,11 +6328,11 @@ html = html.replace('</head>', '<style id="exact-door-coordinates">' + _door_css
 # Load art as separate asset files instead of hardcoding multi-megabyte Base64 data.
 # Run from the project root or any working directory.
 _GAME_ASSET_DIR = Path(__file__).resolve().parent.parent / "assets" / "logic_game"
-_GAME_ASSET_FILES = {'__GAME_IMAGE_f2507ee96aaa__': 'game_f2507ee96aaa.png', '__GAME_IMAGE_8a2fe453a949__': 'game_8a2fe453a949.png', '__GAME_IMAGE_f17f36b1ab38__': 'game_f17f36b1ab38.png', '__GAME_IMAGE_d06f81f4aa5c__': 'game_d06f81f4aa5c.png', '__GAME_IMAGE_33734288cd08__': 'game_33734288cd08.png', '__GAME_IMAGE_d6bd3dd28545__': 'game_d6bd3dd28545.png', '__GAME_IMAGE_b20edfeb619e__': 'game_b20edfeb619e.png', '__GAME_IMAGE_24640e7970c6__': 'game_24640e7970c6.png', '__GAME_IMAGE_a66cdbf2df2e__': 'game_a66cdbf2df2e.png', '__GAME_IMAGE_f912e7818ae4__': 'game_f912e7818ae4.png', '__GAME_IMAGE_38376344af10__': 'game_38376344af10.png', '__GAME_IMAGE_795a41e9c430__': 'game_795a41e9c430.png', '__GAME_IMAGE_fe15e5530ddd__': 'game_fe15e5530ddd.png', '__GAME_IMAGE_6f5413a824c8__': 'game_6f5413a824c8.png', '__GAME_IMAGE_040216a2b6b6__': 'game_040216a2b6b6.png'}
+_GAME_ASSET_FILES = {'__GAME_IMAGE_f2507ee96aaa__': 'game_f2507ee96aaa.webp', '__GAME_IMAGE_8a2fe453a949__': 'game_8a2fe453a949.webp', '__GAME_IMAGE_f17f36b1ab38__': 'game_f17f36b1ab38.webp', '__GAME_IMAGE_d06f81f4aa5c__': 'game_d06f81f4aa5c.webp', '__GAME_IMAGE_33734288cd08__': 'game_33734288cd08.webp', '__GAME_IMAGE_d6bd3dd28545__': 'game_d6bd3dd28545.webp', '__GAME_IMAGE_b20edfeb619e__': 'game_b20edfeb619e.webp', '__GAME_IMAGE_24640e7970c6__': 'game_24640e7970c6.webp', '__GAME_IMAGE_a66cdbf2df2e__': 'game_a66cdbf2df2e.webp', '__GAME_IMAGE_f912e7818ae4__': 'game_f912e7818ae4.webp', '__GAME_IMAGE_38376344af10__': 'game_38376344af10.webp', '__GAME_IMAGE_795a41e9c430__': 'game_795a41e9c430.webp', '__GAME_IMAGE_fe15e5530ddd__': 'game_fe15e5530ddd.webp', '__GAME_IMAGE_6f5413a824c8__': 'game_6f5413a824c8.webp', '__GAME_IMAGE_040216a2b6b6__': 'game_040216a2b6b6.webp'}
 for _image_placeholder, _image_filename in _GAME_ASSET_FILES.items():
     _path = _GAME_ASSET_DIR / _image_filename
     if not _path.is_file():
-        st.error("게임 이미지 파일을 찾지 못했습니다: " + str(_path))
+        st.error("게임 이미지 파일을 찾지 못했습니다: " + str(_path) + "\n압축 파일 내부의 assets/logic_game 폴더를 프로젝트 루트에 그대로 업로드해야 합니다.")
         st.stop()
     _suffix = _path.suffix.lower()
     _mime = "jpeg" if _suffix in (".jpg", ".jpeg") else _suffix.lstrip(".")
