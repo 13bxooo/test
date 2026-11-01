@@ -6332,7 +6332,9 @@ html = html.replace('</head>', '<style id="exact-door-coordinates">' + _door_css
 # Load art as separate asset files instead of hardcoding multi-megabyte Base64 data.
 # Run from the project root or any working directory.
 _GAME_ASSET_DIR = Path(__file__).resolve().parent.parent / "assets" / "logic_game"
-_GAME_ASSET_FILES = {'__GAME_IMAGE_f2507ee96aaa__': 'game_f2507ee96aaa.webp', '__GAME_IMAGE_8a2fe453a949__': 'game_8a2fe453a949.webp', '__GAME_IMAGE_f17f36b1ab38__': 'game_f17f36b1ab38.webp', '__GAME_IMAGE_d06f81f4aa5c__': 'game_d06f81f4aa5c.webp', '__GAME_IMAGE_33734288cd08__': 'game_33734288cd08.webp', '__GAME_IMAGE_d6bd3dd28545__': 'game_d6bd3dd28545.webp', '__GAME_IMAGE_b20edfeb619e__': 'game_b20edfeb619e.webp', '__GAME_IMAGE_24640e7970c6__': 'game_24640e7970c6.webp', '__GAME_IMAGE_a66cdbf2df2e__': 'game_a66cdbf2df2e.webp', '__GAME_IMAGE_f912e7818ae4__': 'game_f912e7818ae4.webp', '__GAME_IMAGE_38376344af10__': 'game_38376344af10.webp', '__GAME_IMAGE_795a41e9c430__': 'game_795a41e9c430.webp', '__GAME_IMAGE_fe15e5530ddd__': 'game_fe15e5530ddd.webp', '__GAME_IMAGE_6f5413a824c8__': 'game_6f5413a824c8.webp', '__GAME_IMAGE_040216a2b6b6__': 'game_040216a2b6b6.webp'}
+_GAME_ASSET_FILES = {'__GAME_IMAGE_f2507ee96aaa__': 'game_f2507ee96aaa.webp', '__GAME_IMAGE_8a2fe453a949__': 'game_8a2fe453a949.webp', '__GAME_IMAGE_f17f36b1ab38__': 'game_f17f36b1ab38.webp', '__GAME_IMAGE_d06f81f4aa5c__': 'game_d06f81f4aa5c.webp', '__GAME_IMAGE_d6bd3dd28545__': 'game_d6bd3dd28545.webp', '__GAME_IMAGE_b20edfeb619e__': 'game_b20edfeb619e.webp', '__GAME_IMAGE_a66cdbf2df2e__': 'game_a66cdbf2df2e.webp', '__GAME_IMAGE_f912e7818ae4__': 'game_f912e7818ae4.webp', '__GAME_IMAGE_38376344af10__': 'game_38376344af10.webp', '__GAME_IMAGE_795a41e9c430__': 'game_795a41e9c430.webp', '__GAME_IMAGE_fe15e5530ddd__': 'game_fe15e5530ddd.webp'}
+# Retired legacy image references; they are hidden by the external wall PNG layer.
+_RETIRED_GAME_IMAGES = ['__GAME_IMAGE_33734288cd08__', '__GAME_IMAGE_24640e7970c6__', '__GAME_IMAGE_6f5413a824c8__', '__GAME_IMAGE_040216a2b6b6__']
 for _image_placeholder, _image_filename in _GAME_ASSET_FILES.items():
     _path = _GAME_ASSET_DIR / _image_filename
     if not _path.is_file():
@@ -6342,6 +6344,12 @@ for _image_placeholder, _image_filename in _GAME_ASSET_FILES.items():
     _mime = "jpeg" if _suffix in (".jpg", ".jpeg") else _suffix.lstrip(".")
     _uri = "data:image/" + _mime + ";base64," + base64.b64encode(_path.read_bytes()).decode("ascii")
     html = html.replace(_image_placeholder, _uri)
+
+# The old door and wall sprites are not required anymore. Legacy hidden layers
+# receive a transparent pixel instead of requesting deleted WebP files.
+_TRANSPARENT_PIXEL = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+for _placeholder in _RETIRED_GAME_IMAGES:
+    html = html.replace(_placeholder, _TRANSPARENT_PIXEL)
 
 # External PNGs kept in the project's root assets/ folder.
 # Streamlit's HTML component needs data URIs because it runs in an iframe.
@@ -6359,9 +6367,9 @@ _desk_uri = _external_png_uri("desk_transparent.png")
 _wall_closed_uri = _external_png_uri("wall_closed.png")
 _wall_open_uri = _external_png_uri("wall_open.png")
 html = html.replace("__EXTERNAL_CARD_PNG__", _card_uri)
-html = html.replace('class="tutorial-wall-overlay" alt="" aria-hidden="true" src="__GAME_IMAGE_24640e7970c6__"', 'class="tutorial-wall-overlay" alt="" aria-hidden="true" src="' + _wall_closed_uri + '"')
+
 # The previous placeholder may already have been resolved above.
-html = html.replace('class="tutorial-wall-overlay" alt="" aria-hidden="true" src="' + _GAME_ASSET_URIS_WALL + '"', 'class="tutorial-wall-overlay" alt="" aria-hidden="true" src="' + _wall_closed_uri + '"') if False else html
+
 html = html.replace("</head>", '<script>window.WALL_OPEN_IMAGE=' + repr(_wall_open_uri) + ';</script></head>', 1)
 _external_css = """<style id="external-wall-png-final">
 .room .object.computer {background-image:url('__COMPUTER_PNG__') !important;}
