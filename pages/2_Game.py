@@ -6443,11 +6443,110 @@ _object_style = """<style>
 _object_style = _object_style.replace("__COMPUTER__",_object_uri("computer_transparent.png")).replace("__DESK__",_object_uri("desk_transparent.png"))
 html = html.replace("</head>", _object_style + "</head>", 1)
 
-# CSS-only pixel card: no extra image dependency.
-html = html.replace("</head>", '<style id="access-key-animated-fix">\n@keyframes terminalMicroShake {\n  0%,100% {transform:translate(0,0)}\n  10%,30%,50%,70%,90% {transform:translate(-2px,1px)}\n  20%,40%,60%,80% {transform:translate(2px,-1px)}\n}\n.computer-overlay.terminal-shake .computer-panel {\n  animation:terminalMicroShake .105s steps(2,end) 19 !important;\n}\n/* Position over the actual desk center (left 28.44%, width 34%). */\n.room .access-key {\n  left:45.44% !important; top:66.8% !important;\n  width:38px !important;height:54px !important;\n  background:transparent !important;border:0 !important;\n  box-shadow:none !important;z-index:40 !important;\n  pointer-events:none !important;\n  transform:translate(-50%,-50%) !important;\n  perspective:180px !important;\n}\n.room .access-key::before {content:none !important;display:none !important}\n.room .access-key::after {content:none !important;display:none !important}\n.room .access-key.visible {display:block !important;animation:none !important}\n.room .access-key .key-rotator {\n  position:absolute;left:0;top:0;width:38px;height:50px;\n  transform-style:preserve-3d;\n  animation:keyFloat 2s ease-in-out infinite, keyTurn 3.8s linear infinite;\n  image-rendering:pixelated;\n  filter:drop-shadow(0 0 5px #36dfff);\n}\n.room .access-key .key-face {\n  position:absolute;inset:0;\n  backface-visibility:hidden;\n  border:3px solid #aeefff;\n  outline:2px solid #1e426e;\n  background:\n    linear-gradient(90deg,transparent 10%,#65c5f0 10% 15%,transparent 15% 85%,#65c5f0 85% 90%,transparent 90%),\n    repeating-linear-gradient(0deg,#d9edff 0 4px,#a5bfe7 4px 6px);\n  box-shadow:inset 0 0 0 3px #5278af,inset 0 0 0 5px #e6f6ff;\n}\n.room .access-key .key-face.back {transform:rotateY(180deg);background:repeating-linear-gradient(0deg,#9dbbe3 0 5px,#cfe8ff 5px 8px)}\n.room .access-key .key-face.front::before {\n  content:"";position:absolute;left:10px;top:12px;width:12px;height:12px;\n  background:#1d538a;border:2px solid #65dfff;box-shadow:0 0 0 3px #effaff;\n}\n.room .access-key .key-face.front::after {\n  content:"";position:absolute;left:8px;bottom:7px;width:18px;height:3px;\n  background:#22538c;box-shadow:0 -5px #5a96d0;\n}\n.room .access-key .key-shadow {\n  position:absolute;top:56px;left:0;width:38px;height:8px;\n  border-radius:50%;background:#071b34;opacity:.5;filter:blur(3px);\n  animation:keyShadow 2s ease-in-out infinite;\n}\n@keyframes keyFloat {0%,100%{translate:0 0}50%{translate:0 -11px}}\n@keyframes keyTurn {from{rotate:y 0deg}to{rotate:y 360deg}}\n@keyframes keyShadow {0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(.7);opacity:.25}}\n</style>' + "</head>", 1)
-html = html.replace('room.appendChild(accessKey);', 'accessKey.innerHTML = \'<div class="key-shadow"></div><div class="key-rotator"><div class="key-spin"><div class="key-face front"></div><div class="key-face back"></div></div></div>\'; room.appendChild(accessKey);', 1)
-html = html.replace("</head>", '<style id="card-pixel-art-final">\n/* 0.5 second fine vibration, not two seconds */\n.computer-overlay.terminal-shake .computer-panel {animation:terminalMicroShake .05s steps(2,end) 10 !important;}\n/* Both the guidance arrow and card bob share an identical 2s cycle. */\n@keyframes itemBob {0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}\n@keyframes pixelCardSpin {from{transform:rotateY(0deg) rotateZ(-12deg)}to{transform:rotateY(360deg) rotateZ(-12deg)}}\n@keyframes pixelShadowBob {0%,100%{transform:scaleX(1);opacity:.45}50%{transform:scaleX(.75);opacity:.28}}\n.room .access-key {left:45.44% !important;top:66.8% !important;width:62px !important;height:48px !important;transform:translate(-50%,-50%) !important;perspective:240px !important;}\n.room .access-key .key-rotator {left:0 !important;top:0 !important;width:62px !important;height:42px !important;animation:itemBob 2s ease-in-out infinite !important;filter:drop-shadow(0 0 3px #35d9ff) !important;}\n.room .access-key .key-spin {position:absolute;inset:0;transform-style:preserve-3d;animation:pixelCardSpin 4s linear infinite;}\n.room .access-key .key-face {position:absolute;inset:0;border:0 !important;outline:0 !important;box-shadow:none !important;background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI0MiIgdmlld0JveD0iMCAwIDY0IDQyIiBzaGFwZS1yZW5kZXJpbmc9ImNyaXNwRWRnZXMiPjxyZWN0IHg9IjMiIHk9IjAiIHdpZHRoPSI1NiIgaGVpZ2h0PSIyIiBmaWxsPSIjYzhmOGZmIi8+PHJlY3QgeD0iMSIgeT0iMiIgd2lkdGg9IjYwIiBoZWlnaHQ9IjIiIGZpbGw9IiM5ZWY0ZmYiLz48cmVjdCB4PSIwIiB5PSI0IiB3aWR0aD0iNjQiIGhlaWdodD0iMzMiIGZpbGw9IiMxNjNjNzAiLz48cmVjdCB4PSIyIiB5PSIzIiB3aWR0aD0iNjAiIGhlaWdodD0iMzUiIGZpbGw9IiNhOGU5ZmYiLz48cmVjdCB4PSI0IiB5PSI1IiB3aWR0aD0iNTYiIGhlaWdodD0iMzEiIGZpbGw9IiMxNTVjOWQiLz48cmVjdCB4PSI2IiB5PSI3IiB3aWR0aD0iNTIiIGhlaWdodD0iMjciIGZpbGw9IiMyMzk4ZDAiLz48cmVjdCB4PSI3IiB5PSI4IiB3aWR0aD0iNTAiIGhlaWdodD0iMjQiIGZpbGw9IiMzOWI1ZTAiLz48cmVjdCB4PSI0IiB5PSIzNiIgd2lkdGg9IjU2IiBoZWlnaHQ9IjMiIGZpbGw9IiMwNjM4NWYiLz48cmVjdCB4PSI4IiB5PSIzOSIgd2lkdGg9IjQ5IiBoZWlnaHQ9IjIiIGZpbGw9IiM5YWYyZmYiLz48cmVjdCB4PSIxMCIgeT0iOSIgd2lkdGg9IjQ0IiBoZWlnaHQ9IjIiIGZpbGw9IiM3OWU2ZmYiLz48cmVjdCB4PSIxMiIgeT0iMTUiIHdpZHRoPSIxMSIgaGVpZ2h0PSIxMiIgZmlsbD0iI2Y1ZmZmZiIvPjxyZWN0IHg9IjE0IiB5PSIxNCIgd2lkdGg9IjciIGhlaWdodD0iMiIgZmlsbD0iI2Q4ZmZmZiIvPjxyZWN0IHg9IjE0IiB5PSIxOCIgd2lkdGg9IjciIGhlaWdodD0iNSIgZmlsbD0iI2E0ZTNmZiIvPjxyZWN0IHg9IjE2IiB5PSIxNyIgd2lkdGg9IjIiIGhlaWdodD0iOSIgZmlsbD0iIzZkYWRkMyIvPjxyZWN0IHg9IjExIiB5PSIyMSIgd2lkdGg9IjEzIiBoZWlnaHQ9IjIiIGZpbGw9IiNlOGZmZmYiLz48cmVjdCB4PSIyOSIgeT0iMTUiIHdpZHRoPSIyMCIgaGVpZ2h0PSIyIiBmaWxsPSIjYjFmM2ZmIi8+PHJlY3QgeD0iMjkiIHk9IjE5IiB3aWR0aD0iMjQiIGhlaWdodD0iMiIgZmlsbD0iI2IxZjNmZiIvPjxyZWN0IHg9IjI5IiB5PSIyMyIgd2lkdGg9IjE1IiBoZWlnaHQ9IjIiIGZpbGw9IiMxMjYwOGMiLz48cmVjdCB4PSIyOSIgeT0iMjciIHdpZHRoPSIxOCIgaGVpZ2h0PSIyIiBmaWxsPSIjMTI2MDhjIi8+PHJlY3QgeD0iOSIgeT0iMjkiIHdpZHRoPSI0IiBoZWlnaHQ9IjIiIGZpbGw9IiNhNGY3ZmYiLz48cmVjdCB4PSI1MSIgeT0iMjkiIHdpZHRoPSI0IiBoZWlnaHQ9IjIiIGZpbGw9IiNhNGY3ZmYiLz48cmVjdCB4PSI0NiIgeT0iMjgiIHdpZHRoPSI4IiBoZWlnaHQ9IjMiIGZpbGw9IiNlNGZmZmYiLz48cmVjdCB4PSI1IiB5PSI2IiB3aWR0aD0iMiIgaGVpZ2h0PSIyIiBmaWxsPSIjZTdmZmZmIi8+PHJlY3QgeD0iNTciIHk9IjYiIHdpZHRoPSIyIiBoZWlnaHQ9IjIiIGZpbGw9IiNlN2ZmZmYiLz48cmVjdCB4PSI1IiB5PSIzMyIgd2lkdGg9IjIiIGhlaWdodD0iMiIgZmlsbD0iI2U3ZmZmZiIvPjxyZWN0IHg9IjU3IiB5PSIzMyIgd2lkdGg9IjIiIGhlaWdodD0iMiIgZmlsbD0iI2U3ZmZmZiIvPjwvc3ZnPg==") !important;background-size:100% 100% !important;image-rendering:pixelated !important;backface-visibility:hidden;}\n.room .access-key .key-face.back {transform:rotateY(180deg);background-image:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NCIgaGVpZ2h0PSI0MiIgdmlld0JveD0iMCAwIDY0IDQyIiBzaGFwZS1yZW5kZXJpbmc9ImNyaXNwRWRnZXMiPjxyZWN0IHg9IjMiIHk9IjAiIHdpZHRoPSI1NiIgaGVpZ2h0PSIyIiBmaWxsPSIjYzhmOGZmIi8+PHJlY3QgeD0iMSIgeT0iMiIgd2lkdGg9IjYwIiBoZWlnaHQ9IjIiIGZpbGw9IiM5ZWY0ZmYiLz48cmVjdCB4PSIwIiB5PSI0IiB3aWR0aD0iNjQiIGhlaWdodD0iMzMiIGZpbGw9IiMxNjNjNzAiLz48cmVjdCB4PSIyIiB5PSIzIiB3aWR0aD0iNjAiIGhlaWdodD0iMzUiIGZpbGw9IiNhOGU5ZmYiLz48cmVjdCB4PSI0IiB5PSI1IiB3aWR0aD0iNTYiIGhlaWdodD0iMzEiIGZpbGw9IiMxNTVjOWQiLz48cmVjdCB4PSI2IiB5PSI3IiB3aWR0aD0iNTIiIGhlaWdodD0iMjciIGZpbGw9IiMyMzk4ZDAiLz48cmVjdCB4PSI3IiB5PSI4IiB3aWR0aD0iNTAiIGhlaWdodD0iMjQiIGZpbGw9IiMzOWI1ZTAiLz48cmVjdCB4PSI0IiB5PSIzNiIgd2lkdGg9IjU2IiBoZWlnaHQ9IjMiIGZpbGw9IiMwNjM4NWYiLz48cmVjdCB4PSI4IiB5PSIzOSIgd2lkdGg9IjQ5IiBoZWlnaHQ9IjIiIGZpbGw9IiM5YWYyZmYiLz48cmVjdCB4PSIxMCIgeT0iOSIgd2lkdGg9IjQ0IiBoZWlnaHQ9IjIiIGZpbGw9IiM3OWU2ZmYiLz48cmVjdCB4PSIxMCIgeT0iMTIiIHdpZHRoPSI0NCIgaGVpZ2h0PSI3IiBmaWxsPSIjMGMyZTYwIi8+PHJlY3QgeD0iMTAiIHk9IjEzIiB3aWR0aD0iNDQiIGhlaWdodD0iMiIgZmlsbD0iI2MzZmFmZiIvPjxyZWN0IHg9IjEwIiB5PSIyNCIgd2lkdGg9IjIiIGhlaWdodD0iNiIgZmlsbD0iIzBiM2Y3MCIvPjxyZWN0IHg9IjE0IiB5PSIyNCIgd2lkdGg9IjIiIGhlaWdodD0iNiIgZmlsbD0iIzBiM2Y3MCIvPjxyZWN0IHg9IjE4IiB5PSIyNCIgd2lkdGg9IjIiIGhlaWdodD0iNiIgZmlsbD0iIzBiM2Y3MCIvPjxyZWN0IHg9IjIyIiB5PSIyNCIgd2lkdGg9IjIiIGhlaWdodD0iNiIgZmlsbD0iIzBiM2Y3MCIvPjxyZWN0IHg9IjI2IiB5PSIyNCIgd2lkdGg9IjIiIGhlaWdodD0iNiIgZmlsbD0iIzBiM2Y3MCIvPjxyZWN0IHg9IjMwIiB5PSIyNCIgd2lkdGg9IjIiIGhlaWdodD0iNiIgZmlsbD0iIzBiM2Y3MCIvPjxyZWN0IHg9IjM0IiB5PSIyNCIgd2lkdGg9IjIiIGhlaWdodD0iNiIgZmlsbD0iIzBiM2Y3MCIvPjxyZWN0IHg9IjM4IiB5PSIyNCIgd2lkdGg9IjIiIGhlaWdodD0iNiIgZmlsbD0iIzBiM2Y3MCIvPjxyZWN0IHg9IjQyIiB5PSIyNCIgd2lkdGg9IjIiIGhlaWdodD0iNiIgZmlsbD0iIzBiM2Y3MCIvPjxyZWN0IHg9IjQ2IiB5PSIyNCIgd2lkdGg9IjIiIGhlaWdodD0iNiIgZmlsbD0iIzBiM2Y3MCIvPjxyZWN0IHg9IjUwIiB5PSIyNCIgd2lkdGg9IjIiIGhlaWdodD0iNiIgZmlsbD0iIzBiM2Y3MCIvPjxyZWN0IHg9IjQ0IiB5PSIyOSIgd2lkdGg9IjgiIGhlaWdodD0iMyIgZmlsbD0iI2QyZmJmZiIvPjxyZWN0IHg9IjUiIHk9IjYiIHdpZHRoPSIyIiBoZWlnaHQ9IjIiIGZpbGw9IiNlN2ZmZmYiLz48cmVjdCB4PSI1NyIgeT0iNiIgd2lkdGg9IjIiIGhlaWdodD0iMiIgZmlsbD0iI2U3ZmZmZiIvPjxyZWN0IHg9IjUiIHk9IjMzIiB3aWR0aD0iMiIgaGVpZ2h0PSIyIiBmaWxsPSIjZTdmZmZmIi8+PHJlY3QgeD0iNTciIHk9IjMzIiB3aWR0aD0iMiIgaGVpZ2h0PSIyIiBmaWxsPSIjZTdmZmZmIi8+PC9zdmc+") !important;}\n.room .access-key .key-face::before,.room .access-key .key-face::after {display:none !important;content:none !important;}\n.room .access-key .key-shadow {top:45px !important;left:12px !important;width:40px !important;height:7px !important;border-radius:0 !important;filter:none !important;background:repeating-linear-gradient(90deg,#061a34 0 5px,#102c49 5px 9px) !important;animation:pixelShadowBob 2s ease-in-out infinite !important;}\n.tutorial-direction-arrow {animation:itemBob 2s ease-in-out infinite !important;}\n</style>' + "</head>", 1)
-html = html.replace("</head>", '<style id="card-repair-2026">\n/* Correctly shaped, chunky pixel sprite with visible physical thickness. */\n.room .access-key {left:45.44% !important;top:66.8% !important;width:82px !important;height:65px !important;transform:translate(-50%,-50%) !important;perspective:340px !important;}\n.room .access-key .key-rotator {width:82px !important;height:56px !important;left:0 !important;top:0 !important;animation:itemBob 2s ease-in-out infinite !important;filter:none !important;}\n.room .access-key .key-spin {position:absolute;inset:0;transform-style:preserve-3d;animation:pixelCardSpin 4s linear infinite !important;}\n.room .access-key .key-face {width:80px !important;height:54px !important;inset:0 !important;background-image:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAAA2CAYAAABQvB7qAAACqUlEQVR4nO2aPU4CQRSAH8aAhyChgQtwAtDExMKE0mhLPAONFtrIFQylEAsLEgsTI0JnxwUWCxIPoTZYrdksOzNvZt6bmSXzdZBldvny/nZ2ASKRSGR3+PrdbHSO3+e6kFDQFaJL6QRyC9HFq8BQZCQAMFz/wKhRAwCAg8bh5nv9XsH8llSgbyEJ0TqrZAb1KsqfXKBPIaYyhusfreOXoxdo908Mz+YghV2JSFmOXgzPaAZaoE16lEVG36AOSgXWq5VKNo1NRaS4FiJjcdcDAIDOYGq1DjoCW7nPIcmwxaYO7ukcnIZ32Ti/PN76rjOYSqNvlcxQawc/SBf9+ZAgEUhVT0RM7l9Z1lWBaSRaKZzFZnbSwZc8LMoIzHfiIrgizwfZUQaDcQRS8HzT83ZuqtqqXQNHjRr0JfMgtRTfTURVB9m78O18tfXdVbeptYaLOlg0C66SGTRbR9LfeU1hDKE3ESuBRZ349Hpqs2TpQAmsVyu4zbGAcFU7vd+JPN/0pFHro4nkRxlZIzESqOrE1IRcB2MTsYQ9hXVHltBQjTLWEbhLnVi2x3nQOCy8nUULLGMnFrG46/3vINnCmsI2kej7Fg6LsUBVJ6ZIY64GMkEcg92V8T4HiuCSp9rHnJ9dQPdxjF4vWIGmYATpknbiooGaRGC7f+LkKR1Gzvztgf06smgJxOxO2zwf4YiePGl6Uj1hdJrCMkFU0dN9HDt9/Ko92+UjMO3EqofTVNHDJUe1cZolWwdJIjCVYxtBnx9PFJcjREcSFmcpzC0HgEeQCjKBLgQBuJWEeTvL6P6W88VLH1GEfZ23CC+DdNkkyWAR6ENQCpcoEcYCfUoCcC9KhNFFiDYXOQhFlIhgNhNCFyXC+KJNorCskmSwROAuiiLHZR2MRCKRSJj8AaPQF0zoQBOgAAAAAElFTkSuQmCC") !important;background-size:80px 54px !important;image-rendering:pixelated !important;border:0 !important;outline:0 !important;box-shadow:none !important;backface-visibility:hidden !important;}\n.room .access-key .key-face.front {transform:translateZ(4px) !important;}\n.room .access-key .key-face.back {transform:rotateY(180deg) translateZ(4px) !important;}\n.room .access-key .key-spin::after {content:"";position:absolute;left:2px;top:3px;width:76px;height:48px;background:#082d54;transform:rotateY(90deg);border:3px solid #69dfff;box-sizing:border-box;}\n/* Small soft-edged pixel shadow; no striped/barcode appearance. */\n.room .access-key .key-shadow {position:absolute !important;top:61px !important;left:23px !important;width:38px !important;height:7px !important;border-radius:0 !important;filter:none !important;opacity:.35 !important;background:#17375a !important;box-shadow:4px 0 #17375a,-4px 0 #17375a,8px 2px #254566,-8px 2px #254566 !important;animation:pixelShadowBob 2s ease-in-out infinite !important;}\n/* Card and its pointer have exactly the same floating period and phase. */\n.tutorial-direction-arrow {animation:itemBob 2s ease-in-out infinite !important;}\n.computer-overlay.terminal-shake .computer-panel {animation:terminalMicroShake .03s steps(2,end) 10 !important;}\n</style>' + "</head>", 1)
+# Pixel-art card is drawn procedurally by Canvas, not a GIF or a generated image.
+_canvas_style = r"""<style id="access-key-canvas-v1">
+.room .access-key {left:45.44% !important;top:66.8% !important;width:108px !important;height:116px !important;transform:translate(-50%,-50%) !important;z-index:40 !important;background:none !important;border:0 !important;box-shadow:none !important;pointer-events:none !important;}
+.room .access-key::before,.room .access-key::after {content:none !important;display:none !important;}
+.room .access-key.visible {display:block !important;animation:none !important;}
+.room .access-key canvas {width:108px;height:116px;display:block;image-rendering:pixelated;}
+@keyframes cardArrowBob {0%,100% {transform:translate(-50%,0)}50% {transform:translate(-50%,-10px)}}
+.tutorial-direction-arrow.show {animation:cardArrowBob 2s ease-in-out infinite !important;}
+@keyframes terminalMicroShake {0%,100%{transform:translate(0,0)}25%{transform:translate(-2px,1px)}75%{transform:translate(2px,-1px)}}
+.computer-overlay.terminal-shake .computer-panel {animation:terminalMicroShake .06s steps(2,end) 5 !important;}
+</style>"""
+html = html.replace("</head>", _canvas_style + "</head>", 1)
+_canvas_js = r"""
+accessKey.innerHTML = '<canvas id="accessKeyCanvas" width="108" height="116" aria-label="Rotating access card"></canvas>';
+(function startPixelCard() {
+  const cv = document.getElementById('accessKeyCanvas');
+  if (!cv) return;
+  const ctx = cv.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  const TW=96,TH=60;
+  function makeTexture(reverse) {
+    const c=document.createElement('canvas');c.width=TW;c.height=TH;
+    const g=c.getContext('2d');g.imageSmoothingEnabled=false;
+    function rect(x,y,w,h,col){g.fillStyle=col;g.fillRect(x,y,w,h);}
+    // stepped beveled pixel silhouette, constant aspect ratio on both faces
+    rect(4,0,88,60,'#173e7d');rect(2,2,92,56,'#c4e6ff');rect(0,5,96,50,'#153b75');
+    rect(3,4,90,52,'#e5f4ff');rect(5,6,86,48,'#3f7bd1');rect(7,8,82,44,reverse?'#8ac1ef':'#0879d5');
+    rect(9,9,78,3,reverse?'#d4ecff':'#28c5fc');rect(9,12,78,2,'#7cdbff');
+    rect(7,48,82,3,'#06448f');rect(8,52,79,2,'#e1f4ff');
+    rect(10,15,3,30,'#6edaff');rect(83,14,3,33,'#06438d');
+    if(!reverse){
+      // EMV chip: individually shaded pixels and gold/cyan contacts
+      rect(15,24,24,19,'#032b65');rect(17,22,20,19,'#d8ffff');rect(19,25,16,14,'#83dfff');
+      rect(26,25,2,14,'#3a9dc6');rect(19,31,16,2,'#3a9dc6');
+      rect(19,26,6,4,'#e8ffff');rect(29,34,6,4,'#b4f4ff');
+      rect(48,17,30,2,'#e4faff');rect(47,20,33,2,'#0c4d9a');
+      rect(48,26,31,3,'#043b85');rect(50,27,24,1,'#b9efff');
+      rect(47,33,33,2,'#b6ecff');rect(48,37,26,2,'#064b94');
+      rect(47,42,29,2,'#e1f7ff');
+      for(let i=0;i<3;i++){rect(15+i*7,47,4,3,i===0?'#ecffff':'#154d99');rect(16+i*7,47,2,1,'#c8f7ff');}
+      rect(65,47,5,4,'#f3ffff');rect(69,46,2,2,'#f3ffff');
+      for(let i=0;i<3;i++){rect(75+i*4,47,3,3,'#f2ffff');rect(76+i*4,48,1,1,'#238ed4');}
+    }else{
+      rect(12,17,72,11,'#072c5a');rect(12,17,72,2,'#2b5b91');rect(12,27,72,2,'#142f5e');
+      rect(15,35,21,11,'#c9e9ff');rect(17,37,17,7,'#7eafdb');
+      for(let i=0;i<12;i++)rect(43+i*3,35,1+(i%3===0?1:0),12,'#16487f');
+      rect(79,42,5,5,'#e8faff');rect(80,43,3,3,'#168cda');
+    }
+    return c;
+  }
+  const front=makeTexture(false),back=makeTexture(true);
+  const period=2000, spinPeriod=1000;
+  const epoch=performance.now();
+  function draw(now){
+    const t=now-epoch;
+    const phase=2*Math.PI*(t%period)/period;
+    const yaw=2*Math.PI*(t%spinPeriod)/spinPeriod + 0.24;
+    const bob=-6-6*Math.sin(phase);
+    ctx.clearRect(0,0,108,116);
+    // fixed, four concentric pixel-art shadow bands, center 50% outward 30/20/10%
+    for(const [rx,ry,opacity] of [[39,10,.10],[32,8,.20],[24,6,.30],[15,4,.50]]){
+      ctx.fillStyle='rgba(12,31,63,'+opacity+')';
+      for(let yy=-ry;yy<=ry;yy+=2){
+        const half=Math.floor(rx*Math.sqrt(Math.max(0,1-(yy*yy)/(ry*ry)))/2)*2;
+        ctx.fillRect(54-half,91+yy,half*2,2);
+      }
+    }
+    // The physical card always keeps the same 96:60 ratio; only projection changes.
+    // Texture strips are perspective projected to avoid stretching the entire sprite.
+    const c=Math.cos(yaw),si=Math.sin(yaw),tex=c>=0?front:back;
+    const baseX=54,baseY=45+bob;
+    const scale=0.82;
+    const xOf=(x,z=0)=>baseX+(x-TW/2)*c*scale+z*si*scale;
+    const yOf=(x,y,z=0)=>baseY+(y-TH/2)*scale-((x-TW/2)*si+z*c)*.19;
+    // 3-pixel thickness, rendered as the edge between front/back surfaces
+    const depth=3;
+    const corners=[[0,0],[TW,0],[TW,TH],[0,TH]];
+    ctx.fillStyle='#173d77';ctx.beginPath();
+    for(let j=0;j<4;j++){const [x,y]=corners[j];const X=xOf(x,depth),Y=yOf(x,y,depth);j?ctx.lineTo(X,Y):ctx.moveTo(X,Y);}
+    ctx.closePath();ctx.fill();
+    const strip=1;
+    for(let x=0;x<TW;x+=strip){
+      const xa=xOf(x),xb=xOf(x+strip);
+      const ya=yOf(x,0),yb=yOf(x+strip,0);
+      const yl=yOf(x,TH),yr=yOf(x+strip,TH);
+      // nearest-neighbor texture, trapezoid-clipped to the projected card plane
+      ctx.save();ctx.beginPath();ctx.moveTo(xa,ya);ctx.lineTo(xb,yb);ctx.lineTo(xb,yr);ctx.lineTo(xa,yl);ctx.closePath();ctx.clip();
+      const left=Math.min(xa,xb)-1,right=Math.max(xa,xb)+1;
+      if(right-left>0.01){
+        ctx.drawImage(tex,x,0,1,TH,left,Math.min(ya,yb,yl,yr)-1,right-left,Math.max(ya,yb,yl,yr)-Math.min(ya,yb,yl,yr)+2);
+      }
+      ctx.restore();
+    }
+    // highlight on the exposed physical edge
+    ctx.strokeStyle='#a9e9ff';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(xOf(0),yOf(0,0));ctx.lineTo(xOf(TW),yOf(TW,0));ctx.stroke();
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
+"""
+html = html.replace('room.appendChild(accessKey);', 'room.appendChild(accessKey);\n' + _canvas_js, 1)
+# Arrow tracks the fixed canvas center rather than changing card frame bounds.
+html = html.replace('(tutorialStep === 3 ? 55 : 76)', '(tutorialStep === 3 ? 82 : 76)', 1)
 
 components.html(
     html,
