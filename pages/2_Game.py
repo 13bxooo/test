@@ -3025,6 +3025,103 @@ button,.game button,.code-button,.help-key{border-radius:0!important}
 .room { position:relative !important; }
 .tutorial-wall-overlay { position:absolute; inset:0; width:100%; height:100%; object-fit:fill; pointer-events:none; z-index:30; image-rendering:pixelated; }
 .tutorial-right-door { position:absolute; left:84.8%; top:21.8%; width:13.8%; height:39.0%; object-fit:fill; pointer-events:none; z-index:31; image-rendering:pixelated; }
+
+/* 카드 리더기: 참고 이미지 스타일 */
+.card-stage {
+    height: 320px !important;
+    background: #111820 !important;
+    border: 2px solid #364c58 !important;
+}
+
+.card-stage .reader {
+    left: 12% !important;
+    right: auto !important;
+    top: 12% !important;
+    transform: none !important;
+    width: 76% !important;
+    height: 125px !important;
+    border: 5px solid #667079 !important;
+    border-radius: 9px !important;
+    background: linear-gradient(#a0a5a9, #666b70) !important;
+    box-shadow: inset 0 0 0 3px #22282d !important;
+    color: transparent !important;
+    font-size: 0 !important;
+}
+
+/* 상단 안내 화면 */
+.card-stage .reader::after {
+    content: "카드를 긁어주세요.";
+    position: absolute;
+    left: 5%;
+    top: 10px;
+    width: 77%;
+    height: 31px;
+    padding: 5px 8px;
+    box-sizing: border-box;
+    background: #103e32;
+    border: 3px solid #101a1b;
+    color: #b3e8db;
+    font-size: 15px;
+    font-family: 'NeoDungGeunMo', monospace;
+}
+
+/* 카드가 통과하는 가로 슬롯 */
+.card-stage .reader-slot {
+    left: 5% !important;
+    right: 18% !important;
+    top: 82px !important;
+    height: 9px !important;
+    border-radius: 7px !important;
+    background: #101417 !important;
+    box-shadow: inset 0 2px 3px #000 !important;
+}
+
+/* 빨간색 표시등 */
+.card-stage .reader::before {
+    content: "";
+    position: absolute;
+    right: 43px;
+    bottom: 12px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #a31720;
+    border: 3px solid #181818;
+    box-shadow: inset 2px 2px 3px #ed6262;
+}
+
+/* 초록색 표시등 */
+.card-stage .reader-light {
+    top: auto !important;
+    right: 9px !important;
+    bottom: 12px !important;
+    width: 20px !important;
+    height: 20px !important;
+    border: 3px solid #181818 !important;
+    background: #174f3c !important;
+    box-shadow: none !important;
+}
+
+.card-stage .reader-light.green {
+    background: #16e487 !important;
+    box-shadow: 0 0 12px #16e487 !important;
+}
+
+/* 조작용 카드 */
+.card-stage #dragCard {
+    top: 73%;
+    background-image: url("__CARD_BLUE__") !important;
+    background-size: contain !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+    background-color: transparent !important;
+    color: transparent !important;
+    border: none !important;
+}
+.card-stage #dragCard .card-chip {
+    display: none !important;
+}
+
 </style>
 
 
@@ -4678,6 +4775,46 @@ function checkInteraction() {
    INACCESSIBLE
    ===================================================== */
 
+function playCardSuccessSound() {
+    try {
+        const AudioCtx =
+            window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+
+        const ctx = new AudioCtx();
+        ctx.resume();
+
+        [523.25, 659.25, 783.99].forEach(function(freq, i) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            const start = ctx.currentTime + i * 0.11;
+
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(freq, start);
+
+            gain.gain.setValueAtTime(0.0001, start);
+            gain.gain.exponentialRampToValueAtTime(
+                0.12, start + 0.015
+            );
+            gain.gain.exponentialRampToValueAtTime(
+                0.0001, start + 0.19
+            );
+
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            osc.start(start);
+            osc.stop(start + 0.2);
+        });
+
+        setTimeout(function() {
+            ctx.close().catch(function() {});
+        }, 850);
+    } catch (error) {
+        console.warn("승인 효과음 재생 실패", error);
+    }
+}
+
 function playErrorSound() {
     try {
         const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -6193,6 +6330,7 @@ function finishCardDrag(
         cardConsumed = true;
         renderInventory();
         if (readerLight) readerLight.classList.add("green");
+        playCardSuccessSound();
         cardStatus.textContent = "ACCESS GRANTED // CARD CONSUMED";
         
         // 인증 완료 후 출입구에서 E키를 눌러 이동한다.
@@ -6560,6 +6698,7 @@ html = html.replace('(tutorialStep === 3 ? 55 : 76)', '(tutorialStep === 3 ? 82 
 # Resolve large image assets from disk rather than embedding them in the Python file.
 _SWIPE_ASSET_DIR = Path(__file__).resolve().parent.parent / "assets" / "logic_game"
 _SWIPE_ASSET_FILES = {
+    "__CARD_BLUE__": "access_card_blue.png",
     "__SWIPE_IMAGE_f2507ee96aaa__": "swipe_f2507ee96aaa.png",
     "__SWIPE_IMAGE_8a2fe453a949__": "swipe_8a2fe453a949.png",
     "__SWIPE_IMAGE_f17f36b1ab38__": "swipe_f17f36b1ab38.png",
@@ -6570,7 +6709,7 @@ _SWIPE_ASSET_FILES = {
     "__SWIPE_IMAGE_24640e7970c6__": "swipe_24640e7970c6.png",
     "__SWIPE_IMAGE_a66cdbf2df2e__": "swipe_a66cdbf2df2e.png",
     "__SWIPE_IMAGE_f912e7818ae4__": "swipe_f912e7818ae4.png",
-    "__SWIPE_IMAGE_38376344af10__": "swipe_38376344af10.png",
+    "__CARD_BLUE__": "swipe_38376344af10.png",
     "__SWIPE_IMAGE_795a41e9c430__": "swipe_795a41e9c430.png",
     "__SWIPE_IMAGE_fe15e5530ddd__": "swipe_fe15e5530ddd.png",
 }
