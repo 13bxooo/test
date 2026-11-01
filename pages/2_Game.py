@@ -6463,46 +6463,16 @@ accessKey.innerHTML = '<canvas id="accessKeyCanvas" width="108" height="116" ari
   const ctx = cv.getContext('2d');
   ctx.imageSmoothingEnabled = false;
   const TW=96,TH=60;
-  function makeTexture(reverse) {
-    const c=document.createElement('canvas');c.width=TW;c.height=TH;
-    const g=c.getContext('2d');g.imageSmoothingEnabled=false;
-    function rect(x,y,w,h,col){g.fillStyle=col;g.fillRect(x,y,w,h);}
-    // stepped beveled pixel silhouette, constant aspect ratio on both faces
-    rect(5,0,86,60,'#173e7d');rect(3,2,90,56,'#c4e6ff');rect(0,6,96,48,'#153b75');
-    rect(6,4,84,52,'#e5f4ff');rect(4,7,88,46,'#e5f4ff');rect(7,6,82,48,'#3f7bd1');rect(5,9,86,42,'#3f7bd1');rect(9,8,78,44,reverse?'#8ac1ef':'#0879d5');
-    rect(9,9,78,3,reverse?'#d4ecff':'#28c5fc');rect(9,12,78,2,'#7cdbff');
-    rect(7,48,82,3,'#06448f');rect(8,52,79,2,'#e1f4ff');
-    rect(10,15,3,30,'#6edaff');rect(83,14,3,33,'#06438d');
-    // stepped enamel edge and fine circuitry keep the collectible's depth/readability
-    rect(5,7,2,44,'#f2faff');rect(89,8,2,42,'#123a80');
-    rect(12,13,70,1,'#d8f7ff');rect(13,45,69,1,'#105ca8');
-    if(!reverse){
-      // EMV chip: individually shaded pixels and gold/cyan contacts
-      rect(15,24,24,19,'#032b65');rect(17,22,20,19,'#d8ffff');rect(19,25,16,14,'#83dfff');
-      rect(26,25,2,14,'#3a9dc6');rect(19,31,16,2,'#3a9dc6');
-      rect(19,26,6,4,'#e8ffff');rect(29,34,6,4,'#b4f4ff');
-      rect(48,17,30,2,'#e4faff');rect(47,20,33,2,'#0c4d9a');
-      rect(48,26,31,3,'#043b85');rect(50,27,24,1,'#b9efff');
-      rect(47,33,33,2,'#b6ecff');rect(48,37,26,2,'#064b94');
-      rect(47,42,29,2,'#e1f7ff');
-      rect(43,15,2,1,'#8eeeff');rect(45,15,2,1,'#d8faff');
-      rect(44,31,3,1,'#a6eaff');rect(80,32,3,1,'#6ad9ff');
-      rect(40,43,4,1,'#1461aa');rect(43,44,4,1,'#86dfff');
-      for(let i=0;i<3;i++){rect(15+i*7,47,4,3,i===0?'#ecffff':'#154d99');rect(16+i*7,47,2,1,'#c8f7ff');}
-      rect(65,47,5,4,'#f3ffff');rect(69,46,2,2,'#f3ffff');
-      for(let i=0;i<3;i++){rect(75+i*4,47,3,3,'#f2ffff');rect(76+i*4,48,1,1,'#238ed4');}
-    }else{
-      rect(13,16,70,3,'#c9f5ff');rect(12,20,72,10,'#063c82');rect(12,22,72,4,'#071e54');
-      rect(13,32,71,2,'#e6faff');rect(15,36,25,10,'#d8f4ff');rect(17,38,21,6,'#76b5e8');
-      rect(17,39,16,1,'#f6ffff');rect(18,43,12,1,'#247cbd');
-      for(let i=0;i<12;i++)rect(46+i*3,36,1+(i%3===0?1:0),10,'#073a7b');
-      rect(73,46,5,4,'#f0ffff');rect(80,46,3,3,'#e0ffff');
-      rect(15,49,68,1,'#3f9fd8');
-    }
-    return c;
-  }
-  const front=makeTexture(false), back=makeTexture(true);
-  const period=2000, spinPeriod= (1000/0.375)*2; // half the previous rotation speed
+  // Use the exact 96x60 pixel-art face textures supplied in the previous revision.
+  // Both textures are transparent PNGs, drawn with nearest-neighbor sampling.
+  const front=document.createElement('canvas'),back=document.createElement('canvas');
+  front.width=back.width=TW; front.height=back.height=TH;
+  const frontImg=new Image(),backImg=new Image();
+  frontImg.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAAA8CAYAAACZ1L+0AAAEbklEQVR4nO2cTWgTQRTH/63xUHK1Bw/FfoDWL1hDUGopWrxYqBQJeihCLYaCelBaIkgtFGovFkUPipSWtiC9SKkfhXqrUoyooS4oWlFs1UMpBsFDKGg/PCSTbLKzu9nM7E6Szu+SzJvdmZd5+97bnclOCSh4a1s3aHIJG7H58ZJMWakIRSQpPNoCufIHxgbFaFPkhNqwAaR7gsf4cOCk4nVap03BpBozrJMhSDAeQIYetyDjqw1F1BCkDT2N3a/c0K1omemvS44nLRTJECQY0ySsZdFb5qQeRUdlbCWr4zx24r/StJtNq02COv3JtH5gbBChtg54a1s3dB5A4pWM/Xwg40hyQWYekDlAMKYGaO+sQ3tnnVu6bEqyTsIAsPD1t1N6FCWLcy8BAJW+esNjZAgSjC0P+PNlGQCwp3ZbUvZxPpr8LuX2sWUAq86k3D4yBOVA31kFfWcVLm3l5AFaRQCgZ1TloErhwPP3MhkgHwb+eUgR2v/RAZXpfBmCBMPkAYRor8KjGSyvAnuvq7bOYb0CRcPFAE6STZ4pW/rmjjIJVrZXc2uLyQCrE/EZ1OVr9wAAQ9/0Cw7hWRWHGxTDMiFY7U1r0xPoAJAfecZJuHrA5Z36RfzwLM8e6PC8It0m70NQthzal3oqff0h6pqMlaIxQGT0CQBgzX84KaMNEm8ZKwVngEfnFao8cC7sriKc4GqA08MvqfLwrGpaBoBgNX3Kduv7SFr51IV4+W90KSl796wHbx9esKEpGweO96WVSxpP5NwWVwPQ7m6yvQsy4t9+P71i5mnya+aAFBLySVgwBZcDCCxun09IDxAMVw+gJVea3E4SLnaEJOGOk+mD/SFq/PdtK6Yu6/t0m+bbas7nyhAkmIJNwgSWqy8fEGIAlpBDOHdG0cmGH6jM7boNVwOQKeV0Wb1p2YotEfoUw2gkjLX1f7baYuLgEUea5WIApeUOj2agPr6kk2kn13S8ecGlX5FwMcDKj888msGuAzbncxy6KnMh13+IFHwSzhdyXbljMgBZNswn3lxRXO3v4A2V6Xz5HCCYogtBrFckYSHxV5uqXj7tGcFsgNWpEfyMpO6CKvyX4GluZ6pzA7Ok6dbgAxYGGLmVek9sPWNlygyzY9ffR9B/M4irU/bO4013F72v7xNBAMCOwBC1fiFRDwBVgSHTcs0x+gqhFiE5oLuL/uNEYzX4BP+12azKlb5607djAE45oMKvf4BirROB1cATItcbbJXN0BlgUo1Rd0kpTazNTlxU0uQtTfpBnLwfZKoTia88/jn3i16vauST94O6ck0ib9Be1KZtVWDoATP98bcjrd4XfjxtPA2Ra51I5n7FjeArNzaCHcg4GuGJzY+XeGtbN0JtHVm9LR+4q7JrVQAs9CrwlTtzJxRqiz/AGu6WQiPbvQ+KhcZQ3PMrHe6HagASq+SOWXww2zHL0gOsYpiEDQ+Q2kSO7OQkd85yBm3sJzJTDzBzHQkf5GyoYHQ7uQJy51ynkDvn5iH/Aap5yxAKMvIDAAAAAElFTkSuQmCC';
+  backImg.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAAA8CAYAAACZ1L+0AAADhklEQVR4nO2cQUgUURjH/9suSLt0EAJDL8tuxUYRoifrIHqpk+IhCAu3wDaRiEj20h4iyC5iVESYGWGUBRGLQYcuiYfqJlselFLzkhRECbJGh2U7bG8d1zez+968nbfOfr+LM2/fe/Pxvvn+HzPO+zzgEIh0Z3nthD3S8xOewrYdOgwhNvAZT9idPzQ+qscalxOPIgtsjgSfeXegqzFQbpuqgmQqbfobSZBmfABJj1Ow9TVKEVeCjNLTlvjghG2uZWqwJb+ePCkiCdKMZRI28tf7p5x2uI6azM6S+vlE9L+u66g9q6qEH8l3lr8PjY8iHo0hEOnObokAplek/Wpg68hyQWEeoBygGcsccPZyCwDg0c3qjYZPN+7jzdOLm9qOnbqDw1fOK5m/5CQMAF8Xfim5qBuwWgv//7/LM7lcEGwyz50kQZoRigD/7BwAoLZxf77td+pz/tiN7WvISU4h/tk503lEEHJAsYu5sb3uwCFuX6t5RCAJkqC/rx39fe1K5pKKgFdX1Vx8u3O8YB06rr0VnkPKAc3NZ2SGuZ6Gjh7hMVIO8HszMsMIDpQDNEMO0IyUBK1nvKrtcAW1EmOkHJBZ+y4zjOBAEqQZcoBmpCTIu2uPajuqFooAzUhFQOzlQ9V2uILX49PCY6QcIHMhgg9JkGbIAZohB2hGKgcwfi4vqrKjZHYHw/njlelJAEB9aydWpidR39qptV0GWw5gvLh1TsU0lpy49KDs19ABSZBmlEQAo0nxA/JMFbzzowjQDDlAM0olqBokwwz2mcq9EbEvI5Q64Mn7BdtznD6yV4ElziO68AylDtiui6cTygGaURIBbn1IcgKlEuQ0xlcAosfXn90GkNNuO/PYeQ0BFHGAcWfMty9LnB5bin+UxOBwLwAgMTAmPJZvhziJATXzmBEKHSypn5YIkFl4p1l6nrtJQifHpM4B650xDGkHTD3ulR1akbT16LkptjggmUpzq6Q07AsBAO4OuPPT9OQI/4YqbC92ztYJnO+XeaUKTCNgajC3Q9Jsv/DqutlId/Bx1d45g62jGb70/IQnEOnOxqOxknbLXxjOPfGlF53/Z4wZgXC4eKcKIh6NAbColsKjsPZBTdB875TjbOPtClwHMK2iillqsKqYVTQCimkYYQ8fsFFEjlVyospZ5cGo/azNMgKsQodQA70N1Qz3ZQ5Vzi0PVDm3AvkHxltDbP0Z7EYAAAAASUVORK5CYII=';
+  frontImg.onload=()=>{const g=front.getContext('2d');g.clearRect(0,0,TW,TH);g.drawImage(frontImg,0,0,TW,TH);};
+  backImg.onload=()=>{const g=back.getContext('2d');g.clearRect(0,0,TW,TH);g.drawImage(backImg,0,0,TW,TH);};
+  const period=2000, spinPeriod= (1000/0.375)*2 / 1.15; // 1.15x rotation speed
   const epoch=performance.now();
   function draw(now) {
     const t=now-epoch;
@@ -6544,11 +6514,14 @@ accessKey.innerHTML = '<canvas id="accessKeyCanvas" width="108" height="116" ari
       const yt2=yOf(x+1,0),yb2=yOf(x+1,TH);
       ctx.save();
       ctx.beginPath();ctx.moveTo(xa,yt);ctx.lineTo(xb,yt2);ctx.lineTo(xb,yb2);ctx.lineTo(xa,yb);ctx.closePath();ctx.clip();
-      // map 1px texture strip onto its projected quadrilateral
-      // Draw nearest-neighbor pixel columns inside the projected silhouette.
-      const l=Math.min(xa,xb)-1,r=Math.max(xa,xb)+1;
-      const top=Math.min(yt,yt2,yb,yb2)-1, bottom=Math.max(yt,yt2,yb,yb2)+1;
-      if(r>l)ctx.drawImage(tex,x,0,1,TH,l,top,r-l,bottom-top);
+      // Exact source pixels, mapped along the projected card column.
+      // Transform each strip instead of stretching its bounding rectangle.
+      const dx=xb-xa, dy=yt2-yt;
+      // Near edge-on, keep the texture from collapsing to a disappearing pixel.
+      if(Math.abs(dx)>0.0001) {
+        ctx.setTransform(dx,dy,0,(yb-yt)/TH,xa,yt);
+        ctx.drawImage(tex,x,0,1,TH,0,0,1,TH);
+      }
       ctx.restore();
     }
     ctx.strokeStyle='#b6edff';ctx.lineWidth=1;
