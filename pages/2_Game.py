@@ -6499,19 +6499,34 @@ accessKey.innerHTML = '<canvas id="accessKeyCanvas" width="108" height="116" ari
     const texCtx=tex.getContext('2d',{willReadFrequently:true});
     const pixels=texCtx.getImageData(0,0,TW,TH).data;
     const faceWidth=Math.max(Math.abs(c)*TW*scale,0.7);
-    // Offset edge behind the face; only visible around its silhouette.
-    const sideOffset=si*depth*scale;
-    ctx.fillStyle='#163d78';
+    // Keep perspective bounded near edge-on angles; no oversized quadrilateral.
     const left=baseX-faceWidth/2, right=baseX+faceWidth/2;
-    const tilt=(x)=>-(x-baseX)*si*.19/(Math.abs(c)*scale+0.0001);
+    const tilt=(x)=>-(x-baseX)*si*.14;
     const topAt=(x)=>baseY-TH*scale/2+tilt(x);
     const bottomAt=(x)=>topAt(x)+TH*scale;
-    ctx.beginPath();
-    ctx.moveTo(left+sideOffset,topAt(left)-depth*.19);
-    ctx.lineTo(right+sideOffset,topAt(right)-depth*.19);
-    ctx.lineTo(right+sideOffset,bottomAt(right)-depth*.19);
-    ctx.lineTo(left+sideOffset,bottomAt(left)-depth*.19);
-    ctx.closePath();ctx.fill();
+    // Draw only a narrow exposed side, following the actual rounded card
+    // silhouette. Never fill a rectangular polygon behind the texture.
+    const sideWidth=Math.min(3,Math.abs(si)*depth*scale);
+    if(sideWidth>0.25 && Math.abs(c)>0.06) {
+      const edgeX=si>0?right:left;
+      const outward=si>0?1:-1;
+      ctx.fillStyle='#173b73';
+      const edgeTop=topAt(edgeX);
+      for(let yy=0;yy<TH;yy++) {
+        const sourceRow=yy*TW*4;
+        const edgePixel=si>0?TW-1:0;
+        let sourceCol=edgePixel;
+        // Find the first opaque texel on this row at the exposed edge.
+        while(sourceCol>=0 && sourceCol<TW && pixels[sourceRow+sourceCol*4+3]<128) {
+          sourceCol-=outward;
+        }
+        if(sourceCol<0||sourceCol>=TW)continue;
+        const edgeInset=(si>0?TW-1-sourceCol:sourceCol)*Math.abs(c)*scale;
+        const x=edgeX-outward*edgeInset;
+        const y=edgeTop+yy*scale;
+        ctx.fillRect(Math.round(x+(outward>0?0:-sideWidth)),Math.round(y),Math.ceil(sideWidth),Math.ceil(scale)+1);
+      }
+    }
     // Render the complete textured face into one pixel buffer. Every output
     // pixel has exactly one source sample, so no seams or overdraw can occur.
     const frame=ctx.createImageData(108,116);
