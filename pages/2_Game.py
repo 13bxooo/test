@@ -5106,7 +5106,35 @@ function playCardAcquireSound() {
 /* =====================================================
    INTERACTION
    ===================================================== */
+let stage01TransitionStarted = false;
 
+function startStage01Transition() {
+    if (stage01TransitionStarted) return;
+
+    stage01TransitionStarted = true;
+    clearKeys();
+
+    const transition = document.createElement("div");
+    transition.className = "tutorial-transition show";
+    transition.setAttribute("aria-hidden", "true");
+
+    transition.innerHTML = `
+        <div class="tutorial-transition-card">
+            <div class="tutorial-transition-stage">STAGE 01</div>
+            <div class="tutorial-transition-room">:ARCHIVE ACCESS</div>
+        </div>
+    `;
+
+    root.appendChild(transition);
+
+    window.setTimeout(function () {
+        transition.classList.add("hide");
+    }, 2700);
+
+    window.setTimeout(function () {
+        parentAction("stage01");
+    }, 3150);
+}
 function interact() {
 
     if (
@@ -5335,19 +5363,18 @@ function interact() {
         }
 
 
-        if (
-            !keyCollected
-        ) {
-
-            inaccessible();
-
+        if (cardConsumed) {
+            startStage01Transition();
             return;
-
         }
 
+        if (!keyCollected) {
+            inaccessible();
+            return;
+        }
 
         openCardAccess();
-
+        return;
     }
 
 }
@@ -5889,6 +5916,7 @@ function startStage01Transition() {
         parentAction("stage01");
     }, 3150);
 }
+
 function openCardAccess() {
 
     if (cardConsumed) {
@@ -6207,65 +6235,10 @@ function finishCardDrag(
             typingDone = true;
             echoNext.classList.add("ready");
 
-            checkInteraction();
-        }, 850);
+            status.textContent =
+                "SECURITY ROOM // EXIT UNLOCKED";
 
-        // 짧은 문 개방 효과음(Web Audio, 별도 파일 불필요)
-        try {
-            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-            if (AudioContextClass) {
-                const audio = new AudioContextClass();
-                const now = audio.currentTime;
-                [440, 660, 880].forEach((frequency, index) => {
-                    const oscillator = audio.createOscillator();
-                    const gain = audio.createGain();
-                    oscillator.type = "square";
-                    oscillator.frequency.value = frequency;
-                    gain.gain.setValueAtTime(0.0001, now + index * 0.12);
-                    gain.gain.exponentialRampToValueAtTime(0.08, now + index * 0.12 + 0.02);
-                    gain.gain.exponentialRampToValueAtTime(0.0001, now + index * 0.12 + 0.18);
-                    oscillator.connect(gain);
-                    gain.connect(audio.destination);
-                    oscillator.start(now + index * 0.12);
-                    oscillator.stop(now + index * 0.12 + 0.2);
-                });
-                setTimeout(() => audio.close(), 900);
-            }
-        } catch (error) {}
-
-        setTimeout(function () {
-            closeCardAccess();
-            clearTimeout(typingTimer);
-            echoMessage.textContent = "이제 다음 스테이지로 넘어가도록 합시다.";
-            typingDone = true;
-            echoNext.classList.add("ready");
-            setTimeout(function () {
-                const fadeMessage = document.getElementById("fadeMessage");
-                if (fadeMessage) fadeMessage.innerHTML = '<span class="fade-stage">STAGE 01</span><span class="fade-room">:ARCHIVE ACCESS</span>';
-                if (fadeScreen) fadeScreen.classList.add("active");
-                // Leave the black screen and flickering stage sign visible for 3 seconds.
-                setTimeout(function () {
-                    parentAction("stage01");
-                    // Sandboxed iframe may prohibit timer-initiated top navigation.
-                    // Always provide a direct user-click fallback on the fade screen.
-                    const next = document.createElement("a");
-                    next.href = "?action=stage01";
-                    next.target = "_top";
-                    next.textContent = "CONTINUE  ▶  STAGE 01";
-                    next.style.cssText = "position:absolute;left:50%;top:65%;transform:translateX(-50%);z-index:999999;color:#8defff;background:#020b13;border:1px solid #54dfff;padding:14px 24px;font:18px monospace;text-decoration:none;cursor:pointer;";
-                    next.onclick = function(e) {
-                        e.preventDefault();
-                        try {
-                            const u = new URL(window.parent.location.href);
-                            u.searchParams.set("action","stage01");
-                            window.parent.location.assign(u.toString());
-                        } catch(err) {
-                            window.open("?action=stage01","_top");
-                        }
-                    };
-                    document.body.appendChild(next);
-                }, 3000);
-            }, 1000);
+            root.focus();
         }, 700);
 
     }
