@@ -3733,7 +3733,7 @@ button,.game button,.code-button,.help-key{border-radius:0!important}
      PAUSE
      ===================================================== -->
 
-<div class="item-acquired-notice" id="itemAcquiredNotice" role="button" tabindex="0" aria-label="아이템 획득 알림을 닫으려면 클릭"><div class="item-acquired-art"><img class="access-card-image" src="__GAME_IMAGE_38376344af10__" alt="Access card"></div><div class="item-acquired-dialog"><div class="item-acquired-tag">ECHO</div><div class="item-acquired-text">카드가 인벤토리에 추가되었습니다.
+<div class="item-acquired-notice" id="itemAcquiredNotice" role="button" tabindex="0" aria-label="아이템 획득 알림을 닫으려면 클릭"><div class="item-acquired-art"><img class="access-card-image" src="__EXTERNAL_CARD_PNG__" alt="Access card"></div><div class="item-acquired-dialog"><div class="item-acquired-tag">ECHO</div><div class="item-acquired-text">카드가 인벤토리에 추가되었습니다.
 이 카드는 특정 장비를 작동시키거나 인증할 때 사용됩니다.</div><div class="item-acquired-close">CLICK TO CLOSE</div></div></div>
 <div class="tutorial-transition" id="tutorialTransition" aria-hidden="true"><div class="tutorial-transition-card"><div class="tutorial-transition-stage">STAGE 00</div><div class="tutorial-transition-room">:TUTORIAL</div></div></div>
 <div class="pause-overlay" id="pauseOverlay"><div class="pause-menu-panel"><div class="pause-actions"><div class="pause-row"><span class="pause-icon">Ⅱ</span><button class="pause-nav-link pause-menu-button" id="resumeButton" type="button">RESUME</button></div><div class="pause-row"><span class="pause-icon">↻</span><a class="pause-nav-link" id="restartButton" href="?action=restart" target="_top" rel="noopener">RESTART</a></div><div class="pause-row"><span class="pause-icon">⌂</span><a class="pause-nav-link" id="titleButton" href="?action=title" target="_top" rel="noopener">TITLE</a></div></div></div></div>
@@ -4087,7 +4087,7 @@ function renderInventory() {
                 slot.innerHTML =
                     `
                     <div class="slot-number">${String(index + 1).padStart(2, "0")}</div>
-                    ${item.name === "ACCESS KEY" ? '<img class="access-card-image inventory-card-image" src="__GAME_IMAGE_38376344af10__" alt="Access card">' : '<div class="item-name">' + item.name + '</div>'}
+                    ${item.name === "ACCESS KEY" ? '<img class="access-card-image inventory-card-image" src="__EXTERNAL_CARD_PNG__" alt="Access card">' : '<div class="item-name">' + item.name + '</div>'}
                     `;
 
             }
@@ -6338,6 +6338,36 @@ for _image_placeholder, _image_filename in _GAME_ASSET_FILES.items():
     _mime = "jpeg" if _suffix in (".jpg", ".jpeg") else _suffix.lstrip(".")
     _uri = "data:image/" + _mime + ";base64," + base64.b64encode(_path.read_bytes()).decode("ascii")
     html = html.replace(_image_placeholder, _uri)
+
+# External PNGs kept in the project's root assets/ folder.
+# Streamlit's HTML component needs data URIs because it runs in an iframe.
+_EXTERNAL_PNG_DIR = Path(__file__).resolve().parent.parent / "assets"
+def _external_png_uri(filename):
+    file_path = _EXTERNAL_PNG_DIR / filename
+    if not file_path.is_file():
+        st.error("필수 이미지 파일이 없습니다: assets/" + filename)
+        st.stop()
+    return "data:image/png;base64," + base64.b64encode(file_path.read_bytes()).decode("ascii")
+
+_card_uri = _external_png_uri("card_front.png")
+_computer_uri = _external_png_uri("computer_transparent.png")
+_desk_uri = _external_png_uri("desk_transparent.png")
+_door_uri = _external_png_uri("door_closed.png")
+html = html.replace("__EXTERNAL_CARD_PNG__", _card_uri)
+# Override earlier object background image rules with the external files.
+_external_png_css = """<style id="external-png-assets-final">
+.room .object.computer {background-image:url('__COMPUTER_PNG__') !important;}
+.room .object.desk {background-image:url('__DESK_PNG__') !important;}
+/* Static door: no slide animation; leave original frame artwork in place. */
+.room #securityDoorLayer,.room #pixelInsetDoor,.room #doorExactSvg {display:none!important;}
+.room .placed-exit,.room .placed-exit-open {display:none!important;}
+.room::after {content:"";position:absolute;left:89.5%;top:31%;width:8%;height:28%;background:url('__DOOR_PNG__') center / contain no-repeat;pointer-events:none;z-index:9;image-rendering:pixelated;}
+.room.security-door-opening::after,.room.security-door-open::after {transform:none!important;opacity:1!important;}
+</style>"""
+_external_png_css = (_external_png_css.replace("__COMPUTER_PNG__", _computer_uri)
+                     .replace("__DESK_PNG__", _desk_uri)
+                     .replace("__DOOR_PNG__", _door_uri))
+html = html.replace("</head>", _external_png_css + "</head>", 1)
 
 components.html(
     html,
