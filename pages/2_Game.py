@@ -3793,7 +3793,7 @@ button,.game button,.code-button,.help-key{border-radius:0!important}
      PAUSE
      ===================================================== -->
 
-<div class="item-acquired-notice" id="itemAcquiredNotice" role="button" tabindex="0" aria-label="아이템 획득 알림을 닫으려면 클릭"><div class="item-acquired-art"><img class="access-card-image" src="__SWIPE_IMAGE_38376344af10__" alt="Access card"></div><div class="item-acquired-dialog"><div class="item-acquired-tag">ECHO</div><div class="item-acquired-text">카드가 인벤토리에 추가되었습니다.
+<div class="item-acquired-notice" id="itemAcquiredNotice" role="button" tabindex="0" aria-label="아이템 획득 알림을 닫으려면 클릭"><div class="item-acquired-art"><img class="access-card-image" src="__SWIPE_IMAGE_795a41e9c430__" alt="Access card"></div><div class="item-acquired-dialog"><div class="item-acquired-tag">ECHO</div><div class="item-acquired-text">카드가 인벤토리에 추가되었습니다.
 이 카드는 특정 장비를 작동시키거나 인증할 때 사용됩니다.</div><div class="item-acquired-close">CLICK TO CLOSE</div></div></div>
 <div class="tutorial-transition" id="tutorialTransition" aria-hidden="true"><div class="tutorial-transition-card"><div class="tutorial-transition-stage">STAGE 00</div><div class="tutorial-transition-room">:TUTORIAL</div></div></div>
 <div class="pause-overlay" id="pauseOverlay"><div class="pause-menu-panel"><div class="pause-actions"><div class="pause-row"><span class="pause-icon">Ⅱ</span><button class="pause-nav-link pause-menu-button" id="resumeButton" type="button">RESUME</button></div><div class="pause-row"><span class="pause-icon">↻</span><a class="pause-nav-link" id="restartButton" href="?action=restart" target="_top" rel="noopener">RESTART</a></div><div class="pause-row"><span class="pause-icon">⌂</span><a class="pause-nav-link" id="titleButton" href="?action=title" target="_top" rel="noopener">TITLE</a></div></div></div></div>
@@ -4144,7 +4144,7 @@ function renderInventory() {
                 slot.innerHTML =
                     `
                     <div class="slot-number">${String(index + 1).padStart(2, "0")}</div>
-                    ${item.name === "ACCESS KEY" ? '<img class="access-card-image inventory-card-image" src="__SWIPE_IMAGE_38376344af10__" alt="Access card">' : '<div class="item-name">' + item.name + '</div>'}
+                    ${item.name === "ACCESS KEY" ? '<img class="access-card-image inventory-card-image" src="__SWIPE_IMAGE_795a41e9c430__" alt="Access card">' : '<div class="item-name">' + item.name + '</div>'}
                     `;
 
             }
@@ -5335,14 +5335,14 @@ function interact() {
         }
 
 
-        if (
-            !keyCollected
-        ) {
-
-            inaccessible();
-
+        if (cardConsumed) {
+            startStage01Transition();
             return;
+        }
 
+        if (!keyCollected) {
+            inaccessible();
+            return;
         }
 
 
@@ -5859,6 +5859,36 @@ document
 /* =====================================================
    CARD ACCESS
    ===================================================== */
+let stage01TransitionStarted = false;
+
+function startStage01Transition() {
+    if (stage01TransitionStarted) return;
+
+    stage01TransitionStarted = true;
+    clearKeys();
+
+    const transition = document.createElement("div");
+
+    transition.className = "tutorial-transition show";
+    transition.setAttribute("aria-hidden", "true");
+
+    transition.innerHTML = `
+        <div class="tutorial-transition-card">
+            <div class="tutorial-transition-stage">STAGE 01</div>
+            <div class="tutorial-transition-room">:ARCHIVE ACCESS</div>
+        </div>
+    `;
+
+    root.appendChild(transition);
+
+    window.setTimeout(function () {
+        transition.classList.add("hide");
+    }, 2700);
+
+    window.setTimeout(function () {
+        parentAction("stage01");
+    }, 3150);
+}
 
 function openCardAccess() {
 
@@ -6164,75 +6194,24 @@ function finishCardDrag(
         renderInventory();
         if (readerLight) readerLight.classList.add("green");
         cardStatus.textContent = "ACCESS GRANTED // CARD CONSUMED";
-        // Animate the existing angled door in the right wall after the card is accepted.
-        const gameRoom = document.querySelector(".room");
-        if (gameRoom) {
-            gameRoom.classList.remove("door-animating","door-finished");
-            void gameRoom.offsetWidth;
-            gameRoom.classList.add("door-animating");
-            window.setTimeout(() => {
-                gameRoom.classList.remove("door-animating");
-                gameRoom.classList.add("door-finished");
-            }, 740);
-        }
-
-        // 짧은 문 개방 효과음(Web Audio, 별도 파일 불필요)
-        try {
-            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-            if (AudioContextClass) {
-                const audio = new AudioContextClass();
-                const now = audio.currentTime;
-                [440, 660, 880].forEach((frequency, index) => {
-                    const oscillator = audio.createOscillator();
-                    const gain = audio.createGain();
-                    oscillator.type = "square";
-                    oscillator.frequency.value = frequency;
-                    gain.gain.setValueAtTime(0.0001, now + index * 0.12);
-                    gain.gain.exponentialRampToValueAtTime(0.08, now + index * 0.12 + 0.02);
-                    gain.gain.exponentialRampToValueAtTime(0.0001, now + index * 0.12 + 0.18);
-                    oscillator.connect(gain);
-                    gain.connect(audio.destination);
-                    oscillator.start(now + index * 0.12);
-                    oscillator.stop(now + index * 0.12 + 0.2);
-                });
-                setTimeout(() => audio.close(), 900);
-            }
-        } catch (error) {}
+        
+        // 인증 완료 후 출입구에서 E키를 눌러 이동한다.
+        cardStatus.textContent =
+             "ACCESS GRANTED // 출입구에서 E키를 누르십시오.";
 
         setTimeout(function () {
             closeCardAccess();
+
             clearTimeout(typingTimer);
-            echoMessage.textContent = "이제 다음 스테이지로 넘어가도록 합시다.";
+
+            echoMessage.textContent =
+                "보안 인증이 완료되었습니다. 출입구에서 E키를 눌러 다음 구역으로 이동하십시오.";
+
             typingDone = true;
             echoNext.classList.add("ready");
-            setTimeout(function () {
-                const fadeMessage = document.getElementById("fadeMessage");
-                if (fadeMessage) fadeMessage.innerHTML = '<span class="fade-stage">STAGE 01</span><span class="fade-room">:ARCHIVE ACCESS</span>';
-                if (fadeScreen) fadeScreen.classList.add("active");
-                // Leave the black screen and flickering stage sign visible for 3 seconds.
-                setTimeout(function () {
-                    parentAction("stage01");
-                    // Sandboxed iframe may prohibit timer-initiated top navigation.
-                    // Always provide a direct user-click fallback on the fade screen.
-                    const next = document.createElement("a");
-                    next.href = "?action=stage01";
-                    next.target = "_top";
-                    next.textContent = "CONTINUE  ▶  STAGE 01";
-                    next.style.cssText = "position:absolute;left:50%;top:65%;transform:translateX(-50%);z-index:999999;color:#8defff;background:#020b13;border:1px solid #54dfff;padding:14px 24px;font:18px monospace;text-decoration:none;cursor:pointer;";
-                    next.onclick = function(e) {
-                        e.preventDefault();
-                        try {
-                            const u = new URL(window.parent.location.href);
-                            u.searchParams.set("action","stage01");
-                            window.parent.location.assign(u.toString());
-                        } catch(err) {
-                            window.open("?action=stage01","_top");
-                        }
-                    };
-                    document.body.appendChild(next);
-                }, 3000);
-            }, 1000);
-        }, 700);
+
+            checkInteraction();
+        }, 850);
 
     }
 
