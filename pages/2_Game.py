@@ -6491,41 +6491,53 @@ accessKey.innerHTML = '<canvas id="accessKeyCanvas" width="108" height="116" ari
         ctx.fillRect(54-half,91+yy,half*2,2);
       }
     }
-    // Perspective projection of a physical 96x60 card, thin 3px edge.
-    const c=Math.cos(yaw),si=Math.sin(yaw);
-    const baseX=54,baseY=45+bob,scale=.82,depth=3;
-    const xOf=(x,z=0)=>baseX+(x-TW/2)*c*scale+z*si*scale;
-    const yOf=(x,y,z=0)=>baseY+(y-TH/2)*scale-((x-TW/2)*si+z*c)*.19;
-    // The back is visible only during the rear-facing half-turn.
+    // Draw the card as a single nearest-neighbor raster, not 96 overlapping
+    // canvas transforms. This removes seams, gray blending and stray lines.
+    const c=Math.cos(yaw), si=Math.sin(yaw);
+    const baseX=54,baseY=45+bob,scale=.82,depth=2.5;
     const tex=c>=0?front:back;
-    const edgeX=c>=0?depth:-depth;
-    ctx.fillStyle='#174278';
+    const texCtx=tex.getContext('2d',{willReadFrequently:true});
+    const pixels=texCtx.getImageData(0,0,TW,TH).data;
+    const faceWidth=Math.max(Math.abs(c)*TW*scale,0.7);
+    // Offset edge behind the face; only visible around its silhouette.
+    const sideOffset=si*depth*scale;
+    ctx.fillStyle='#163d78';
+    const left=baseX-faceWidth/2, right=baseX+faceWidth/2;
+    const tilt=(x)=>-(x-baseX)*si*.19/(Math.abs(c)*scale+0.0001);
+    const topAt=(x)=>baseY-TH*scale/2+tilt(x);
+    const bottomAt=(x)=>topAt(x)+TH*scale;
     ctx.beginPath();
-    [[2,2],[TW-2,2],[TW-2,TH-2],[2,TH-2]].forEach(([x,y],i)=>{
-      const xx=xOf(x,edgeX),yy=yOf(x,y,edgeX);
-      i?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy);
-    });
+    ctx.moveTo(left+sideOffset,topAt(left)-depth*.19);
+    ctx.lineTo(right+sideOffset,topAt(right)-depth*.19);
+    ctx.lineTo(right+sideOffset,bottomAt(right)-depth*.19);
+    ctx.lineTo(left+sideOffset,bottomAt(left)-depth*.19);
     ctx.closePath();ctx.fill();
-    // Per-pixel-column projection, with affine mapping along the card's top/bottom edges.
-    // This avoids stretched black corners and never imports a rectangular screenshot.
-    for(let x=0;x<TW;x++) {
-      const xa=xOf(x),xb=xOf(x+1);
-      const yt=yOf(x,0),yb=yOf(x,TH);
-      const yt2=yOf(x+1,0),yb2=yOf(x+1,TH);
-      ctx.save();
-      ctx.beginPath();ctx.moveTo(xa,yt);ctx.lineTo(xb,yt2);ctx.lineTo(xb,yb2);ctx.lineTo(xa,yb);ctx.closePath();ctx.clip();
-      // Exact source pixels, mapped along the projected card column.
-      // Transform each strip instead of stretching its bounding rectangle.
-      const dx=xb-xa, dy=yt2-yt;
-      // Near edge-on, keep the texture from collapsing to a disappearing pixel.
-      if(Math.abs(dx)>0.0001) {
-        ctx.setTransform(dx,dy,0,(yb-yt)/TH,xa,yt);
-        ctx.drawImage(tex,x,0,1,TH,0,0,1,TH);
+    // Render the complete textured face into one pixel buffer. Every output
+    // pixel has exactly one source sample, so no seams or overdraw can occur.
+    const frame=ctx.createImageData(108,116);
+    const dst=frame.data;
+    for(let py=0;py<116;py++) {
+      for(let px=Math.max(0,Math.floor(left)-1);px<Math.min(108,Math.ceil(right)+1);px++) {
+        if(px<left||px>=right) continue;
+        const u=(px+.5-left)/faceWidth;
+        const sourceX=c>=0?Math.floor(u*TW):TW-1-Math.floor(u*TW);
+        const xSrc=Math.max(0,Math.min(TW-1,sourceX));
+        const top=topAt(px+.5);
+        const v=(py+.5-top)/(TH*scale);
+        if(v<0||v>=1)continue;
+        const ySrc=Math.max(0,Math.min(TH-1,Math.floor(v*TH)));
+        const src=(ySrc*TW+xSrc)*4, out=(py*108+px)*4;
+        if(pixels[src+3]<128)continue;
+        dst[out]=pixels[src];dst[out+1]=pixels[src+1];
+        dst[out+2]=pixels[src+2];dst[out+3]=pixels[src+3];
       }
-      ctx.restore();
     }
-    ctx.strokeStyle='#b6edff';ctx.lineWidth=1;
-    ctx.beginPath();ctx.moveTo(xOf(3),yOf(3,3));ctx.lineTo(xOf(TW-3),yOf(TW-3,3,3));ctx.stroke();
+    // A transparent intermediary preserves the already-rendered shadow.
+    if(!draw._faceCanvas){draw._faceCanvas=document.createElement('canvas');draw._faceCanvas.width=108;draw._faceCanvas.height=116;}
+    const faceCtx=draw._faceCanvas.getContext('2d');
+    faceCtx.putImageData(frame,0,0);
+    ctx.drawImage(draw._faceCanvas,0,0);
+    // No extra stroke: the pixel texture already contains its own border.
     requestAnimationFrame(draw);
   }
   requestAnimationFrame(draw);
