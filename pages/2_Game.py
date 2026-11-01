@@ -267,16 +267,16 @@ footer {{
 }}
 
 /* 2026-11 card reader: reference-inspired horizontal swipe device */
-.card-stage {height:330px!important;background:#202428!important;border:2px solid #55626b!important;}
-.card-stage .reader {left:8%!important;right:auto!important;top:12px!important;transform:none!important;width:84%!important;height:152px!important;box-sizing:border-box!important;border:5px solid #828b90!important;border-radius:10px!important;background:linear-gradient(180deg,#a8adae,#747b80)!important;box-shadow:inset 0 0 0 3px #242c32,0 5px 0 #151719!important;color:transparent!important;font-size:0!important;display:block!important;}
-.card-stage .reader::after {content:"카드를 긁어주세요.";position:absolute;left:6%;top:9px;width:80%;height:35px;box-sizing:border-box;padding:6px 9px;background:#164b3c;border:3px solid #14211f;color:#b9efe0;font:17px 'NeoDungGeunMo',monospace;}
-.card-stage .reader-slot {left:5%!important;right:18%!important;top:80px!important;height:10px!important;background:#080d0f!important;border-radius:8px!important;box-shadow:inset 0 2px 3px #000!important;}
-.card-stage .reader::before {content:"";position:absolute;right:48px;bottom:12px;width:22px;height:22px;border-radius:50%;background:#a3131d;border:3px solid #161616;box-shadow:inset 2px 2px 3px #e66;}
-.card-stage .reader-light {top:auto!important;right:12px!important;bottom:12px!important;width:22px!important;height:22px!important;border:3px solid #161616!important;background:#17513d!important;box-shadow:none!important;}
-.card-stage .reader-light.green {background:#19e88b!important;box-shadow:0 0 12px #19e88b!important;}
-.card-stage #dragCard {top:205px;width:130px!important;height:86px!important;box-sizing:border-box!important;background-image:url("__CARD_BLUE__")!important;background-position:center!important;background-size:contain!important;background-repeat:no-repeat!important;background-color:transparent!important;border:none!important;color:transparent!important;font-size:0!important;padding:0!important;}
-.card-stage #dragCard .card-chip,.card-stage #dragCard span {display:none!important;}
-.card-stage .card-arrow {display:none!important;}
+.card-stage {{height:330px!important;background:#202428!important;border:2px solid #55626b!important;}}
+.card-stage .reader {{left:8%!important;right:auto!important;top:12px!important;transform:none!important;width:84%!important;height:152px!important;box-sizing:border-box!important;border:5px solid #828b90!important;border-radius:10px!important;background:linear-gradient(180deg,#a8adae,#747b80)!important;box-shadow:inset 0 0 0 3px #242c32,0 5px 0 #151719!important;color:transparent!important;font-size:0!important;display:block!important;}}
+.card-stage .reader::after {{content:"카드를 긁어주세요.";position:absolute;left:6%;top:9px;width:80%;height:35px;box-sizing:border-box;padding:6px 9px;background:#164b3c;border:3px solid #14211f;color:#b9efe0;font:17px 'NeoDungGeunMo',monospace;}}
+.card-stage .reader-slot {{left:5%!important;right:18%!important;top:80px!important;height:10px!important;background:#080d0f!important;border-radius:8px!important;box-shadow:inset 0 2px 3px #000!important;}}
+.card-stage .reader::before {{content:"";position:absolute;right:48px;bottom:12px;width:22px;height:22px;border-radius:50%;background:#a3131d;border:3px solid #161616;box-shadow:inset 2px 2px 3px #e66;}}
+.card-stage .reader-light {{top:auto!important;right:12px!important;bottom:12px!important;width:22px!important;height:22px!important;border:3px solid #161616!important;background:#17513d!important;box-shadow:none!important;}}
+.card-stage .reader-light.green {{background:#19e88b!important;box-shadow:0 0 12px #19e88b!important;}}
+.card-stage #dragCard {{top:205px;width:130px!important;height:86px!important;box-sizing:border-box!important;background-image:url("__CARD_BLUE__")!important;background-position:center!important;background-size:contain!important;background-repeat:no-repeat!important;background-color:transparent!important;border:none!important;color:transparent!important;font-size:0!important;padding:0!important;}}
+.card-stage #dragCard .card-chip,.card-stage #dragCard span {{display:none!important;}}
+.card-stage .card-arrow {{display:none!important;}}
 </style>
 """,
     unsafe_allow_html=True,
