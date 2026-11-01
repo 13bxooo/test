@@ -5903,7 +5903,7 @@ function unlockSecurityDoor() {
     cardStatus.textContent="인증 성공 // 보안문 개방";
     room.classList.add("security-door-opening");
     document.querySelectorAll(".placed-exit,.placed-exit-open").forEach(el=>el.classList.add("door-opening"));
-    window.setTimeout(()=>{room.classList.remove("security-door-opening");room.classList.add("security-door-open");document.querySelectorAll(".placed-exit,.placed-exit-open").forEach(el=>{el.classList.remove("door-opening");el.classList.add("door-open");});},1050);
+    window.setTimeout(()=>{room.classList.remove("security-door-opening");room.classList.add("security-door-open");document.querySelectorAll(".placed-exit,.placed-exit-open").forEach(el=>{el.classList.remove("door-opening");el.classList.add("door-open");});},1800);
     saveTutorialState();
     window.setTimeout(()=>{
         closeCardAccess();
@@ -6289,6 +6289,20 @@ _door_css = """
 .room .placed-exit,.room .placed-exit-open {display:none !important;}
 """.replace('__SPRITE__',_door_sprite_uri)
 html = html.replace('</head>', '<style id="door-approved-image-animation">'+_door_css+'</style></head>', 1)
+
+# Final override: preserve the original frame and animate both leaves gradually.
+_smooth_door_css = """
+.room .placed-exit,.room .placed-exit-open {display:block !important;}
+.room #securityDoorLayer .security-door-half {
+  transition:transform 1.8s cubic-bezier(.42,0,.22,1) !important;
+  will-change:transform;
+}
+.room.security-door-opening #securityDoorLayer .security-door-left,
+.room.security-door-open #securityDoorLayer .security-door-left {transform:translateX(-105%) !important;}
+.room.security-door-opening #securityDoorLayer .security-door-right,
+.room.security-door-open #securityDoorLayer .security-door-right {transform:translateX(105%) !important;}
+"""
+html = html.replace('</head>', '<style id="door-smooth-final">'+_smooth_door_css+'</style></head>', 1)
 
 components.html(
     html,
