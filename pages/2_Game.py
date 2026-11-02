@@ -5107,34 +5107,6 @@ function playCardAcquireSound() {
 /* =====================================================
    INTERACTION
    ===================================================== */
-
-function startStage01Transition() {
-    if (stage01TransitionStarted) return;
-
-    stage01TransitionStarted = true;
-    clearKeys();
-
-    const transition = document.createElement("div");
-    transition.className = "tutorial-transition show";
-    transition.setAttribute("aria-hidden", "true");
-
-    transition.innerHTML = `
-        <div class="tutorial-transition-card">
-            <div class="tutorial-transition-stage">STAGE 01</div>
-            <div class="tutorial-transition-room">:ARCHIVE ACCESS</div>
-        </div>
-    `;
-
-    root.appendChild(transition);
-
-    window.setTimeout(function () {
-        transition.classList.add("hide");
-    }, 2700);
-
-    window.setTimeout(function () {
-        parentAction("stage01");
-    }, 3150);
-}
 function interact() {
 
     if (
@@ -5887,34 +5859,11 @@ document
    CARD ACCESS
    ===================================================== */
 let stage01TransitionStarted = false;
-
 function startStage01Transition() {
     if (stage01TransitionStarted) return;
-
     stage01TransitionStarted = true;
     clearKeys();
-
-    const transition = document.createElement("div");
-
-    transition.className = "tutorial-transition show";
-    transition.setAttribute("aria-hidden", "true");
-
-    transition.innerHTML = `
-        <div class="tutorial-transition-card">
-            <div class="tutorial-transition-stage">STAGE 01</div>
-            <div class="tutorial-transition-room">:ARCHIVE ACCESS</div>
-        </div>
-    `;
-
-    root.appendChild(transition);
-
-    window.setTimeout(function () {
-        transition.classList.add("hide");
-    }, 2700);
-
-    window.setTimeout(function () {
-        parentAction("stage01");
-    }, 3150);
+    parentAction("stage01");
 }
 
 function openCardAccess() {
