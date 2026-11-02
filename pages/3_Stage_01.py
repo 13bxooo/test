@@ -63,6 +63,19 @@ if not style_match:
     st.stop()
 tutorial_css = style_match.group(1).replace("__FONT_BASE64__", font_data)
 
+STAGE_ASSETS = project_root / "assets" / "stage01"
+SPRITE_NAMES = ["door_locked","door_unlocked","console","servers","archive_shelf",
+                "containment","desk","terminal","lockers","crates","notice_board","science_board"]
+missing = [name for name in SPRITE_NAMES if not (STAGE_ASSETS / (name + ".png")).is_file()]
+if missing:
+    st.error("STAGE 01 PNG 누락: " + ", ".join(missing))
+    st.stop()
+sprite_urls = {
+    name: "data:image/png;base64," + base64.b64encode((STAGE_ASSETS / (name + ".png")).read_bytes()).decode("ascii")
+    for name in SPRITE_NAMES
+}
+
+
 st.markdown(
     """
     <style>
@@ -203,11 +216,38 @@ __TUTORIAL_CSS__
 .stage01-object{background:#07121e!important;border:2px solid #29c6e3!important;box-shadow:0 0 10px #00dfff1b!important;z-index:2}
 .stage01-object .main-label{color:#a9f4ff!important}
 .stage01-object .sub-label{color:#7bacc0!important}
+
+/* STAGE 01 pixel sprites — consistent with tutorial theme */
+.room{background:linear-gradient(145deg,#182941,#263b55 52%,#111e32)!important;border:3px solid #397e9c!important}
+.room:before{background-image:linear-gradient(#8ab1d022 1px,transparent 1px),linear-gradient(90deg,#8ab1d022 1px,transparent 1px)!important;background-size:12.5% 12.5%!important}
+.stage01-object{background:transparent!important;border:0!important;box-shadow:none!important;animation:none!important;padding:0!important;min-width:0!important}
+.stage01-object .main-label,.stage01-object .sub-label{display:none!important}
+.stage01-object.near{filter:drop-shadow(0 0 7px #46eaff)!important}
+.stage01-object img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated;pointer-events:none}
+.stage01-a{left:10%!important;top:15%!important;width:18%!important;height:17%!important}
+.stage01-b{left:33%!important;top:13%!important;width:34%!important;height:23%!important}
+.stage01-c{left:73%!important;top:15%!important;width:17%!important;height:18%!important}
+.stage01-archive{left:12%!important;bottom:17%!important;width:23%!important;height:20%!important}
+.exit-wall{left:42%!important;top:0!important;width:16%!important;height:17%!important;background:transparent!important;border:0!important;box-shadow:none!important}
+.exit-wall:before,.exit-wall:after,.exit-sign{display:none!important}
+.exit-wall img{width:100%;height:100%;object-fit:contain;image-rendering:pixelated}
+.exit-reader-label{display:none!important}
+#exitLight{display:none!important}
+.stage01-decor{position:absolute;object-fit:contain;image-rendering:pixelated;pointer-events:none;z-index:1}
+.stage01-object,.exit-wall{z-index:4!important}
+.player{z-index:6!important}
+.pause-overlay>div{width:min(390px,86vw)!important;padding:34px!important;background:#02070c!important;border:1px solid #54dfff!important;box-shadow:0 0 0 1px #123c4d,0 0 18px #00cfff22!important}
+.pause-actions{display:flex!important;flex-direction:column!important;gap:12px!important}
+.pause-row{display:flex;align-items:center;gap:12px}
+.pause-icon{width:30px;color:#54dfff;text-align:center;font-size:22px}
+.pause-nav-link{flex:1;display:flex;justify-content:center;align-items:center;min-height:44px;background:#fff!important;color:#000!important;border:1px solid #fff!important;text-decoration:none;font-family:NeoDungGeunMo,monospace;cursor:pointer}
+.pause-nav-link:hover{background:#28dfff!important;color:#000!important}
+#timeoutPanel{display:none}
 </style></head><body>
 <div class="game" id="gameRoot" tabindex="0">
   <div class="project-title">PROJECT : LOGIC</div>
   <div class="stage-title">STAGE 01 // ARCHIVE ACCESS</div>
-  <div class="stage01-timer" id="timer">12:00</div>
+  <div class="stage01-timer" id="timer">10:00</div>
   <button class="stage01-pause" id="pauseBtn" type="button" aria-label="Pause">Ⅱ</button>
 
   <div class="game-area" id="gameArea">
@@ -219,16 +259,22 @@ __TUTORIAL_CSS__
     </div>
 
     <div class="room" id="room">
-      <div class="room-line-horizontal"></div>
+      <img class="stage01-decor" src="__SPR_CONTAINMENT__" style="left:5%;top:48%;width:15%;height:23%">
+<img class="stage01-decor" src="__SPR_DESK__" style="left:35%;top:68%;width:31%;height:15%">
+<img class="stage01-decor" src="__SPR_LOCKERS__" style="left:79%;top:54%;width:15%;height:21%">
+<img class="stage01-decor" src="__SPR_CRATES__" style="left:77%;top:5%;width:17%;height:12%">
+<img class="stage01-decor" src="__SPR_TERMINAL__" style="left:76%;top:73%;width:11%;height:15%">
+<img class="stage01-decor" src="__SPR_SCIENCE_BOARD__" style="left:5%;top:72%;width:16%;height:13%">
+<div class="room-line-horizontal"></div>
       <div class="room-line-vertical"></div>
 
-      <div class="object stage01-object stage01-a" id="objectA" data-id="A"><span class="main-label">SECTOR A</span><span class="sub-label" id="stateA">DATA SEALED</span></div>
-      <div class="object stage01-object stage01-b" id="objectB" data-id="B"><span class="main-label">COMPUTER / B</span><span class="sub-label" id="stateB">DATA SEALED</span></div>
-      <div class="object stage01-object stage01-c" id="objectC" data-id="C"><span class="main-label">SECTOR C</span><span class="sub-label" id="stateC">DATA SEALED</span></div>
-      <div class="object stage01-object stage01-archive" id="objectArchive" data-id="ARCHIVE"><span class="main-label">ARCHIVE NOTE</span><span class="sub-label" id="stateArchive">UNREAD</span></div>
+      <div class="object stage01-object stage01-a" id="objectA" data-id="A"><img src="__SPR_SERVERS__" alt="서버 로그"><span class="sub-label" id="stateA">DATA SEALED</span></div>
+      <div class="object stage01-object stage01-b" id="objectB" data-id="B"><img src="__SPR_CONSOLE__" alt="중앙 컴퓨터"><span class="sub-label" id="stateB">DATA SEALED</span></div>
+      <div class="object stage01-object stage01-c" id="objectC" data-id="C"><img src="__SPR_ARCHIVE_SHELF__" alt="기록 보관함"><span class="sub-label" id="stateC">DATA SEALED</span></div>
+      <div class="object stage01-object stage01-archive" id="objectArchive" data-id="ARCHIVE"><img src="__SPR_NOTICE_BOARD__" alt="보관 기록"><span class="sub-label" id="stateArchive">UNREAD</span></div>
       <div class="object stage01-object stage01-panel" id="objectPanel" aria-hidden="true"><span class="reader-light" id="panelLight"></span><span class="main-label">EXIT ACCESS</span><span class="sub-label" id="statePanel">LOCKED</span></div>
 
-      <div class="exit-wall" id="exitDoor" data-id="EXIT"><span class="reader-light" id="exitLight" aria-label="Exit access indicator"></span><span class="exit-reader-label">E<br>ACCESS</span></div>
+      <div class="exit-wall" id="exitDoor" data-id="EXIT"><span class="reader-light" id="exitLight" aria-label="Exit access indicator"></span><img id="doorSprite" src="__SPR_DOOR_LOCKED__" alt="잠긴 출입구"></div>
       <div class="exit-sign"><span class="exit-arrow">↓ ↑</span><br><span>[EXIT] ARCHIVE ACCESS</span></div>
       <div class="player" id="player"></div>
       <div class="interaction-message" id="interactionMessage">PRESS E</div>
@@ -290,7 +336,11 @@ __TUTORIAL_CSS__
 
   <div class="stage-transition" id="stageTransition"><div class="stage-card"><div class="stage-no">STAGE 01</div><div class="stage-room">:ARCHIVE ACCESS</div></div></div>
   <div class="pause-overlay" id="pauseOverlay">
-    <div><div class="pause-title">GAME PAUSED</div><div class="pause-sub">PRESS Ⅱ TO CONTINUE</div><div class="pause-actions"><button class="code-button" id="resumeBtn" type="button">RESUME</button><button class="code-button" id="restartBtn" type="button">RESTART</button><button class="code-button" id="titleBtn" type="button">TITLE</button></div></div>
+    <div class="pause-menu-panel"><div class="pause-actions">
+<div class="pause-row"><span class="pause-icon">Ⅱ</span><button class="pause-nav-link" id="resumeBtn" type="button">RESUME</button></div>
+<div class="pause-row"><span class="pause-icon">↻</span><button class="pause-nav-link" id="restartBtn" type="button">RESTART</button></div>
+<div class="pause-row"><span class="pause-icon">⌂</span><button class="pause-nav-link" id="titleBtn" type="button">TITLE</button></div>
+</div></div>
   </div>
 <div class="save-fade" id="saveFade"><div class="fade-label"><span class="fade-gear">⚙</span>SAVING DATA...</div></div>
 <div class="save-gear" id="saveGear" aria-live="polite"><span class="gear">⚙</span><span id="saveGearText">SAVING...</span></div>
@@ -303,13 +353,13 @@ const $=id=>document.getElementById(id);
 const root=$('gameRoot'), room=$('room'), player=$('player'), interactionMessage=$('interactionMessage');
 const inventoryOverlay=$('inventoryOverlay'), helpOverlay=$('helpOverlay'), dataOverlay=$('dataOverlay'), codeOverlay=$('codeOverlay'), pauseOverlay=$('pauseOverlay');
 const echoMessage=$('echoMessage'), echoNext=$('echoNext'), status=$('status'), timerNode=$('timer');
-let playerX=50, playerY=43, seconds=720, paused=false, finished=false, codeSolved=false, nearby=null;
+let playerX=50, playerY=85, seconds=600, paused=false, finished=false, codeSolved=false, nearby=null;
 let helpOpen=false, inventoryOpen=false, dataOpen=false, codeOpen=false, typingDone=false, typingTimer=null, echoIndex=0, pinBuffer='';
 let timerLast=Date.now();
 const RUN_SAVE_KEY='project_logic_run_state_v1';
-try{const run=JSON.parse(localStorage.getItem(RUN_SAVE_KEY)||'null');if(run&&Number.isFinite(run.seconds))seconds=Math.max(0,Math.min(720,Math.floor(run.seconds)))}catch(e){}
+try{const run=JSON.parse(localStorage.getItem(RUN_SAVE_KEY)||'null');if(run&&Number.isFinite(run.seconds))seconds=Math.max(0,Math.min(600,Math.floor(run.seconds)))}catch(e){}
 const STAGE_SAVE_KEY='project_logic_stage01_save_v1';
-if(__RESET_STAGE_SAVE__){seconds=720;try{localStorage.removeItem(STAGE_SAVE_KEY);localStorage.removeItem('project_logic_stage02_save_v1');localStorage.removeItem('project_logic_run_state_v1')}catch(e){}}
+if(__RESET_STAGE_SAVE__){seconds=600;try{localStorage.removeItem(STAGE_SAVE_KEY);localStorage.removeItem('project_logic_stage02_save_v1');localStorage.removeItem('project_logic_run_state_v1')}catch(e){}}
 let audioContext=null;
 function playTone(freq=880,duration=0.07,volume=0.045){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;if(!audioContext)audioContext=new AC();if(audioContext.state==='suspended')audioContext.resume();const osc=audioContext.createOscillator(),gain=audioContext.createGain();osc.type='square';osc.frequency.value=freq;gain.gain.setValueAtTime(0.0001,audioContext.currentTime);gain.gain.exponentialRampToValueAtTime(volume,audioContext.currentTime+0.008);gain.gain.exponentialRampToValueAtTime(0.0001,audioContext.currentTime+duration);osc.connect(gain);gain.connect(audioContext.destination);osc.start();osc.stop(audioContext.currentTime+duration+0.01)}catch(e){}}
 function playDoorOpen(){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;if(!audioContext)audioContext=new AC();if(audioContext.state==='suspended')audioContext.resume();const now=audioContext.currentTime;[440,660,880].forEach((frequency,index)=>{const osc=audioContext.createOscillator(),gain=audioContext.createGain();osc.type='square';osc.frequency.value=frequency;gain.gain.setValueAtTime(0.0001,now+index*.12);gain.gain.exponentialRampToValueAtTime(.08,now+index*.12+.02);gain.gain.exponentialRampToValueAtTime(.0001,now+index*.12+.18);osc.connect(gain);gain.connect(audioContext.destination);osc.start(now+index*.12);osc.stop(now+index*.12+.2)});}catch(e){}}
@@ -321,7 +371,7 @@ const messages=[
  '7년 전 사고 당일, 누군가 중앙 기록을 삭제했습니다. 그러나 세 단말기 A, B, C에는 서로 다른 기록 조각이 남아 있습니다.',
  '각 기록에서 복구되는 숫자는 출구 암호가 아닙니다. 보관실의 ARCHIVE NOTE를 찾아 기록의 조합 규칙을 확인하십시오.',
  '이상합니다. 삭제 명령의 발신자 서명이 제 내부 인증값과 일치합니다. 하지만 저는 그 명령을 내린 기억이 없습니다.',
- '제한 시간은 12분입니다. A, B, C의 기록을 조사하고 ARCHIVE NOTE로 네 자리 코드를 복원한 뒤 출구에서 E키로 인증하십시오.'
+ '제한 시간은 10분입니다. A, B, C의 기록을 조사하고 ARCHIVE NOTE로 네 자리 코드를 복원한 뒤 출구에서 E키로 인증하십시오.'
 ];
 const puzzleCandidates=[];
 for(let a=2;a<=9;a++)for(let b=1;b<a;b++)for(let c=a+1;c<=Math.min(9,a+b-1);c++)puzzleCandidates.push({A:a,B:b,C:c});
@@ -337,13 +387,13 @@ function rebuildClues(){
 }
 rebuildClues();
 const objects=[
- {id:'A',name:'SECTOR A',x:11,y:17,w:15,h:10,el:$('objectA')},
- {id:'B',name:'COMPUTER / SECTOR B',x:42,y:13,w:16,h:13,el:$('objectB')},
- {id:'C',name:'SECTOR C',x:77,y:18,w:15,h:10,el:$('objectC')},
- {id:'ARCHIVE',name:'ARCHIVE NOTE',x:15,y:73,w:18,h:10,el:$('objectArchive')},
- {id:'EXIT',name:'EXIT',x:92,y:35,w:8,h:30,el:$('exitDoor')}
+ {id:'A',name:'SERVER LOG',x:10,y:15,w:18,h:17,el:$('objectA')},
+ {id:'B',name:'CENTRAL CONSOLE',x:33,y:13,w:34,h:23,el:$('objectB')},
+ {id:'C',name:'ARCHIVE SHELF',x:73,y:15,w:17,h:18,el:$('objectC')},
+ {id:'ARCHIVE',name:'ARCHIVE NOTE',x:12,y:63,w:23,h:20,el:$('objectArchive')},
+ {id:'EXIT',name:'EXIT',x:42,y:0,w:16,h:17,el:$('exitDoor')}
 ];
-const obstacles=objects.map(o=>({x:o.x,y:o.y,w:o.w,h:o.h}));
+const obstacles=objects.filter(o=>o.id!=='EXIT').map(o=>({x:o.x,y:o.y,w:o.w,h:o.h}));
 function say(t){status.textContent=t}
 function updateTimer(){const m=Math.floor(seconds/60),s=seconds%60;timerNode.textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')}
 function clearKeys(){Object.keys(keys).forEach(k=>keys[k]=false)}
@@ -361,8 +411,8 @@ function openInventory(){if(dataOpen||codeOpen||paused||finished)return;if(inven
 function openHelp(){if(dataOpen||codeOpen||paused||finished)return;if(helpOpen){helpOpen=false;helpOverlay.style.display='none';root.focus();return}inventoryOpen=false;inventoryOverlay.style.display='none';helpOpen=true;helpOverlay.style.display='flex';clearKeys()}
 function addItem(id){if(items.some(item=>item.id===id))return;let item;if(id==='ARCHIVE'){item={id,name:'ARCHIVE NOTE',body:'ARCHIVE INCIDENT // FRAGMENT 04\n\n첫째 자리 = A − B.\n둘째 자리 = C − A.\n셋째 자리 = A + B − C.\n넷째 자리 = A + B + C를 9로 나눈 나머지. 나머지가 0이면 9로 기록한다.\n\n“ECHO에게 묻지 말 것. 이 명령은 기록을 삭제하라는 지시와 함께 저장되었다.”'}}else item={id,name:clues[id].title,body:clues[id].body};items.push(item);const slot=items.length-1;if(slot<inventory.length)inventory[slot]=item;renderInventory()}
 function interact(){if(paused||finished||isOverlayOpen())return;if(!nearby){say('NO TARGET // 가까운 장치로 이동하십시오.');return}const id=nearby.id;if(clues[id]){if(!found[id]){found[id]=true;addItem(id);$('state'+id).textContent='DATA FOUND';say(id+' 기록을 확보했습니다. INVENTORY에서 다시 확인할 수 있습니다.')}showRecord(clues[id].title,clues[id].body);return}if(id==='ARCHIVE'){found.ARCHIVE=true;$('stateArchive').textContent='READ';addItem('ARCHIVE');say('ARCHIVE NOTE 확보 // 네 자리 인증식을 확인하십시오.');showRecord('ARCHIVE NOTE // FRAGMENT 04','ARCHIVE INCIDENT // PERSONAL NOTE\n\n첫째 자리 = A − B.\n둘째 자리 = C − A.\n셋째 자리 = A + B − C.\n넷째 자리 = A + B + C를 9로 나눈 나머지. 나머지가 0이면 9로 기록한다.\n\n“ECHO에게 묻지 말 것. 기록 삭제 명령은 사고 직전 ECHO의 내부 인증값으로 전송되었다.”');return}if(id==='EXIT'){if(!codeSolved){showCode();return}finishStage();return}}
-function verify(){if(pinBuffer.length!==4){$('codeError').textContent='FOUR DIGITS REQUIRED // 네 자리 모두 입력하십시오.';return}if(pinBuffer===expectedCode){codeSolved=true;$('statePanel').textContent='UNLOCKED';$('panelLight').classList.add('green');$('exitLight').classList.add('green');$('pinLight').classList.add('green');$('pinStatus').textContent='ACCESS GRANTED // GREEN';$('codeError').textContent='ACCESS GRANTED // 출구 잠금 해제';playDoorOpen();saveStageState();say('인증 완료. 출구 표시등이 초록색으로 바뀌었습니다. 출구에서 E를 눌러 진입하십시오.');setTimeout(()=>{if(codeOpen)closeCode()},900)}else{$('pinLight').classList.remove('green');$('codeError').textContent='INVALID CODE // 기록의 규칙을 다시 확인하십시오.';$('pinStatus').textContent='ACCESS DENIED // RED';say('인증 실패 // 보안 표시등이 빨간색입니다. 기록과 계산 순서를 다시 대조하십시오.')}}
-function addRestartAndTitleButtons(title,sub,copy){helpOpen=false;inventoryOpen=false;dataOpen=true;codeOpen=false;helpOverlay.style.display='none';inventoryOverlay.style.display='none';codeOverlay.style.display='none';pauseOverlay.style.display='none';$('closeRecord').style.display='none';$('windowTitle').textContent=title;$('windowSub').textContent=sub;$('windowBody').innerHTML=copy+'<div class="stage01-window-actions"><button class="code-button" id="clearRestart" type="button">RESTART</button><a class="code-button" href="?action=title" target="_top" rel="noopener" style="display:inline-flex;align-items:center;text-decoration:none">TITLE</a></div>';const b=$('clearRestart');if(b)b.onclick=restartViaHost;dataOpen=true;dataOverlay.style.display='flex'}
+function verify(){if(pinBuffer.length!==4){$('codeError').textContent='FOUR DIGITS REQUIRED // 네 자리 모두 입력하십시오.';return}if(pinBuffer===expectedCode){codeSolved=true;$('statePanel').textContent='UNLOCKED';$('panelLight').classList.add('green');$('exitLight').classList.add('green');$('doorSprite').src='__SPR_DOOR_UNLOCKED__';$('pinLight').classList.add('green');$('pinStatus').textContent='ACCESS GRANTED // GREEN';$('codeError').textContent='ACCESS GRANTED // 출구 잠금 해제';playDoorOpen();saveStageState();say('인증 완료. 출구 표시등이 초록색으로 바뀌었습니다. 출구에서 E를 눌러 진입하십시오.');setTimeout(()=>{if(codeOpen)closeCode()},900)}else{$('pinLight').classList.remove('green');$('codeError').textContent='INVALID CODE // 기록의 규칙을 다시 확인하십시오.';$('pinStatus').textContent='ACCESS DENIED // RED';say('인증 실패 // 보안 표시등이 빨간색입니다. 기록과 계산 순서를 다시 대조하십시오.')}}
+function addRestartAndTitleButtons(title,sub,copy){helpOpen=false;inventoryOpen=false;dataOpen=true;codeOpen=false;helpOverlay.style.display='none';inventoryOverlay.style.display='none';codeOverlay.style.display='none';pauseOverlay.style.display='none';$('closeRecord').style.display='none';$('windowTitle').textContent=title;$('windowSub').textContent=sub;$('windowBody').innerHTML=copy+'<div class="pause-actions"><div class="pause-row"><span class="pause-icon">↻</span><button class="pause-nav-link" id="clearRestart" type="button">RESTART</button></div><div class="pause-row"><span class="pause-icon">⌂</span><button class="pause-nav-link" id="timeoutTitle" type="button">TITLE</button></div></div>';const b=$('clearRestart');if(b)b.onclick=restartViaHost;const tb=$('timeoutTitle');if(tb)tb.onclick=saveAndReturnToTitle;dataOpen=true;dataOverlay.style.display='flex'}
 function finishStage(){finished=true;paused=true;timerLast=Date.now();clearKeys();pauseOverlay.style.display='none';helpOpen=false;inventoryOpen=false;codeOpen=false;dataOpen=true;helpOverlay.style.display='none';inventoryOverlay.style.display='none';codeOverlay.style.display='none';$('closeRecord').style.display='none';$('windowTitle').textContent='SYSTEM HANDOFF';$('windowSub').textContent='ARCHIVE ACCESS // NEXT SECTOR DETECTED';$('windowBody').innerHTML='<div class="system-computer" aria-label="blue pixel computer"><div class="screen"></div><div class="neck"></div><div class="base"></div></div><p> ECHO // 연결된 시스템에서 새로운 신호가 감지되었습니다.</p><p>“이 기록은 끝이 아닙니다. 서버 코어에 남아 있는 원본 로그를 확인해야 합니다.”</p><p>STAGE 02로 이동할 준비가 되었습니다.</p><div class="stage01-window-actions"><button class="code-button" id="continueStage2Btn" type="button">CONTINUE // STAGE 02</button><button class="code-button" id="stage1TitleBtn" type="button">TITLE</button></div>';$('continueStage2Btn').onclick=continueStage2;$('stage1TitleBtn').onclick=saveAndReturnToTitle;dataOverlay.style.display='flex';say('SYSTEM HANDOFF // 타이머 일시정지')}
 function expireGame(){if(finished)return;finished=true;clearKeys();addRestartAndTitleButtons('TIME EXPIRED','SYSTEM LOCKDOWN','<p>제한 시간이 종료되었습니다.</p>');say('TIME EXPIRED // RESTART를 선택하십시오.')}
 function introDialogueActive(){return !(echoIndex>=messages.length-1&&typingDone)}
@@ -370,7 +420,7 @@ function syncTimer(){const now=Date.now();if(introDialogueActive()){timerLast=no
 function getDistance(obj){return Math.hypot(playerX-(obj.x+obj.w/2),playerY-(obj.y+obj.h/2))}
 function checkInteraction(){nearby=null;let best=Infinity;objects.forEach(obj=>{const d=getDistance(obj);obj.el.classList.remove('near');if(d<12&&d<best){best=d;nearby=obj}});if(nearby&&!paused&&!isOverlayOpen()){nearby.el.classList.add('near');interactionMessage.textContent='E  //  '+nearby.name;interactionMessage.classList.add('visible')}else interactionMessage.classList.remove('visible')}
 function circleHitsRect(cx,cy,r,o){const dx=Math.max(o.x,Math.min(cx,o.x+o.w));const dy=Math.max(o.y,Math.min(cy,o.y+o.h));return Math.hypot(cx-dx,cy-dy)<r}
-function blocked(x,y){if(x<3||x>97||y<3||y>96)return true;return obstacles.some(o=>circleHitsRect(x,y,1.3,o))}
+function blocked(x,y){if(x<3||x>97||y<8||y>96)return true;return obstacles.some(o=>circleHitsRect(x,y,1.3,o))}
 function updateMovement(){if(paused||isOverlayOpen())return;let dx=(keys.d?1:0)-(keys.a?1:0),dy=(keys.s?1:0)-(keys.w?1:0);if(!dx&&!dy)return;const len=Math.hypot(dx,dy);dx=dx/len*.48;dy=dy/len*.48;if(!blocked(playerX+dx,playerY))playerX+=dx;if(!blocked(playerX,playerY+dy))playerY+=dy;player.style.left=playerX+'%';player.style.top=playerY+'%';checkInteraction()}
 function typeEcho(index){echoIndex=index;clearTimeout(typingTimer);const text=messages[index]||'';echoMessage.textContent='';typingDone=false;echoNext.classList.remove('ready');let i=0;function tick(){if(i<text.length){echoMessage.textContent+=text[i++];typingTimer=setTimeout(tick,24)}else{typingDone=true;echoNext.classList.add('ready')}}tick()}
 function nextEcho(){if(!typingDone){clearTimeout(typingTimer);echoMessage.textContent=messages[echoIndex]||'';typingDone=true;echoNext.classList.add('ready');return}if(echoIndex<messages.length-1)typeEcho(echoIndex+1)}
@@ -385,15 +435,15 @@ function restoreStageState(){
   try{
     const saved=JSON.parse(localStorage.getItem(STAGE_SAVE_KEY)||'null');
     if(!saved||saved.version!==1||!saved.puzzle||!Number.isFinite(saved.seconds))return false;
-    playerX=Number.isFinite(saved.playerX)?saved.playerX:50;playerY=Number.isFinite(saved.playerY)?saved.playerY:43;
-    seconds=Math.max(0,Math.min(720,Math.floor(saved.seconds)));codeSolved=!!saved.codeSolved;
+    playerX=Number.isFinite(saved.playerX)?saved.playerX:50;playerY=Number.isFinite(saved.playerY)?saved.playerY:85;
+    seconds=Math.max(0,Math.min(600,Math.floor(saved.seconds)));codeSolved=!!saved.codeSolved;
     if(Number.isFinite(saved.puzzle.A)&&Number.isFinite(saved.puzzle.B)&&Number.isFinite(saved.puzzle.C)){puzzle=saved.puzzle;expectedCode=makeExpectedCode();rebuildClues()}
     Object.keys(found).forEach(k=>found[k]=!!(saved.found&&saved.found[k]));
     items.length=0;(Array.isArray(saved.items)?saved.items:[]).forEach(item=>{if(item&&item.id&&item.name)items.push(item)});
     inventory.fill(null);(Array.isArray(saved.inventory)?saved.inventory:[]).slice(0,inventory.length).forEach((item,i)=>inventory[i]=item);
     ['A','B','C'].forEach(k=>{const el=$('state'+k);if(el)el.textContent=found[k]?'DATA FOUND':'DATA SEALED'});
     $('stateArchive').textContent=found.ARCHIVE?'READ':'UNREAD';
-    if(codeSolved){$('statePanel').textContent='UNLOCKED';$('panelLight').classList.add('green');$('exitLight').classList.add('green');$('pinLight').classList.add('green')}
+    if(codeSolved){$('statePanel').textContent='UNLOCKED';$('panelLight').classList.add('green');$('exitLight').classList.add('green');$('doorSprite').src='__SPR_DOOR_UNLOCKED__';$('pinLight').classList.add('green')}
     echoIndex=Number.isFinite(saved.echoIndex)?Math.max(0,Math.min(messages.length-1,saved.echoIndex)):0;
     player.style.left=playerX+'%';player.style.top=playerY+'%';renderInventory();updateTimer();
     if(typeof saved.echoText==='string'){echoMessage.textContent=saved.echoText;typingDone=true;echoNext.classList.add('ready')}else typeEcho(echoIndex);
@@ -410,7 +460,7 @@ function saveAndReturnToTitle(){
 }
 function restartViaHost(){paused=true;clearKeys();try{localStorage.removeItem(STAGE_SAVE_KEY);localStorage.removeItem(RUN_SAVE_KEY)}catch(e){}if(!clickHostControl('host_restart_nav'))restartStage()}
 function continueStage2(){paused=true;timerLast=Date.now();clearKeys();saveStageState();try{localStorage.removeItem('project_logic_stage02_save_v1');localStorage.setItem(RUN_SAVE_KEY,JSON.stringify({seconds,stage:2,updatedAt:Date.now()}))}catch(e){}if(!clickHostControl('host_stage2_nav')){try{window.top.location.assign(new URL('pages/4_Stage_02.py',window.top.location.href).toString())}catch(e){say('STAGE 02 NAVIGATION BLOCKED')}}}
-function restartStage(){try{localStorage.removeItem(STAGE_SAVE_KEY);localStorage.removeItem('project_logic_stage02_save_v1');localStorage.setItem(RUN_SAVE_KEY,JSON.stringify({seconds:720,stage:1,updatedAt:Date.now()}))}catch(e){}paused=false;finished=false;codeSolved=false;seconds=720;timerLast=Date.now();playerX=50;playerY=43;nearby=null;helpOpen=inventoryOpen=dataOpen=codeOpen=false;[inventoryOverlay,helpOverlay,dataOverlay,codeOverlay,pauseOverlay].forEach(el=>el.style.display='none');Object.keys(found).forEach(k=>found[k]=false);items.length=0;inventory.fill(null);$('stateA').textContent=$('stateB').textContent=$('stateC').textContent='DATA SEALED';$('stateArchive').textContent='UNREAD';$('statePanel').textContent='LOCKED';$('panelLight').classList.remove('green');$('exitLight').classList.remove('green');$('pinLight').classList.remove('green');pinBuffer='';renderPin();puzzle=puzzleCandidates[Math.floor(Math.random()*puzzleCandidates.length)];expectedCode=makeExpectedCode();rebuildClues();$('panelLight').classList.remove('green');$('exitLight').classList.remove('green');$('pinLight').classList.remove('green');clearPin();renderInventory();updateTimer();player.style.left=playerX+'%';player.style.top=playerY+'%';echoIndex=0;typeEcho(0);say('SYSTEM READY // 접근 가능한 장치 가까이 이동하십시오.');clearKeys();checkInteraction();root.focus()}
+function restartStage(){try{localStorage.removeItem(STAGE_SAVE_KEY);localStorage.removeItem('project_logic_stage02_save_v1');localStorage.setItem(RUN_SAVE_KEY,JSON.stringify({seconds:600,stage:1,updatedAt:Date.now()}))}catch(e){}paused=false;finished=false;codeSolved=false;seconds=600;timerLast=Date.now();playerX=50;playerY=85;nearby=null;helpOpen=inventoryOpen=dataOpen=codeOpen=false;[inventoryOverlay,helpOverlay,dataOverlay,codeOverlay,pauseOverlay].forEach(el=>el.style.display='none');Object.keys(found).forEach(k=>found[k]=false);items.length=0;inventory.fill(null);$('stateA').textContent=$('stateB').textContent=$('stateC').textContent='DATA SEALED';$('stateArchive').textContent='UNREAD';$('statePanel').textContent='LOCKED';$('panelLight').classList.remove('green');$('exitLight').classList.remove('green');$('doorSprite').src='__SPR_DOOR_LOCKED__';$('pinLight').classList.remove('green');pinBuffer='';renderPin();puzzle=puzzleCandidates[Math.floor(Math.random()*puzzleCandidates.length)];expectedCode=makeExpectedCode();rebuildClues();$('panelLight').classList.remove('green');$('exitLight').classList.remove('green');$('doorSprite').src='__SPR_DOOR_LOCKED__';$('pinLight').classList.remove('green');clearPin();renderInventory();updateTimer();player.style.left=playerX+'%';player.style.top=playerY+'%';echoIndex=0;typeEcho(0);say('SYSTEM READY // 접근 가능한 장치 가까이 이동하십시오.');clearKeys();checkInteraction();root.focus()}
 function resume(){paused=false;pauseOverlay.style.display='none';timerLast=Date.now();root.focus();clearKeys()}
 function focusGame(){try{root.focus({preventScroll:true})}catch(e){root.focus()}}
 
@@ -429,6 +479,9 @@ const restored=restoreStageState();if(!restored){player.style.left=playerX+'%';p
 """
 
 html = html.replace("__TUTORIAL_CSS__", tutorial_css)
+for name, data in sprite_urls.items():
+    html = html.replace("__SPR_" + name.upper() + "__", data)
+
 
 html = html.replace("__RESET_STAGE_SAVE__", "true" if st.session_state.pop("stage01_reset_save", False) else "false")
 components.html(html, height=1000, scrolling=False)
