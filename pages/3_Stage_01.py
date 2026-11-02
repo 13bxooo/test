@@ -40,7 +40,7 @@ if _host_stage2:
 # scene framing, room, player, ECHO bar, help and inventory panels stay consistent.
 page_dir = Path(__file__).resolve().parent
 project_root = page_dir.parent
-lab_background_data = base64.b64encode((project_root / "assets" / "lab_background.jpeg").read_bytes()).decode("ascii")
+
 font_data = ""
 for candidate in (
     project_root / "neodgm.ttf",
@@ -87,7 +87,7 @@ __TUTORIAL_CSS__
 .pause-actions{visibility:visible!important;pointer-events:auto!important;margin-top:24px!important;display:flex!important;flex-direction:column!important;gap:12px!important;align-items:stretch!important}
 .pause-actions button,.pause-actions a{width:100%!important;min-height:44px!important;background:#fff!important;color:#000!important;border:1px solid #fff!important;border-radius:0!important;font-family:NeoDungGeunMo,monospace!important;display:flex!important;align-items:center!important;justify-content:center!important;text-decoration:none!important;cursor:pointer!important}
 .pause-actions button:hover,.pause-actions a:hover{background:#28dfff!important;color:#000!important;border-color:#28dfff!important}
-.game-area{background-image:linear-gradient(rgba(0,0,0,.18),rgba(0,0,0,.35)),url(data:image/jpeg;base64,__LAB_BACKGROUND__)!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;}
+.game-area{background:#000!important;}
 .room{background:rgba(0,0,0,.12)!important;}
 .inventory-panel{background:#020609!important;color:#eefaff!important;border:2px solid #28dfff!important;box-shadow:0 0 0 2px #073c4b,0 0 18px #00dfff20!important}
 .inventory-header{border-bottom:2px solid #147b94!important}
@@ -190,6 +190,19 @@ __TUTORIAL_CSS__
 #exitLight{top:8px;right:8px}
 .exit-reader-label{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:9px;line-height:1.8;letter-spacing:1px;color:#666;text-align:center;white-space:nowrap}
 #exitDoor.near .exit-reader-label{color:#fff}
+/* Stage entrance uses the same minimal cyan chapter card as the tutorial. */
+.stage-transition{background:#000!important;z-index:999999!important;transition:opacity .45s steps(7,end)!important}
+.stage-transition:before{display:none!important}
+.stage-transition .stage-card{width:min(355px,82vw)!important;min-height:148px!important;padding:22px!important;border:1px solid #2cddf7!important;outline:none!important;box-shadow:0 0 15px #00dfff25!important}
+.stage-transition .stage-no{font-size:30px!important;letter-spacing:2px!important;color:#f3ffff!important}
+.stage-transition .stage-room{font-size:16px!important;letter-spacing:0!important;color:#b5f5ff!important}
+/* New archive: no JPEG backdrop; keep the tutorial's dark cyan room theme. */
+.game-area{background:#000!important}
+.room{background:linear-gradient(135deg,#111e30,#172a40 45%,#0c1726)!important;border:3px solid #368eac!important;box-shadow:inset 0 0 0 8px #09111e!important}
+.room:before{content:"";position:absolute;inset:3%;pointer-events:none;background-image:linear-gradient(#6fa5c61e 1px,transparent 1px),linear-gradient(90deg,#6fa5c61e 1px,transparent 1px);background-size:11.1% 11.1%;z-index:0}
+.stage01-object{background:#07121e!important;border:2px solid #29c6e3!important;box-shadow:0 0 10px #00dfff1b!important;z-index:2}
+.stage01-object .main-label{color:#a9f4ff!important}
+.stage01-object .sub-label{color:#7bacc0!important}
 </style></head><body>
 <div class="game" id="gameRoot" tabindex="0">
   <div class="project-title">PROJECT : LOGIC</div>
@@ -275,7 +288,7 @@ __TUTORIAL_CSS__
     </div>
   </div>
 
-  <div class="stage-transition" id="stageTransition"><div class="stage-card"><div class="stage-no">STAGE 01</div><div class="stage-room">: RESEARCH ROOM</div><div class="transition-line"></div></div><div class="loading-indicator"><div class="loading-symbol">◉</div><div class="loading-label">데이터를 불러오는 중입니다...</div><div class="loading-track"><span></span></div></div><div class="transition-gear">⚙</div></div>
+  <div class="stage-transition" id="stageTransition"><div class="stage-card"><div class="stage-no">STAGE 01</div><div class="stage-room">:ARCHIVE ACCESS</div></div></div>
   <div class="pause-overlay" id="pauseOverlay">
     <div><div class="pause-title">GAME PAUSED</div><div class="pause-sub">PRESS Ⅱ TO CONTINUE</div><div class="pause-actions"><button class="code-button" id="resumeBtn" type="button">RESUME</button><button class="code-button" id="restartBtn" type="button">RESTART</button><button class="code-button" id="titleBtn" type="button">TITLE</button></div></div>
   </div>
@@ -304,11 +317,11 @@ const keys={w:false,a:false,s:false,d:false};
 const inventory=Array(8).fill(null);
 const items=[];
 const messages=[
- '연결이 확인되었습니다. 저는 ECHO입니다. 7년 전 이 시설에서 발생한 사고 기록은 아직 완전히 복구되지 않았습니다.',
- '사고 직전, 관리자는 세 구역의 로그를 따로 저장했습니다. 누군가 기록을 지우려 했기 때문에 하나의 파일로 보관하지 않았습니다.',
- '복구된 숫자는 접근 코드 자체가 아닙니다. ARCHIVE NOTE의 규칙으로 숫자를 변환해야 보안 시스템이 이를 받아들입니다.',
- '마지막 로그에는 이상한 명령이 남아 있습니다. “기록을 복구하지 말 것.” 발신자 식별란은 ECHO의 내부 인증값으로 덮여 있습니다.',
- '출구의 인증 장치에 네 자리 코드를 입력하면 잠금이 해제됩니다. 제한 시간은 12분입니다. 남은 기록을 대조하고 사고 당시의 명령을 확인하십시오.'
+ 'STAGE 01. ARCHIVE ACCESS에 진입했습니다. 저는 ECHO입니다. 이곳은 외부에서 삭제된 기록의 사본을 보관하는 구역입니다.',
+ '7년 전 사고 당일, 누군가 중앙 기록을 삭제했습니다. 그러나 세 단말기 A, B, C에는 서로 다른 기록 조각이 남아 있습니다.',
+ '각 기록에서 복구되는 숫자는 출구 암호가 아닙니다. 보관실의 ARCHIVE NOTE를 찾아 기록의 조합 규칙을 확인하십시오.',
+ '이상합니다. 삭제 명령의 발신자 서명이 제 내부 인증값과 일치합니다. 하지만 저는 그 명령을 내린 기억이 없습니다.',
+ '제한 시간은 12분입니다. A, B, C의 기록을 조사하고 ARCHIVE NOTE로 네 자리 코드를 복원한 뒤 출구에서 E키로 인증하십시오.'
 ];
 const puzzleCandidates=[];
 for(let a=2;a<=9;a++)for(let b=1;b<a;b++)for(let c=a+1;c<=Math.min(9,a+b-1);c++)puzzleCandidates.push({A:a,B:b,C:c});
@@ -410,12 +423,12 @@ document.querySelectorAll('.inventory-slot').forEach((slot,i)=>slot.addEventList
 document.addEventListener('keydown',e=>{const key=e.key.toLowerCase();if(codeOpen){if(/^[0-9]$/.test(e.key)){e.preventDefault();appendPinDigit(e.key);return}if(key==='backspace'){e.preventDefault();backspacePin();return}if(key==='enter'){e.preventDefault();verify();return}if(key==='escape'){e.preventDefault();closeCode();return}return}if(e.repeat&&['e','h','i','escape'].includes(key))return;if(e.code==='Space'){e.preventDefault();if(!paused&&!isOverlayOpen())nextEcho();return}if(key==='escape'){if(codeOpen){closeCode();return}if(dataOpen){closeRecord();return}if(helpOpen){openHelp();return}if(inventoryOpen){openInventory();return}if(paused){resume();return}return}if(key==='h'){e.preventDefault();openHelp();return}if(key==='i'){e.preventDefault();openInventory();return}if(key==='e'){e.preventDefault();interact();return}if(['w','a','s','d'].includes(key)&&!paused&&!isOverlayOpen()){keys[key]=true;e.preventDefault()}});
 document.addEventListener('keyup',e=>{const key=e.key.toLowerCase();if(key in keys){keys[key]=false;e.preventDefault()}});window.addEventListener('blur',clearKeys);root.addEventListener('pointerdown',focusGame);
 function loop(){updateMovement();checkInteraction();requestAnimationFrame(loop)}
-const restored=restoreStageState();if(!restored){player.style.left=playerX+'%';player.style.top=playerY+'%';renderInventory();updateTimer();typeEcho(0)}const stageTransition=$('stageTransition');if(stageTransition){if(restored){stageTransition.remove()}else{setTimeout(()=>stageTransition.classList.add('hide'),1900);setTimeout(()=>stageTransition.remove(),2700)}}checkInteraction();focusGame();setInterval(syncTimer,250);setInterval(saveStageState,1000);requestAnimationFrame(loop);
+const restored=restoreStageState();if(!restored){player.style.left=playerX+'%';player.style.top=playerY+'%';renderInventory();updateTimer();typeEcho(0)}const stageTransition=$('stageTransition');if(stageTransition){if(restored){stageTransition.remove()}else{setTimeout(()=>stageTransition.classList.add('hide'),2700);setTimeout(()=>stageTransition.remove(),3150)}}checkInteraction();focusGame();setInterval(syncTimer,250);setInterval(saveStageState,1000);requestAnimationFrame(loop);
 })();
 </script></body></html>
 """
 
 html = html.replace("__TUTORIAL_CSS__", tutorial_css)
-html = html.replace("__LAB_BACKGROUND__", lab_background_data)
+
 html = html.replace("__RESET_STAGE_SAVE__", "true" if st.session_state.pop("stage01_reset_save", False) else "false")
 components.html(html, height=1000, scrolling=False)
