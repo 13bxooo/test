@@ -41,6 +41,8 @@ if _host_stage2:
 page_dir = Path(__file__).resolve().parent
 project_root = page_dir.parent
 lab_background_data = base64.b64encode((project_root / "assets" / "lab_background.jpeg").read_bytes()).decode("ascii")
+stage02_floor_data = base64.b64encode((project_root / "assets" / "stage02" / "floor.png").read_bytes()).decode("ascii")
+stage02_wall_data = base64.b64encode((project_root / "assets" / "stage02" / "walls.png").read_bytes()).decode("ascii")
 font_data = ""
 for candidate in (
     project_root / "neodgm.ttf",
@@ -79,6 +81,12 @@ html = r"""
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <style>
 __TUTORIAL_CSS__
+/* Stage 02 바닥과 벽의 중심 좌표를 동일하게 고정합니다. */
+.room{background-image:url("data:image/png;base64,__STAGE02_FLOOR__")!important;background-position:center!important;background-size:100% 100%!important;background-repeat:no-repeat!important;border:none!important}
+.room::after{content:"";position:absolute;inset:0;background:url("data:image/png;base64,__STAGE02_WALL__") center/100% 100% no-repeat;pointer-events:none;z-index:12}
+.room .player{z-index:30!important}
+.room .room-line-horizontal,.room .room-line-vertical{display:none!important}
+
 
 .pause-overlay{position:fixed!important;inset:0!important;z-index:1500000!important;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.78)!important;padding:18px;box-sizing:border-box}
 .pause-overlay>div{width:min(390px,90vw)!important;box-sizing:border-box!important;background:#000!important;color:#fff!important;border:3px double #28dfff!important;padding:28px!important;box-shadow:0 0 0 1px #07566c,0 0 18px #00dfff22!important}
@@ -466,5 +474,7 @@ checkInteraction();focusGame();setInterval(syncTimer,250);setInterval(saveStageS
 
 html = html.replace("__TUTORIAL_CSS__", tutorial_css)
 html = html.replace("__LAB_BACKGROUND__", lab_background_data)
+html = html.replace("__STAGE02_FLOOR__", stage02_floor_data)
+html = html.replace("__STAGE02_WALL__", stage02_wall_data)
 html = html.replace("__RESET_STAGE_SAVE__", "true" if st.session_state.pop("stage02_reset_save", False) else "false")
 components.html(html, height=1000, scrolling=False)
