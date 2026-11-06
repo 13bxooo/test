@@ -4296,7 +4296,10 @@ function nextEcho() {
 }
 
 const TUTORIAL_SAVE_KEY = "project_logic_tutorial_save_v3";
-if (__RESET_TUTORIAL_SAVE__) { try { localStorage.removeItem(TUTORIAL_SAVE_KEY); } catch (e) {} }
+if (__RESET_TUTORIAL_SAVE__) { try {
+    ['project_logic_tutorial_save_v3','project_logic_stage01_progress_v6',
+     'project_logic_stage02_progress_v1','project_logic_stage02_handoff_v1'].forEach(k=>localStorage.removeItem(k));
+} catch (e) {} }
 function saveTutorialState() {
     try {
         localStorage.setItem(TUTORIAL_SAVE_KEY, JSON.stringify({
@@ -4342,8 +4345,9 @@ function restoreTutorialState() {
     } catch (e) { return false; }
 }
 
-const tutorialWasRestored = false;
-localStorage.removeItem(TUTORIAL_SAVE_KEY);
+// 저장된 튜토리얼 진행 상황을 CONTINUE에서 복원합니다.
+const tutorialWasRestored = restoreTutorialState();
+window.addEventListener("pagehide",saveTutorialState);
 const tutorialTransition = document.getElementById("tutorialTransition");
 if (!tutorialWasRestored && tutorialTransition) {
     tutorialTransition.classList.add("show");
@@ -6260,7 +6264,17 @@ function parentAction(action) {
 const restartButton = document.getElementById("restartButton");
 const titleButton = document.getElementById("titleButton");
 if (restartButton) restartButton.addEventListener("click", function (event) { event.preventDefault(); event.stopPropagation(); parentAction("restart"); });
-if (titleButton) titleButton.addEventListener("click", function (event) { event.preventDefault(); event.stopPropagation(); parentAction("title"); });
+if (titleButton) titleButton.addEventListener("click", function (event) {
+    event.preventDefault();event.stopPropagation();saveTutorialState();
+    let overlay=document.getElementById('tutorialDataSaving');
+    if(!overlay){overlay=document.createElement('div');overlay.id='tutorialDataSaving';
+      overlay.style.cssText='position:fixed;inset:0;background:#000;z-index:999999;';
+      overlay.innerHTML='<div style="position:absolute;left:28px;bottom:25px;color:#9beaff;font-size:13px;display:flex;gap:12px;align-items:center"><span class="savingGear">⚙</span>DATA SAVING...</div>';
+      document.body.appendChild(overlay);
+      const style=document.createElement('style');style.textContent='.savingGear{font-size:23px;display:inline-block;animation:saveGearSpin .9s linear infinite}@keyframes saveGearSpin{to{transform:rotate(360deg)}}';document.head.appendChild(style);
+    }
+    setTimeout(()=>parentAction('title'),3000);
+});
 
 
 /* =====================================================
