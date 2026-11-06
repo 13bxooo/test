@@ -40,7 +40,6 @@ if _host_stage2:
 # scene framing, room, player, ECHO bar, help and inventory panels stay consistent.
 page_dir = Path(__file__).resolve().parent
 project_root = page_dir.parent
-lab_background_data = base64.b64encode((project_root / "assets" / "lab_background.jpeg").read_bytes()).decode("ascii")
 stage02_floor_data = base64.b64encode((project_root / "assets" / "stage02" / "floor.png").read_bytes()).decode("ascii")
 stage02_wall_data = base64.b64encode((project_root / "assets" / "stage02" / "walls.png").read_bytes()).decode("ascii")
 font_data = ""
@@ -109,7 +108,7 @@ __TUTORIAL_CSS__
 #stage02Intro .intro-progress{margin-top:12px;color:#67cde0;font-size:11px;letter-spacing:2px}
 #gameRoot.intro-active .game-area{visibility:hidden!important}
 
-.game-area{background-image:linear-gradient(rgba(0,0,0,.18),rgba(0,0,0,.35)),url(data:image/jpeg;base64,__LAB_BACKGROUND__)!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;}
+.game-area{background-image:none!important;background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important;}
 .room{background:rgba(0,0,0,.12)!important;}
 .inventory-panel{background:#020609!important;color:#eefaff!important;border:2px solid #28dfff!important;box-shadow:0 0 0 2px #073c4b,0 0 18px #00dfff20!important}
 .inventory-header{border-bottom:2px solid #147b94!important}
@@ -239,7 +238,7 @@ __TUTORIAL_CSS__
 
   <div class="project-title">PROJECT : LOGIC</div>
   <div class="stage-title">STAGE 02 // SERVER CORE</div>
-  <div class="stage01-timer" id="timer">12:00</div>
+  <div class="stage01-timer" id="timer">10:00</div>
   <button class="stage01-pause" id="pauseBtn" type="button" aria-label="Pause">Ⅱ</button>
 
   <div class="game-area" id="gameArea">
@@ -335,13 +334,24 @@ const $=id=>document.getElementById(id);
 const root=$('gameRoot'), room=$('room'), player=$('player'), interactionMessage=$('interactionMessage');
 const inventoryOverlay=$('inventoryOverlay'), helpOverlay=$('helpOverlay'), dataOverlay=$('dataOverlay'), codeOverlay=$('codeOverlay'), pauseOverlay=$('pauseOverlay');
 const echoMessage=$('echoMessage'), echoNext=$('echoNext'), status=$('status'), timerNode=$('timer');
-let playerX=50, playerY=43, seconds=720, paused=false, finished=false, codeSolved=false, nearby=null;
+let playerX=50, playerY=43, seconds=600, paused=false, finished=false, codeSolved=false, nearby=null;
 let helpOpen=false, inventoryOpen=false, dataOpen=false, codeOpen=false, typingDone=false, typingTimer=null, echoIndex=0, pinBuffer='';
 let timerLast=Date.now();
 const RUN_SAVE_KEY='project_logic_run_state_v1';
-try{const run=JSON.parse(localStorage.getItem(RUN_SAVE_KEY)||'null');if(run&&Number.isFinite(run.seconds))seconds=Math.max(0,Math.min(720,Math.floor(run.seconds)))}catch(e){}
+const STAGE01_SAVE_KEY='project_logic_stage01_progress_v6';
 const STAGE_SAVE_KEY='project_logic_stage02_save_v1';
-if(__RESET_STAGE_SAVE__){seconds=720;try{localStorage.removeItem(STAGE_SAVE_KEY);localStorage.removeItem('project_logic_run_state_v1')}catch(e){}}
+// Stage 01의 남은 시간을 최초 입장 시 한 번만 이어받습니다.
+function readStage01Seconds(){
+ try{
+  const stage01=JSON.parse(localStorage.getItem(STAGE01_SAVE_KEY)||'null');
+  if(stage01&&Number.isFinite(Number(stage01.remaining)))return Math.max(0,Math.min(600,Math.floor(Number(stage01.remaining))));
+  const run=JSON.parse(localStorage.getItem(RUN_SAVE_KEY)||'null');
+  if(run&&Number.isFinite(Number(run.seconds)))return Math.max(0,Math.min(600,Math.floor(Number(run.seconds))));
+ }catch(e){}
+ return 600;
+}
+seconds=readStage01Seconds();
+if(__RESET_STAGE_SAVE__){try{localStorage.removeItem(STAGE_SAVE_KEY)}catch(e){}}
 let audioContext=null;
 function playTone(freq=880,duration=0.07,volume=0.045){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;if(!audioContext)audioContext=new AC();if(audioContext.state==='suspended')audioContext.resume();const osc=audioContext.createOscillator(),gain=audioContext.createGain();osc.type='square';osc.frequency.value=freq;gain.gain.setValueAtTime(0.0001,audioContext.currentTime);gain.gain.exponentialRampToValueAtTime(volume,audioContext.currentTime+0.008);gain.gain.exponentialRampToValueAtTime(0.0001,audioContext.currentTime+duration);osc.connect(gain);gain.connect(audioContext.destination);osc.start();osc.stop(audioContext.currentTime+duration+0.01)}catch(e){}}
 function playDoorOpen(){try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;if(!audioContext)audioContext=new AC();if(audioContext.state==='suspended')audioContext.resume();const now=audioContext.currentTime;[440,660,880].forEach((frequency,index)=>{const osc=audioContext.createOscillator(),gain=audioContext.createGain();osc.type='square';osc.frequency.value=frequency;gain.gain.setValueAtTime(0.0001,now+index*.12);gain.gain.exponentialRampToValueAtTime(.08,now+index*.12+.02);gain.gain.exponentialRampToValueAtTime(.0001,now+index*.12+.18);osc.connect(gain);gain.connect(audioContext.destination);osc.start(now+index*.12);osc.stop(now+index*.12+.2)});}catch(e){}}
@@ -449,7 +459,7 @@ function saveAndReturnToTitle(){
 }
 function restartViaHost(){paused=true;clearKeys();try{localStorage.removeItem('project_logic_stage01_save_v1');localStorage.removeItem('project_logic_stage02_save_v1');localStorage.removeItem(RUN_SAVE_KEY)}catch(e){}if(!clickHostControl('host_restart_nav')){try{window.top.location.assign(new URL('?action=restart',window.top.location.href).toString())}catch(e){say('RESTART NAVIGATION BLOCKED')}}}
 function continueStage2(){paused=true;timerLast=Date.now();clearKeys();saveStageState();try{localStorage.setItem(RUN_SAVE_KEY,JSON.stringify({seconds,stage:2,updatedAt:Date.now()}))}catch(e){}if(!clickHostControl('host_stage2_nav')){try{window.top.location.assign(new URL('pages/4_Stage_02.py',window.top.location.href).toString())}catch(e){say('STAGE 02 NAVIGATION BLOCKED')}}}
-function restartStage(){try{localStorage.removeItem(STAGE_SAVE_KEY);localStorage.setItem(RUN_SAVE_KEY,JSON.stringify({seconds:720,stage:2,updatedAt:Date.now()}))}catch(e){}paused=false;finished=false;codeSolved=false;switchState={A:false,B:false,C:false};targetPattern={A:Math.random()<0.5,B:Math.random()<0.5,C:Math.random()<0.5};rebuildClues();seconds=720;timerLast=Date.now();playerX=50;playerY=43;nearby=null;helpOpen=inventoryOpen=dataOpen=codeOpen=false;[inventoryOverlay,helpOverlay,dataOverlay,codeOverlay,pauseOverlay].forEach(el=>el.style.display='none');Object.keys(found).forEach(k=>found[k]=false);items.length=0;inventory.fill(null);$('stateA').textContent=$('stateB').textContent=$('stateC').textContent='POWER OFF';$('stateArchive').textContent='SEALED';$('statePanel').textContent='MISALIGNED';$('panelLight').classList.remove('green');$('exitLight').classList.remove('green');$('pinLight').classList.remove('green');pinBuffer='';renderPin();puzzle=puzzleCandidates[Math.floor(Math.random()*puzzleCandidates.length)];expectedCode=makeExpectedCode();rebuildClues();$('panelLight').classList.remove('green');$('exitLight').classList.remove('green');$('pinLight').classList.remove('green');clearPin();renderInventory();updateTimer();player.style.left=playerX+'%';player.style.top=playerY+'%';echoIndex=0;typeEcho(0);say('SYSTEM READY // 접근 가능한 장치 가까이 이동하십시오.');clearKeys();checkInteraction();root.focus()}
+function restartStage(){try{localStorage.removeItem(STAGE_SAVE_KEY);localStorage.setItem(RUN_SAVE_KEY,JSON.stringify({seconds:600,stage:2,updatedAt:Date.now()}))}catch(e){}paused=false;finished=false;codeSolved=false;switchState={A:false,B:false,C:false};targetPattern={A:Math.random()<0.5,B:Math.random()<0.5,C:Math.random()<0.5};rebuildClues();seconds=600;timerLast=Date.now();playerX=50;playerY=43;nearby=null;helpOpen=inventoryOpen=dataOpen=codeOpen=false;[inventoryOverlay,helpOverlay,dataOverlay,codeOverlay,pauseOverlay].forEach(el=>el.style.display='none');Object.keys(found).forEach(k=>found[k]=false);items.length=0;inventory.fill(null);$('stateA').textContent=$('stateB').textContent=$('stateC').textContent='POWER OFF';$('stateArchive').textContent='SEALED';$('statePanel').textContent='MISALIGNED';$('panelLight').classList.remove('green');$('exitLight').classList.remove('green');$('pinLight').classList.remove('green');pinBuffer='';renderPin();puzzle=puzzleCandidates[Math.floor(Math.random()*puzzleCandidates.length)];expectedCode=makeExpectedCode();rebuildClues();$('panelLight').classList.remove('green');$('exitLight').classList.remove('green');$('pinLight').classList.remove('green');clearPin();renderInventory();updateTimer();player.style.left=playerX+'%';player.style.top=playerY+'%';echoIndex=0;typeEcho(0);say('SYSTEM READY // 접근 가능한 장치 가까이 이동하십시오.');clearKeys();checkInteraction();root.focus()}
 function resume(){paused=false;pauseOverlay.style.display='none';timerLast=Date.now();root.focus();clearKeys()}
 function focusGame(){try{root.focus({preventScroll:true})}catch(e){root.focus()}}
 
@@ -473,7 +483,6 @@ checkInteraction();focusGame();setInterval(syncTimer,250);setInterval(saveStageS
 """
 
 html = html.replace("__TUTORIAL_CSS__", tutorial_css)
-html = html.replace("__LAB_BACKGROUND__", lab_background_data)
 html = html.replace("__STAGE02_FLOOR__", stage02_floor_data)
 html = html.replace("__STAGE02_WALL__", stage02_wall_data)
 html = html.replace("__RESET_STAGE_SAVE__", "true" if st.session_state.pop("stage02_reset_save", False) else "false")
