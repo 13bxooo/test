@@ -136,7 +136,8 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#02050a;col
 .room{position:relative;width:min(98vw,calc((100vh - 60px)*4/3));aspect-ratio:4/3;flex-shrink:0;overflow:hidden;background:transparent}
 .room img.layer{position:absolute;left:50%;top:50%;width:100%;height:100%;min-width:100%;min-height:100%;transform:translate(-50%,-50%);object-fit:fill;pointer-events:none;image-rendering:pixelated;filter:none;backface-visibility:hidden}
 #floorLayer{z-index:1;transform:translate(-50%,-50%);transform-origin:center center}#wallLayer{z-index:4;transform:translate(-50%,-50%);transform-origin:center center;clip-path:polygon(0 0,100% 0,100% 100%,0 100%)}
-.room.show-upper-player #wallLayer{z-index:2}.room.show-upper-player .player{z-index:5}
+#wallOpenLayer{left:calc(50% - 3px);top:50%;transform:translate(-50%,-50%);transform-origin:center center;z-index:4}
+.room.show-upper-player #wallLayer,.room.show-upper-player #wallOpenLayer{z-index:2}.room.show-upper-player .player{z-index:5}
 .player{position:absolute;z-index:3;width:22px;height:28px;background:#d5e7ee;border:0;box-shadow:inset 0 0 0 4px #7895a5,inset 0 -7px #263d4d,-4px 0 #152a39,4px 0 #152a39,0 -3px #152a39,0 3px #152a39;image-rendering:pixelated;transform:translate(-50%,-50%);pointer-events:none}
 .player::before{content:"";position:absolute;left:4px;right:4px;top:-7px;height:8px;background:#c5d8e0;border:2px solid #142b3a;box-shadow:inset 0 -3px #7896a5}
 .player::after{content:"";position:absolute;left:6px;right:6px;top:2px;height:3px;background:#5ceaff;box-shadow:0 0 3px #5ceaff}
@@ -464,7 +465,7 @@ function rebuildWallWalkable(){
  const image=doorOpen?$('wallOpenLayer'):$('wallLayer');if(!image.complete||!image.naturalWidth)return;
  try{
   wallHitContext.clearRect(0,0,1200,900);
-  wallHitContext.drawImage(image,doorOpen?0:(-10*1200/Math.max(1,$('room').clientWidth)),0,1200,900);
+  wallHitContext.drawImage(image,doorOpen?(-3*1200/Math.max(1,$('room').clientWidth)):(-10*1200/Math.max(1,$('room').clientWidth)),0,1200,900);
   const rgba=wallHitContext.getImageData(0,0,1200,900).data;
   const width=300,height=225,occupied=new Uint8Array(width*height);
   for(let cy=0;cy<height;cy++)for(let cx=0;cx<width;cx++){
