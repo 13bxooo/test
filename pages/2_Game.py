@@ -267,21 +267,21 @@ footer {{
 }}
 
 /* v8: consistent overlays, compact scroll-free controls and pause glow */
-#helpOverlay,#inventoryOverlay{position:fixed!important;inset:0!important;z-index:4000!important;background:rgba(0,0,0,.70)!important;overflow:hidden!important}
-#helpOverlay .help-panel{width:min(760px,90vw)!important;max-height:min(720px,90vh)!important;overflow:hidden!important;padding:28px 32px!important}
-#helpOverlay .help-row{display:grid!important;grid-template-columns:32px 230px minmax(0,1fr)!important;align-items:center!important;gap:12px!important;padding:11px 0!important}
-#helpOverlay .help-number{width:auto!important;color:#5fe9ff!important;border:0!important;background:none!important}
-#helpOverlay .help-key{width:auto!important;color:#61e8ff!important;border:0!important;background:none!important;display:flex!important;align-items:center!important;gap:10px!important}
-#helpOverlay .help-key .control-label{color:#63e8ff!important;min-width:88px!important}
-#helpOverlay .help-key .control-separator{color:#637985!important}
-#helpOverlay .help-key .control-button{color:#f2fbff!important}
-#helpOverlay .help-description{color:#8c9da7!important}
-#inventoryOverlay .inventory-panel{max-height:90vh!important;overflow:hidden!important}
-#pauseOverlay{position:fixed!important;inset:0!important;z-index:9000!important;background:rgba(0,0,0,.72)!important}
-#pauseOverlay .pause-menu-panel{box-shadow:0 0 0 1px #123c4d,0 0 22px #00cfff55,0 0 100px #00cfff20!important}
-.pause-toggle{z-index:9100!important}
-.item-acquired-dialog .item-acquired-text{font-size:14px!important;line-height:1.6!important}
-#tutorialTransition{z-index:9998!important}
+#helpOverlay,#inventoryOverlay{{position:fixed!important;inset:0!important;z-index:4000!important;background:rgba(0,0,0,.70)!important;overflow:hidden!important}}
+#helpOverlay .help-panel{{width:min(760px,90vw)!important;max-height:min(720px,90vh)!important;overflow:hidden!important;padding:28px 32px!important}}
+#helpOverlay .help-row{{display:grid!important;grid-template-columns:32px 230px minmax(0,1fr)!important;align-items:center!important;gap:12px!important;padding:11px 0!important}}
+#helpOverlay .help-number{{width:auto!important;color:#5fe9ff!important;border:0!important;background:none!important}}
+#helpOverlay .help-key{{width:auto!important;color:#61e8ff!important;border:0!important;background:none!important;display:flex!important;align-items:center!important;gap:10px!important}}
+#helpOverlay .help-key .control-label{{color:#63e8ff!important;min-width:88px!important}}
+#helpOverlay .help-key .control-separator{{color:#637985!important}}
+#helpOverlay .help-key .control-button{{color:#f2fbff!important}}
+#helpOverlay .help-description{{color:#8c9da7!important}}
+#inventoryOverlay .inventory-panel{{max-height:90vh!important;overflow:hidden!important}}
+#pauseOverlay{{position:fixed!important;inset:0!important;z-index:9000!important;background:rgba(0,0,0,.72)!important}}
+#pauseOverlay .pause-menu-panel{{box-shadow:0 0 0 1px #123c4d,0 0 22px #00cfff55,0 0 100px #00cfff20!important}}
+.pause-toggle{{z-index:9100!important}}
+.item-acquired-dialog .item-acquired-text{{font-size:14px!important;line-height:1.6!important}}
+#tutorialTransition{{z-index:9998!important}}
 </style>
 """,
     unsafe_allow_html=True,
