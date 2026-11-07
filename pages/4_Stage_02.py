@@ -40,6 +40,46 @@ st.markdown("""<style>html,body,.stApp,[data-testid="stAppViewContainer"],[data-
 #echoText{padding-right:6px!important;padding-bottom:8px!important}
 #dataSavingScreen:not(.active){display:none!important}
 #floorLayer,#wallLayer{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:fill!important;transform:none!important}</style>""", unsafe_allow_html=True)
+
+# Lock the host page and game iframe to the visible viewport.
+# The in-game interfaces and all gameplay JS remain unchanged.
+_SCROLL_LOCK_CSS = """<style id="logic-other-stage-scroll-lock">
+html, body, .stApp,
+[data-testid="stAppViewContainer"], [data-testid="stMain"] {
+    height: 100vh !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    overflow: hidden !important;
+    overscroll-behavior: none !important;
+}
+[data-testid="stMainBlockContainer"], .block-container {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100vw !important;
+    width: 100% !important;
+}
+.stApp iframe[data-testid="stIFrame"],
+.stApp [data-testid="stCustomComponentV1"] iframe,
+.stApp iframe {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: auto !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    z-index: 20 !important;
+    display: block !important;
+}
+</style>"""
+st.markdown(_SCROLL_LOCK_CSS, unsafe_allow_html=True)
+
 title = st.button("TITLE NAV", key="stage02_title_nav")
 restart = st.button("RESTART NAV", key="stage02_restart_nav")
 st.markdown("<style>.st-key-stage02_title_nav,.st-key-stage02_restart_nav{position:fixed!important;left:-10000px!important;top:0!important}</style>", unsafe_allow_html=True)
@@ -656,4 +696,4 @@ html = html.replace("__RESET_SAVE__", "true" if st.session_state.pop("stage02_re
 html = html.replace("</head>", '<style id="logic-v9-iframe-ui">\n/* This style lives INSIDE the components.html iframe, unlike v8\'s Streamlit-level CSS. */\n#helpOverlay,#inventoryOverlay{position:fixed!important;inset:0!important;z-index:4000!important;background:rgba(0,0,0,.70)!important;align-items:center!important;justify-content:center!important;overflow:hidden!important}\n#helpOverlay .help-panel,#helpOverlay .utility-panel{box-sizing:border-box!important;width:min(760px,90vw)!important;max-width:90vw!important;max-height:90vh!important;overflow:hidden!important;padding:24px 32px!important}\n#helpOverlay .help-row{display:grid!important;grid-template-columns:32px 260px minmax(0,1fr)!important;grid-template-rows:auto!important;gap:2px 14px!important;align-items:center!important;padding:9px 0!important;min-width:0!important;border-bottom:1px solid #17495b!important}\n#helpOverlay .help-number{grid-column:1!important;grid-row:1!important;display:block!important;width:auto!important;min-width:0!important;height:auto!important;color:#61e8ff!important;border:0!important;background:none!important;box-shadow:none!important}\n#helpOverlay .help-key{grid-column:2!important;grid-row:1!important;display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;gap:12px!important;min-width:0!important;width:auto!important;height:auto!important;padding:0!important;border:0!important;background:none!important;box-shadow:none!important;font-size:12px!important}\n#helpOverlay .help-key .control-label{position:static!important;display:inline!important;flex:0 0 128px!important;min-width:0!important;width:auto!important;height:auto!important;padding:0!important;transform:none!important;clip-path:none!important;border:0!important;background:none!important;box-shadow:none!important;color:#63e8ff!important;font-size:12px!important}\n#helpOverlay .help-key .control-separator{position:static!important;display:inline!important;flex:0 0 auto!important;color:#637985!important}\n#helpOverlay .help-key .control-button{position:static!important;display:inline!important;flex:0 0 auto!important;min-width:0!important;width:auto!important;height:auto!important;padding:0!important;transform:none!important;clip-path:none!important;border:0!important;background:none!important;box-shadow:none!important;color:#f2fbff!important;font-size:12px!important;line-height:1.4!important}\n#helpOverlay .help-description{grid-column:3!important;grid-row:1!important;color:#8c9da7!important;font-size:11px!important;line-height:1.5!important;min-width:0!important}\n#helpOverlay .help-important{margin-top:14px!important;padding:12px 14px!important}\n#inventoryOverlay .inventory-panel,#inventoryOverlay .utility-panel{box-sizing:border-box!important;width:min(760px,90vw)!important;max-height:90vh!important;overflow:hidden!important;padding:24px!important}\n#inventoryOverlay .inventory-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-template-rows:repeat(3,minmax(0,1fr))!important;gap:8px!important;max-height:min(55vh,470px)!important;overflow:hidden!important}\n#inventoryOverlay .inventory-slot{position:relative!important;min-width:0!important;min-height:0!important;aspect-ratio:1.1!important;background:#01060b!important;border:1px solid #28546a!important}\n#inventoryOverlay .item-description{margin-top:12px!important;min-height:56px!important;padding:12px!important;border:1px solid #48dfff!important;color:#d9faff!important}\n#pauseOverlay,.pause-overlay{z-index:9000!important;background:rgba(0,0,0,.72)!important;backdrop-filter:blur(3px)!important}\n#pauseOverlay .pause-menu-panel,.pause-overlay .pause-menu-panel{box-shadow:0 0 0 1px #123c4d,0 0 22px #00cfff55,0 0 100px #00cfff20!important}\n#pauseToggle,.pause-toggle{z-index:9100!important}\n.item-acquired-notice.show{z-index:4500!important}\n.item-acquired-text{font-size:12px!important;line-height:1.6!important}\n.echo-next{color:#4b8da0!important;opacity:.85!important}\n#dataSavingScreen:not(.active){display:none!important}\n#floorLayer,#wallLayer{width:100%!important;height:100%!important;object-fit:fill!important}\n</style>' + "</head>", 1)
 html = html.replace('</head>', '<style id="logic-v11-gameplay">' + '\n/* v11: tutorial-matched entrance and slow low-contrast ECHO prompt */\n.stage-transition-card{\n  text-shadow:0 0 5px #fff,0 0 12px #00dfff!important;\n  animation:neonFaultOnce .85s steps(1,end) 1 both!important;\n}\n.stage-transition-stage,.stage-transition-room{animation:none!important}\n@keyframes neonFaultOnce{\n  0%,18%,22%,100%{opacity:1;filter:none}\n  19%,21%{opacity:.22;filter:brightness(.4)}\n}\n.echo-next,.echo-next.ready,.echo-next:not(.ready){\n color:#80bbc8!important;\n opacity:.65!important;\n animation:logicSlowBlink 3s ease-in-out infinite!important;\n}\n@keyframes logicSlowBlink{0%,100%{filter:opacity(.35)}50%{filter:opacity(.9)}}\n' + '</style></head>', 1)
 html = html.replace("</head>", '\n<style id="logic-v14-shared-prompt">\n/* Identical typography and ready state to the tutorial ECHO prompt. */\n.echo-bar {box-sizing:border-box!important;padding-bottom:29px!important;min-height:88px!important}\n.echo-bar #echoText {display:block!important;margin:0!important;padding:0 0 8px!important;max-width:100%!important;white-space:normal!important;overflow-wrap:anywhere!important}\n.echo-bar #echoNext.echo-next {\n position:absolute!important;right:14px!important;bottom:7px!important;\n font:9px/1.4 NeoDungGeunMo,monospace!important;letter-spacing:normal!important;\n pointer-events:none!important;color:#6c8791!important;opacity:1!important;\n animation:none!important;text-shadow:none!important;\n}\n.echo-bar #echoNext.echo-next.ready {color:#f5ffff!important;animation:tutorialEchoBlink .8s steps(2,end) infinite!important}\n@keyframes tutorialEchoBlink {50%{opacity:.35}}\n</style>\n' + "</head>", 1)
-components.html(html, height=1000, scrolling=False)
+components.html(html, height=800, scrolling=False)
