@@ -50,6 +50,27 @@ html,body,.stApp,[data-testid="stAppViewContainer"],[data-testid="stMain"]{backg
 [data-testid="stHeader"],[data-testid="stToolbar"],[data-testid="stSidebarCollapsedControl"],footer{display:none!important}
 .block-container,[data-testid="stMainBlockContainer"]{padding:0!important;max-width:100vw!important;width:100%!important}
 iframe{display:block!important;border:0!important;width:100%!important}
+/* Stage 01 viewport lock: prevent the 1000px components iframe from scrolling
+   Streamlit's outer page on smaller screens. This CSS runs in the host page. */
+html,body,.stApp,[data-testid="stAppViewContainer"],[data-testid="stMain"] {
+  height:100vh!important;
+  height:100dvh!important;
+  max-height:100dvh!important;
+  overflow:hidden!important;
+  overscroll-behavior:none!important;
+}
+.stApp iframe[data-testid="stIFrame"],
+.stApp [data-testid="stCustomComponentV1"] iframe,
+.stApp iframe {
+  position:fixed!important;
+  top:0!important;left:0!important;right:0!important;bottom:auto!important;
+  width:100vw!important;height:100vh!important;height:100dvh!important;
+  min-height:0!important;max-height:none!important;
+  margin:0!important;padding:0!important;
+  border:0!important;z-index:20!important;
+  display:block!important;
+}
+
 
 /* v8 shared popup hierarchy and tutorial styling */
 #helpOverlay,#inventoryOverlay{position:fixed!important;inset:0!important;z-index:4000!important;background:rgba(0,0,0,.70)!important}
@@ -589,4 +610,4 @@ html = html.replace("</head>", '<style id="logic-v9-iframe-ui">\n/* This style l
 html = html.replace('</head>', '<style id="logic-v11-gameplay">' + '\n/* v11: tutorial-matched entrance and slow low-contrast ECHO prompt */\n.stage-transition-card{\n  text-shadow:0 0 5px #fff,0 0 12px #00dfff!important;\n  animation:neonFaultOnce .85s steps(1,end) 1 both!important;\n}\n.stage-transition-stage,.stage-transition-room{animation:none!important}\n@keyframes neonFaultOnce{\n  0%,18%,22%,100%{opacity:1;filter:none}\n  19%,21%{opacity:.22;filter:brightness(.4)}\n}\n.echo-next,.echo-next.ready,.echo-next:not(.ready){\n color:#80bbc8!important;\n opacity:.65!important;\n animation:logicSlowBlink 3s ease-in-out infinite!important;\n}\n@keyframes logicSlowBlink{0%,100%{filter:opacity(.35)}50%{filter:opacity(.9)}}\n\n/* v11: closed and open Stage 01 wall sprites share the SAME physical rectangle. */\n.room #floorLayer,.room #wallLayer{\n position:absolute!important;left:0!important;top:0!important;right:auto!important;bottom:auto!important;\n width:100%!important;height:100%!important;min-width:100%!important;min-height:100%!important;\n transform:none!important;object-fit:fill!important;transform-origin:center center!important;\n image-rendering:pixelated!important;\n}\n.room #wallLayer{clip-path:none!important}\n.game #interactionHint{bottom:calc(5% + 135px)!important;z-index:30!important}\n' + '</style></head>', 1)
 html = html.replace("</head>", '<style id="logic-v14-wall-sync">\n/* Preloaded full-canvas closed/open wall sprites. Keep precisely the same render box. */\n.room #wallLayer,.room #wallOpenLayer {\n position:absolute!important;left:0!important;top:0!important;right:auto!important;bottom:auto!important;\n width:100%!important;height:100%!important;min-width:100%!important;min-height:100%!important;\n margin:0!important;padding:0!important;max-width:none!important;max-height:none!important;\n transform:none!important;transform-origin:center center!important;object-fit:fill!important;\n image-rendering:pixelated!important;filter:none!important;clip-path:none!important;\n z-index:4!important;pointer-events:none!important;\n}\n.room.show-upper-player #wallLayer,.room.show-upper-player #wallOpenLayer{z-index:2!important}\n</style>' + "</head>", 1)
 html = html.replace("</head>", '\n<style id="logic-v14-shared-prompt">\n/* Identical typography and ready state to the tutorial ECHO prompt. */\n.echo-bar {box-sizing:border-box!important;padding-bottom:29px!important;min-height:88px!important}\n.echo-bar #echoText {display:block!important;margin:0!important;padding:0 0 8px!important;max-width:100%!important;white-space:normal!important;overflow-wrap:anywhere!important}\n.echo-bar #echoNext.echo-next {\n position:absolute!important;right:14px!important;bottom:7px!important;\n font:9px/1.4 NeoDungGeunMo,monospace!important;letter-spacing:normal!important;\n pointer-events:none!important;color:#6c8791!important;opacity:1!important;\n animation:none!important;text-shadow:none!important;\n}\n.echo-bar #echoNext.echo-next.ready {color:#f5ffff!important;animation:tutorialEchoBlink .8s steps(2,end) infinite!important}\n@keyframes tutorialEchoBlink {50%{opacity:.35}}\n</style>\n' + "</head>", 1)
-components.html(html,height=1000,scrolling=False)
+components.html(html,height=800,scrolling=False)
