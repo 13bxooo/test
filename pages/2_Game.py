@@ -265,6 +265,23 @@ footer {{
   box-shadow:none !important;
   border:0 !important;
 }}
+
+/* v8: consistent overlays, compact scroll-free controls and pause glow */
+#helpOverlay,#inventoryOverlay{position:fixed!important;inset:0!important;z-index:4000!important;background:rgba(0,0,0,.70)!important;overflow:hidden!important}
+#helpOverlay .help-panel{width:min(760px,90vw)!important;max-height:min(720px,90vh)!important;overflow:hidden!important;padding:28px 32px!important}
+#helpOverlay .help-row{display:grid!important;grid-template-columns:32px 230px minmax(0,1fr)!important;align-items:center!important;gap:12px!important;padding:11px 0!important}
+#helpOverlay .help-number{width:auto!important;color:#5fe9ff!important;border:0!important;background:none!important}
+#helpOverlay .help-key{width:auto!important;color:#61e8ff!important;border:0!important;background:none!important;display:flex!important;align-items:center!important;gap:10px!important}
+#helpOverlay .help-key .control-label{color:#63e8ff!important;min-width:88px!important}
+#helpOverlay .help-key .control-separator{color:#637985!important}
+#helpOverlay .help-key .control-button{color:#f2fbff!important}
+#helpOverlay .help-description{color:#8c9da7!important}
+#inventoryOverlay .inventory-panel{max-height:90vh!important;overflow:hidden!important}
+#pauseOverlay{position:fixed!important;inset:0!important;z-index:9000!important;background:rgba(0,0,0,.72)!important}
+#pauseOverlay .pause-menu-panel{box-shadow:0 0 0 1px #123c4d,0 0 22px #00cfff55,0 0 100px #00cfff20!important}
+.pause-toggle{z-index:9100!important}
+.item-acquired-dialog .item-acquired-text{font-size:14px!important;line-height:1.6!important}
+#tutorialTransition{z-index:9998!important}
 </style>
 """,
     unsafe_allow_html=True,
@@ -3516,8 +3533,7 @@ button,.game button,.code-button,.help-key{border-radius:0!important}
     </div>
 
     <div class="help-key">
-        MOVEMENT<br>
-        W A S D
+        <span class="control-label">MOVEMENT</span><span class="control-separator">|</span><span class="control-button">W A S D</span>
     </div>
 
     <div class="help-description">
@@ -3534,8 +3550,7 @@ button,.game button,.code-button,.help-key{border-radius:0!important}
     </div>
 
     <div class="help-key">
-        INTERACTION<br>
-        E
+        <span class="control-label">INTERACTION</span><span class="control-separator">|</span><span class="control-button">E</span>
     </div>
 
     <div class="help-description">
@@ -3552,8 +3567,7 @@ button,.game button,.code-button,.help-key{border-radius:0!important}
     </div>
 
     <div class="help-key">
-        INVENTORY<br>
-        I
+        <span class="control-label">INVENTORY</span><span class="control-separator">|</span><span class="control-button">I</span>
     </div>
 
     <div class="help-description">
@@ -3570,8 +3584,7 @@ button,.game button,.code-button,.help-key{border-radius:0!important}
     </div>
 
     <div class="help-key">
-        SYSTEM<br>
-        SPACE
+        <span class="control-label">SYSTEM</span><span class="control-separator">|</span><span class="control-button">SPACE</span>
     </div>
 
     <div class="help-description">
@@ -3588,8 +3601,7 @@ button,.game button,.code-button,.help-key{border-radius:0!important}
     </div>
 
     <div class="help-key">
-        CONTROLS<br>
-        H
+        <span class="control-label">CONTROLS</span><span class="control-separator">|</span><span class="control-button">H</span>
     </div>
 
     <div class="help-description">
@@ -3795,7 +3807,7 @@ button,.game button,.code-button,.help-key{border-radius:0!important}
 
 <div class="item-acquired-notice" id="itemAcquiredNotice" role="button" tabindex="0" aria-label="아이템 획득 알림을 닫으려면 클릭"><div class="item-acquired-art"><img class="access-card-image" src="__SWIPE_IMAGE_795a41e9c430__" alt="Access card"></div><div class="item-acquired-dialog"><div class="item-acquired-tag">ECHO</div><div class="item-acquired-text">카드가 인벤토리에 추가되었습니다.
 이 카드는 특정 장비를 작동시키거나 인증할 때 사용됩니다.</div><div class="item-acquired-close">CLICK TO CLOSE</div></div></div>
-<div class="tutorial-transition" id="tutorialTransition" aria-hidden="true"><div class="tutorial-transition-card"><div class="tutorial-transition-stage">STAGE 00</div><div class="tutorial-transition-room">:TUTORIAL</div></div></div>
+<div class="tutorial-transition show" id="tutorialTransition" aria-hidden="true"><div class="tutorial-transition-card"><div class="tutorial-transition-stage">STAGE 00</div><div class="tutorial-transition-room">:TUTORIAL</div></div></div>
 <div class="pause-overlay" id="pauseOverlay"><div class="pause-menu-panel"><div class="pause-actions"><div class="pause-row"><span class="pause-icon">Ⅱ</span><button class="pause-nav-link pause-menu-button" id="resumeButton" type="button">RESUME</button></div><div class="pause-row"><span class="pause-icon">↻</span><a class="pause-nav-link" id="restartButton" href="?action=restart" target="_top" rel="noopener">RESTART</a></div><div class="pause-row"><span class="pause-icon">⌂</span><a class="pause-nav-link" id="titleButton" href="?action=title" target="_top" rel="noopener">TITLE</a></div></div></div></div>
 
 <div
@@ -4285,7 +4297,7 @@ function nextEcho() {
 
     if (echoIndex === 0 && tutorialStep === 0) {
         typeEcho(1);
-        status.textContent = "TUTORIAL // W A S D TO MOVE";
+        status.textContent = "ECHO SYSTEM // ONLINE";
         saveTutorialState();
         return;
     }
@@ -4349,6 +4361,8 @@ function restoreTutorialState() {
 const tutorialWasRestored = restoreTutorialState();
 window.addEventListener("pagehide",saveTutorialState);
 const tutorialTransition = document.getElementById("tutorialTransition");
+if (tutorialWasRestored && tutorialTransition) tutorialTransition.remove();
+if (tutorialWasRestored && tutorialTransition) tutorialTransition.remove();
 if (!tutorialWasRestored && tutorialTransition) {
     tutorialTransition.classList.add("show");
     window.setTimeout(() => tutorialTransition.classList.add("hide"), 2700);
@@ -6092,6 +6106,20 @@ function dragCardMove(
 }
 
 
+function playVerificationChime(){
+  try{const C=window.AudioContext||window.webkitAudioContext;const ctx=new C();ctx.resume();
+    [659.25,880,1318.5].forEach((hz,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type="sine";o.frequency.value=hz;const t=ctx.currentTime+i*.11;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.055,t+.025);g.gain.exponentialRampToValueAtTime(.0001,t+.25);o.connect(g).connect(ctx.destination);o.start(t);o.stop(t+.27)});
+    setTimeout(()=>ctx.close().catch(()=>{}),1000);
+  }catch(e){}
+}
+
+function playVerificationChime(){
+  try{const C=window.AudioContext||window.webkitAudioContext;const ctx=new C();ctx.resume();
+    [659.25,880,1318.5].forEach((hz,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type="sine";o.frequency.value=hz;const t=ctx.currentTime+i*.11;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.055,t+.025);g.gain.exponentialRampToValueAtTime(.0001,t+.25);o.connect(g).connect(ctx.destination);o.start(t);o.stop(t+.27)});
+    setTimeout(()=>ctx.close().catch(()=>{}),1000);
+  }catch(e){}
+}
+
 function finishCardDrag(
     event
 ) {
@@ -6172,6 +6200,8 @@ function finishCardDrag(
         cardConsumed = true;
         renderInventory();
         if (readerLight) readerLight.classList.add("green");
+        playVerificationChime();
+        playVerificationChime();
         cardStatus.textContent = "ACCESS GRANTED // CARD CONSUMED";
         // 인증 완료 후 출입구에서 E키를 눌러 이동한다.
         cardStatus.textContent =
