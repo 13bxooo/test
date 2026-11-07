@@ -432,11 +432,49 @@ const player=$('player');
 // 열린 벽 이미지를 미리 불러와 문 전환 시 크기 재계산을 방지합니다.
 const openWallPreload=new Image();openWallPreload.src='__WALLSOPEN__';
 function draw(){player.style.left=x+'%';player.style.top=y+'%';$('room').classList.toggle('show-upper-player',y<30&&(x<23||x>77))}
-// Coordinates are expressed in the original 843×619 artwork. The red boundary
-// defines the traversable floor; walls are always rendered above the player.
-// 방 내부를 0~100% 좌표로 표현한다. 위쪽 문 및 네 모서리의 사선 벽을 반영한다.
-const boundary=[[14,24],[86,24],[94,31],[94,83],[88,92],[12,92],[6,83],[6,31]];
-function inPolygon(px,py){let inside=false;for(let i=0,j=boundary.length-1;i<boundary.length;j=i++){const a=boundary[i],b=boundary[j];if((a[1]>py)!=(b[1]>py)&&px<(b[0]-a[0])*(py-a[1])/(b[1]-a[1])+a[0])inside=!inside}return inside}
+// The collision surface is derived from the rendered WALL image (not the floor).
+// A flood fill from the room centre keeps movement inside the wall frame.
+const wallHitCanvas=document.createElement('canvas');
+wallHitCanvas.width=1200;wallHitCanvas.height=900;
+const wallHitContext=wallHitCanvas.getContext('2d',{willReadFrequently:true});
+let wallWalkable=null;
+function rebuildWallWalkable(){
+ const image=$('wallLayer');if(!image.complete||!image.naturalWidth)return;
+ try{
+  wallHitContext.clearRect(0,0,1200,900);
+  wallHitContext.drawImage(image,0,0,1200,900);
+  const rgba=wallHitContext.getImageData(0,0,1200,900).data;
+  const width=300,height=225,occupied=new Uint8Array(width*height);
+  for(let cy=0;cy<height;cy++)for(let cx=0;cx<width;cx++){
+   let solid=false;
+   for(let yy=0;yy<4&&!solid;yy++)for(let xx=0;xx<4;xx++){
+    if(rgba[(((cy*4+yy)*1200)+(cx*4+xx))*4+3]>100){solid=true;break}
+   }
+   occupied[cy*width+cx]=solid?1:0;
+  }
+  const region=new Uint8Array(width*height);
+  const queue=new Int32Array(width*height);let read=0,write=0;
+  const start=112*width+150;
+  if(!occupied[start]){region[start]=1;queue[write++]=start}
+  while(read<write){
+   const p=queue[read++],cx=p%width,cy=(p/width)|0;
+   const neighbors=[cx>0?p-1:-1,cx<width-1?p+1:-1,cy>0?p-width:-1,cy<height-1?p+width:-1];
+   for(const n of neighbors)if(n>=0&&!occupied[n]&&!region[n]){region[n]=1;queue[write++]=n}
+  }
+  wallWalkable=region;
+ }catch(e){wallWalkable=null}
+}
+$('wallLayer').addEventListener('load',rebuildWallWalkable);
+if($('wallLayer').complete)rebuildWallWalkable();
+function insideWall(nx,ny){
+ const cx=Math.round(nx*3),cy=Math.round(ny*2.25);
+ if(cx<0||cy<0||cx>=300||cy>=225||!wallWalkable)return false;
+ for(const [dx,dy] of [[0,0],[-3,-4],[3,-4],[-3,4],[3,4]]){
+  const ix=cx+dx,iy=cy+dy;
+  if(ix<0||iy<0||ix>=300||iy>=225||!wallWalkable[iy*300+ix])return false;
+ }
+ return true;
+}
 // 충돌 영역은 이미지 요소의 실제 표시 크기를 기준으로 계산합니다.
 function objectRect(o){
  const el=$(o.id),room=$('room').getBoundingClientRect(),r=el.getBoundingClientRect();
@@ -445,9 +483,7 @@ function objectRect(o){
 }
 // 열린 문 벽의 안쪽 경계만 이동 제한으로 사용합니다.
 function canMove(nx,ny){
- const corners=[[-1.2,-1.8],[1.2,-1.8],[-1.2,1.8],[1.2,1.8]];
- if(!(doorOpen&&nx>45&&nx<55&&ny>=18&&ny<32) &&
-    !corners.every(([dx,dy])=>inPolygon(nx+dx,ny+dy)))return false;
+ if(!insideWall(nx,ny))return false;
  // 터미널과 NOTE·키패드 이미지에만 충돌 판정을 적용합니다.
  for(const o of objects){
   if(o.k==='EXIT')continue;
@@ -491,7 +527,7 @@ function nearest(){
  for(const o of objects){if(o.k==='EXIT'&&!doorOpen)continue;const d=objectDistance(o);if(d<dist){best=o;dist=d}}
  return dist<(best?.k==='EXIT'?8:best?.k==='KEYPAD'?8.5:4.8)?best:null;
 }
-function updateHint(){const o=nearest();$('interactionHint').style.display=o&&!leaving?'block':'none';if(o)$('interactionHint').textContent='E : '+(o.k==='NOTE'?'NOTE 확인':o.k==='KEYPAD'?'보안 키패드':o.k==='EXIT'?'열린 출구로 이동':`터미널 ${o.k} 조사`)}
+function updateHint(){const o=nearest();$('interactionHint').style.display=o&&!leaving&&!dialogOpen&&!paused?'block':'none';if(o)$('interactionHint').textContent=o.k==='NOTE'?'E // READ NOTE':o.k==='KEYPAD'?'E // ACCESS KEYPAD':o.k==='EXIT'?'E // EXIT':`E // INVESTIGATE TERMINAL ${o.k}`}
 function openDialog(content){dialogOpen=true;$('gameRoot').classList.add('dialog-active');keys.clear();$('dialogContent').innerHTML=content+`<div style="text-align:right"><button onclick="closeDialog()">CLOSE [SPACE]</button></div>`;$('dialogOverlay').style.display='flex'}
 function closeDialog(){dialogOpen=false;$('gameRoot').classList.remove('dialog-active');$('dialogOverlay').style.display='none';keys.clear();if(deferredEcho){const message=deferredEcho;deferredEcho=null;echoSay(message)}}
 $('dialogOverlay').addEventListener('click',e=>{if(e.target===$('dialogOverlay'))closeDialog()});
@@ -526,8 +562,8 @@ function renderInventory(){const keys=Object.keys(records).filter(k=>records[k])
 function showRecord(k){$('inventoryItems').querySelectorAll('.inventory-slot').forEach(el=>el.classList.remove('selected'));const idx=Object.keys(records).filter(v=>records[v]).indexOf(k);$('inventoryItems').children[idx]?.classList.add('selected');$('itemDescription').textContent=`조사 기록지 ${k} / ${recordText(k)}`;}
 function recordText(k){return k==='A'?`기록 A / 접근 인증값: ${digits[1]} — 순서 단서는 NOTE에 보관되어 있다.`:k==='B'?`기록 B / 접근 인증값: ${digits[2]} — 모든 기록을 대조해야 한다.`:`기록 C / 접근 인증값: ${digits[0]}${digits[3]} — 첫 번째와 마지막 자릿수이다.`}
 function checkGlow(){if(Object.values(records).every(Boolean)&&!noteRead)$('noteProp').classList.add('glow');else $('noteProp').classList.remove('glow');$('keypadProp').classList.toggle('glow',noteRead&&!doorOpen)}
-function interact(){if(paused||entering||!typingDone||echoIndex<echoLines.length)return;const o=nearest();if(!o||leaving)return;if(o.k==='EXIT'){leaveStage();return;}if('ABC'.includes(o.k)&&o.k.length===1){const first=!records[o.k];records[o.k]=true;if(first){scribble();}checkGlow();deferredEcho=`터미널 ${o.k}의 기록을 확보했습니다. 인벤토리(I)에 기록지가 저장되었습니다.`;openDialog(`<h3>TERMINAL ${o.k} // 조사 완료</h3><img src="${recordImages[o.k]}"><p>${recordText(o.k)}</p><p>${first?'기록지가 인벤토리에 추가되었습니다.':'이미 확보한 기록입니다.'}</p>`);return}
-if(o.k==='NOTE'){if(!Object.values(records).every(Boolean)){openDialog('<h3>NOTE // 잠금</h3>세 터미널의 기록을 모두 수집한 뒤 확인할 수 있습니다.');return}noteRead=true;checkGlow();openDialog(`<h3>NOTE // 인증 절차</h3><img src="__NOTE__"><p>이 보관실은 세 단말기에 분산된 인증 기록을 복원해야 출구가 개방된다.</p><p>기록을 읽는 순서는 <strong>C → A → B</strong>이다. C에는 첫째·넷째 자리, A에는 둘째 자리, B에는 셋째 자리가 기록되어 있다.</p><p>수집한 네 자릿수를 순서대로 입력하면 출구 잠금이 해제된다.</p>`);deferredEcho=`기록 복원이 완료되었습니다. 키패드의 정답은 ${digits}입니다. 안내한 번호를 그대로 입력하십시오.`;return}
+function interact(){if(paused||entering||!typingDone||echoIndex<echoLines.length)return;const o=nearest();if(!o||leaving)return;if(o.k==='EXIT'){leaveStage();return;}if('ABC'.includes(o.k)&&o.k.length===1){const first=!records[o.k];records[o.k]=true;if(first){scribble();}checkGlow();deferredEcho=`터미널 ${o.k}의 기록을 확보했습니다. 인벤토리(I)에 기록지가 저장되었습니다.`;openDialog(`<h3>TERMINAL ${o.k} // INVESTIGATION COMPLETE</h3><img src="${recordImages[o.k]}"><p>${recordText(o.k)}</p><p>${first?'기록지가 인벤토리에 추가되었습니다.':'이미 확보한 기록입니다.'}</p>`);return}
+if(o.k==='NOTE'){if(!Object.values(records).every(Boolean)){openDialog('<h3>NOTE // 잠금</h3>세 터미널의 기록을 모두 수집한 뒤 확인할 수 있습니다.');return}scribble();noteRead=true;checkGlow();openDialog(`<h3>NOTE // 인증 절차</h3><img src="__NOTE__"><p>이 보관실은 세 단말기에 분산된 인증 기록을 복원해야 출구가 개방된다.</p><p>기록을 읽는 순서는 <strong>C → A → B</strong>이다. C에는 첫째·넷째 자리, A에는 둘째 자리, B에는 셋째 자리가 기록되어 있다.</p><p>수집한 네 자릿수를 순서대로 입력하면 출구 잠금이 해제된다.</p>`);deferredEcho=`기록 복원이 완료되었습니다. 키패드의 정답은 ${digits}입니다. 안내한 번호를 그대로 입력하십시오.`;return}
 if(o.k==='KEYPAD'){if(!noteRead){openDialog('<h3>SECURITY // LOCKED</h3>NOTE를 확인하고 인증 절차를 복원해야 합니다.');return}if(doorOpen){openDialog('<h3>EXIT OPEN</h3>출구가 열렸습니다.');return}enteredCode='';showKeypad()}}
 function showKeypad(){openDialog(`<h3>SECURITY // ACCESS CODE</h3><p>에코가 안내한 네 자리 인증번호: <strong>${digits}</strong></p><div id="keypadDigits">${enteredCode.padEnd(4,'_')}</div><div class="keygrid">${['1','2','3','4','5','6','7','8','9','←','0','OK'].map(v=>`<button onclick="keyInput('${v}')">${v}</button>`).join('')}</div>`)}
 function beep(){try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();audioCtx.resume();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='square';o.frequency.value=820;g.gain.setValueAtTime(.035,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+.085);o.connect(g).connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+.09)}catch(e){}}
@@ -550,4 +586,5 @@ for token,name in {"__FLOOR__":"floor.png","__WALLS__":"walls.png","__WALLSOPEN_
 html=html.replace("__FONT__",font)
 html=html.replace("__RESET_SAVE__", "true" if reset_save else "false")
 html = html.replace("</head>", '<style id="logic-v9-iframe-ui">\n/* This style lives INSIDE the components.html iframe, unlike v8\'s Streamlit-level CSS. */\n#helpOverlay,#inventoryOverlay{position:fixed!important;inset:0!important;z-index:4000!important;background:rgba(0,0,0,.70)!important;align-items:center!important;justify-content:center!important;overflow:hidden!important}\n#helpOverlay .help-panel,#helpOverlay .utility-panel{box-sizing:border-box!important;width:min(760px,90vw)!important;max-width:90vw!important;max-height:90vh!important;overflow:hidden!important;padding:24px 32px!important}\n#helpOverlay .help-row{display:grid!important;grid-template-columns:32px 260px minmax(0,1fr)!important;grid-template-rows:auto!important;gap:2px 14px!important;align-items:center!important;padding:9px 0!important;min-width:0!important;border-bottom:1px solid #17495b!important}\n#helpOverlay .help-number{grid-column:1!important;grid-row:1!important;display:block!important;width:auto!important;min-width:0!important;height:auto!important;color:#61e8ff!important;border:0!important;background:none!important;box-shadow:none!important}\n#helpOverlay .help-key{grid-column:2!important;grid-row:1!important;display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;gap:12px!important;min-width:0!important;width:auto!important;height:auto!important;padding:0!important;border:0!important;background:none!important;box-shadow:none!important;font-size:12px!important}\n#helpOverlay .help-key .control-label{position:static!important;display:inline!important;flex:0 0 128px!important;min-width:0!important;width:auto!important;height:auto!important;padding:0!important;transform:none!important;clip-path:none!important;border:0!important;background:none!important;box-shadow:none!important;color:#63e8ff!important;font-size:12px!important}\n#helpOverlay .help-key .control-separator{position:static!important;display:inline!important;flex:0 0 auto!important;color:#637985!important}\n#helpOverlay .help-key .control-button{position:static!important;display:inline!important;flex:0 0 auto!important;min-width:0!important;width:auto!important;height:auto!important;padding:0!important;transform:none!important;clip-path:none!important;border:0!important;background:none!important;box-shadow:none!important;color:#f2fbff!important;font-size:12px!important;line-height:1.4!important}\n#helpOverlay .help-description{grid-column:3!important;grid-row:1!important;color:#8c9da7!important;font-size:11px!important;line-height:1.5!important;min-width:0!important}\n#helpOverlay .help-important{margin-top:14px!important;padding:12px 14px!important}\n#inventoryOverlay .inventory-panel,#inventoryOverlay .utility-panel{box-sizing:border-box!important;width:min(760px,90vw)!important;max-height:90vh!important;overflow:hidden!important;padding:24px!important}\n#inventoryOverlay .inventory-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-template-rows:repeat(3,minmax(0,1fr))!important;gap:8px!important;max-height:min(55vh,470px)!important;overflow:hidden!important}\n#inventoryOverlay .inventory-slot{position:relative!important;min-width:0!important;min-height:0!important;aspect-ratio:1.1!important;background:#01060b!important;border:1px solid #28546a!important}\n#inventoryOverlay .item-description{margin-top:12px!important;min-height:56px!important;padding:12px!important;border:1px solid #48dfff!important;color:#d9faff!important}\n#pauseOverlay,.pause-overlay{z-index:9000!important;background:rgba(0,0,0,.72)!important;backdrop-filter:blur(3px)!important}\n#pauseOverlay .pause-menu-panel,.pause-overlay .pause-menu-panel{box-shadow:0 0 0 1px #123c4d,0 0 22px #00cfff55,0 0 100px #00cfff20!important}\n#pauseToggle,.pause-toggle{z-index:9100!important}\n.item-acquired-notice.show{z-index:4500!important}\n.item-acquired-text{font-size:12px!important;line-height:1.6!important}\n.echo-next{color:#4b8da0!important;opacity:.85!important}\n#dataSavingScreen:not(.active){display:none!important}\n#floorLayer,#wallLayer{width:100%!important;height:100%!important;object-fit:fill!important}\n</style>' + "</head>", 1)
+html = html.replace('</head>', '<style id="logic-v11-gameplay">' + '\n/* v11: tutorial-matched entrance and slow low-contrast ECHO prompt */\n.stage-transition-card{\n  text-shadow:0 0 5px #fff,0 0 12px #00dfff!important;\n  animation:neonFaultOnce .85s steps(1,end) 1 both!important;\n}\n.stage-transition-stage,.stage-transition-room{animation:none!important}\n@keyframes neonFaultOnce{\n  0%,18%,22%,100%{opacity:1;filter:none}\n  19%,21%{opacity:.22;filter:brightness(.4)}\n}\n.echo-next,.echo-next.ready,.echo-next:not(.ready){\n color:#80bbc8!important;\n opacity:.65!important;\n animation:logicSlowBlink 3s ease-in-out infinite!important;\n}\n@keyframes logicSlowBlink{0%,100%{filter:opacity(.35)}50%{filter:opacity(.9)}}\n\n/* v11: closed and open Stage 01 wall sprites share the SAME physical rectangle. */\n.room #floorLayer,.room #wallLayer{\n position:absolute!important;left:0!important;top:0!important;right:auto!important;bottom:auto!important;\n width:100%!important;height:100%!important;min-width:100%!important;min-height:100%!important;\n transform:none!important;object-fit:fill!important;transform-origin:center center!important;\n image-rendering:pixelated!important;\n}\n.room #wallLayer{clip-path:none!important}\n.game #interactionHint{bottom:calc(5% + 135px)!important;z-index:30!important}\n' + '</style></head>', 1)
 components.html(html,height=1000,scrolling=False)
