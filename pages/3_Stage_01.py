@@ -102,6 +102,30 @@ with a:
 with b:
     restart=st.button("RESTART",key="stage01_restart")
     next_stage=st.button("STAGE 02",key="stage01_next")
+    timeout_title=st.button("TIMEOUT TITLE",key="stage01_timeout_title")
+if timeout_title:
+    # 시간 초과 TITLE은 저장 연출 없이 모든 진행 기록을 초기화합니다.
+    for _key in list(st.session_state.keys()):
+        if _key.startswith(("s1_", "s2_", "tutorial_", "stage01_", "stage02_")) or _key in (
+            "game_started", "game_finished", "game_paused", "remaining_seconds", "tutorial_step"
+        ):
+            del st.session_state[_key]
+    st.session_state.update({
+        "tutorial_reset_save": True,
+        "stage01_reset_save": True,
+        "stage02_reset_save": True,
+        "tutorial_complete": False,
+        "stage01_started": False,
+        "stage02_started": False,
+        "game_started": False,
+        "game_finished": False,
+        "game_paused": False,
+        "remaining_seconds": 15 * 60,
+        "start_open": False,
+        "error_popup": False,
+        "warning_popup": False,
+    })
+    st.switch_page("main.py")
 if title:
     st.session_state["stage01_started"] = True
     st.session_state["game_started"] = True
@@ -117,7 +141,7 @@ if restart:
     st.session_state["stage01_reset_save"] = True
     st.session_state["game_paused"] = False
     st.rerun()
-st.markdown("<style>.st-key-stage01_title,.st-key-stage01_restart,.st-key-stage01_next{position:fixed!important;left:-9999px!important;top:0!important}</style>",unsafe_allow_html=True)
+st.markdown("<style>.st-key-stage01_title,.st-key-stage01_restart,.st-key-stage01_next,.st-key-stage01_timeout_title{position:fixed!important;left:-9999px!important;top:0!important}</style>",unsafe_allow_html=True)
 reset_save = bool(st.session_state.pop("stage01_reset_save", False))
 html = r"""<!DOCTYPE html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
@@ -430,9 +454,11 @@ const objects=[{id:'terminalA',x:34,y:44,k:'A'},{id:'terminalB',x:66,y:44,k:'B'}
 
 // 저장된 Stage 01 진행 상태를 복원합니다.
 const SAVE_KEY='project_logic_stage01_progress_v6';
+let timedOut=false;
 const resetSaved=__RESET_SAVE__;
 if(resetSaved){try{localStorage.removeItem(SAVE_KEY)}catch(e){}}
 function saveProgress(){
+ if(timedOut)return;
  try{localStorage.setItem(SAVE_KEY,JSON.stringify({x,y,remaining,records:{...records},noteRead,doorOpen,digits,echoIndex}))}catch(e){}
 }
 if(!resetSaved){try{
@@ -517,11 +543,27 @@ function canMove(nx,ny){
 }
 function togglePause(value){paused=value;$('pauseOverlay').style.display=paused?'flex':'none';$('pauseToggle').textContent=paused?'▶':'Ⅱ';$('pauseToggle').classList.toggle('paused',paused);keys.clear()}
 function closePanels(){$('helpOverlay').style.display='none';$('inventoryOverlay').style.display='none';keys.clear()}
-$('pauseToggle').onclick=()=>togglePause(!paused);$('resumeButton').onclick=()=>togglePause(false);
+$('pauseToggle').onclick=()=>{if(!timedOut)togglePause(!paused)};$('resumeButton').onclick=()=>{if(!timedOut)togglePause(false)};
 // 게임 안의 버튼 클릭을 Streamlit의 재시작·타이틀 버튼에 전달한다.
-function hostAction(action){window.parent.document.querySelector(action==='title'?'[class*=st-key-stage01_title] button':action==='next'?'[class*=st-key-stage01_next] button':'[class*=st-key-stage01_restart] button')?.click()}
-$('restartButton').onclick=()=>{try{localStorage.removeItem(SAVE_KEY)}catch(e){}hostAction('restart')};$('titleButton').onclick=()=>{saveProgress();const screen=$('dataSavingScreen');screen.classList.add('active');togglePause(true);setTimeout(()=>hostAction('title'),3000)};
-document.addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();if(e.repeat&&['escape','h','i'].includes(k))return;
+function hostAction(action){
+ const selector=action==='timeout_title'?'[class*=st-key-stage01_timeout_title] button':action==='title'?'[class*=st-key-stage01_title] button':action==='next'?'[class*=st-key-stage01_next] button':'[class*=st-key-stage01_restart] button';
+ try{window.parent.document.querySelector(selector)?.click()}catch(e){}
+}
+function clearAllGameStorage(){
+ for(const owner of [window,window.parent]){
+  for(const type of ['localStorage','sessionStorage']){
+   try{const store=owner[type],keys=[];
+    for(let i=0;i<store.length;i++){const key=store.key(i);if(key&&(key.startsWith('project_logic_')||key.startsWith('logic_tutorial_')))keys.push(key)}
+    keys.forEach(key=>store.removeItem(key));
+   }catch(e){}
+  }
+ }
+}
+function timeoutTitle(){
+ leaving=true;keys.clear();clearAllGameStorage();hostAction('timeout_title');
+}
+$('restartButton').onclick=()=>{try{localStorage.removeItem(SAVE_KEY)}catch(e){}hostAction('restart')};$('titleButton').onclick=()=>{if(timedOut){timeoutTitle();return}saveProgress();const screen=$('dataSavingScreen');screen.classList.add('active');togglePause(true);setTimeout(()=>hostAction('title'),3000)};
+document.addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(timedOut){e.preventDefault();return}if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();if(e.repeat&&['escape','h','i'].includes(k))return;
 if(k==='escape'){if(dialogOpen){closeDialog();return}if($('helpOverlay').style.display==='flex'||$('inventoryOverlay').style.display==='flex'){closePanels();return}togglePause(!paused);return}
 if(k==='h'&&!paused&&!dialogOpen){const el=$('helpOverlay');const opening=el.style.display!=='flex';closePanels();if(opening)el.style.display='flex';return}
 if(k==='i'&&!paused&&!dialogOpen){const el=$('inventoryOverlay');const opening=el.style.display!=='flex';closePanels();if(opening){renderInventory();el.style.display='flex'}return}
@@ -534,7 +576,7 @@ document.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
 window.addEventListener('blur',()=>keys.clear());
 // 프레임 간 시간차로 이동량과 10분 제한시간을 갱신한다.
 function tick(now){let dt=Math.min((now-last)/1000,.05);last=now;if(!paused&&!entering&&!leaving&&!dialogOpen&&$('helpOverlay').style.display!=='flex'&&$('inventoryOverlay').style.display!=='flex'){let dx=0,dy=0;if(keys.has('a')||keys.has('arrowleft'))dx--;if(keys.has('d')||keys.has('arrowright'))dx++;if(keys.has('w')||keys.has('arrowup'))dy--;if(keys.has('s')||keys.has('arrowdown'))dy++;if(dx||dy){const l=Math.hypot(dx,dy);dx=dx/l*78*dt;dy=dy/l*78*dt;if(canMove(x+dx,y))x+=dx;if(canMove(x,y+dy))y+=dy;draw()}
-}if(!paused&&!entering&&!leaving){remaining=Math.max(0,remaining-dt);}if(!paused&&!entering&&!leaving){const sec=Math.ceil(remaining);$('timer').textContent=String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0');if(remaining===0){togglePause(true);$('echoText').textContent='제한 시간이 종료되었습니다.'}}
+}if(!paused&&!entering&&!leaving){remaining=Math.max(0,remaining-dt);}if(!paused&&!entering&&!leaving){const sec=Math.ceil(remaining);$('timer').textContent=String(Math.floor(sec/60)).padStart(2,'0')+':'+String(sec%60).padStart(2,'0');if(remaining===0&&!timedOut){timedOut=true;closePanels();$('dialogOverlay').style.display='none';dialogOpen=false;$('pauseOverlay').classList.add('timeout-mode');togglePause(true);$('echoText').textContent='제한 시간이 종료되었습니다.'}}
 updateHint();requestAnimationFrame(tick)}draw();requestAnimationFrame(tick);
 setInterval(()=>{if(!leaving)saveProgress()},1500);
 window.addEventListener('pagehide',()=>{if(!leaving)saveProgress()});
@@ -609,6 +651,7 @@ html=html.replace("__FONT__",font)
 html=html.replace("__RESET_SAVE__", "true" if reset_save else "false")
 html = html.replace("</head>", '<style id="logic-v9-iframe-ui">\n/* This style lives INSIDE the components.html iframe, unlike v8\'s Streamlit-level CSS. */\n#helpOverlay,#inventoryOverlay{position:fixed!important;inset:0!important;z-index:4000!important;background:rgba(0,0,0,.70)!important;align-items:center!important;justify-content:center!important;overflow:hidden!important}\n#helpOverlay .help-panel,#helpOverlay .utility-panel{box-sizing:border-box!important;width:min(760px,90vw)!important;max-width:90vw!important;max-height:90vh!important;overflow:hidden!important;padding:24px 32px!important}\n#helpOverlay .help-row{display:grid!important;grid-template-columns:32px 260px minmax(0,1fr)!important;grid-template-rows:auto!important;gap:2px 14px!important;align-items:center!important;padding:9px 0!important;min-width:0!important;border-bottom:1px solid #17495b!important}\n#helpOverlay .help-number{grid-column:1!important;grid-row:1!important;display:block!important;width:auto!important;min-width:0!important;height:auto!important;color:#61e8ff!important;border:0!important;background:none!important;box-shadow:none!important}\n#helpOverlay .help-key{grid-column:2!important;grid-row:1!important;display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;gap:12px!important;min-width:0!important;width:auto!important;height:auto!important;padding:0!important;border:0!important;background:none!important;box-shadow:none!important;font-size:12px!important}\n#helpOverlay .help-key .control-label{position:static!important;display:inline!important;flex:0 0 128px!important;min-width:0!important;width:auto!important;height:auto!important;padding:0!important;transform:none!important;clip-path:none!important;border:0!important;background:none!important;box-shadow:none!important;color:#63e8ff!important;font-size:12px!important}\n#helpOverlay .help-key .control-separator{position:static!important;display:inline!important;flex:0 0 auto!important;color:#637985!important}\n#helpOverlay .help-key .control-button{position:static!important;display:inline!important;flex:0 0 auto!important;min-width:0!important;width:auto!important;height:auto!important;padding:0!important;transform:none!important;clip-path:none!important;border:0!important;background:none!important;box-shadow:none!important;color:#f2fbff!important;font-size:12px!important;line-height:1.4!important}\n#helpOverlay .help-description{grid-column:3!important;grid-row:1!important;color:#8c9da7!important;font-size:11px!important;line-height:1.5!important;min-width:0!important}\n#helpOverlay .help-important{margin-top:14px!important;padding:12px 14px!important}\n#inventoryOverlay .inventory-panel,#inventoryOverlay .utility-panel{box-sizing:border-box!important;width:min(760px,90vw)!important;max-height:90vh!important;overflow:hidden!important;padding:24px!important}\n#inventoryOverlay .inventory-grid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-template-rows:repeat(3,minmax(0,1fr))!important;gap:8px!important;max-height:min(55vh,470px)!important;overflow:hidden!important}\n#inventoryOverlay .inventory-slot{position:relative!important;min-width:0!important;min-height:0!important;aspect-ratio:1.1!important;background:#01060b!important;border:1px solid #28546a!important}\n#inventoryOverlay .item-description{margin-top:12px!important;min-height:56px!important;padding:12px!important;border:1px solid #48dfff!important;color:#d9faff!important}\n#pauseOverlay,.pause-overlay{z-index:9000!important;background:rgba(0,0,0,.72)!important;backdrop-filter:blur(3px)!important}\n#pauseOverlay .pause-menu-panel,.pause-overlay .pause-menu-panel{box-shadow:0 0 0 1px #123c4d,0 0 22px #00cfff55,0 0 100px #00cfff20!important}\n#pauseToggle,.pause-toggle{z-index:9100!important}\n.item-acquired-notice.show{z-index:4500!important}\n.item-acquired-text{font-size:12px!important;line-height:1.6!important}\n.echo-next{color:#4b8da0!important;opacity:.85!important}\n#dataSavingScreen:not(.active){display:none!important}\n#floorLayer,#wallLayer{width:100%!important;height:100%!important;object-fit:fill!important}\n</style>' + "</head>", 1)
 html = html.replace('</head>', '<style id="logic-v11-gameplay">' + '\n/* v11: tutorial-matched entrance and slow low-contrast ECHO prompt */\n.stage-transition-card{\n  text-shadow:0 0 5px #fff,0 0 12px #00dfff!important;\n  animation:neonFaultOnce .85s steps(1,end) 1 both!important;\n}\n.stage-transition-stage,.stage-transition-room{animation:none!important}\n@keyframes neonFaultOnce{\n  0%,18%,22%,100%{opacity:1;filter:none}\n  19%,21%{opacity:.22;filter:brightness(.4)}\n}\n.echo-next,.echo-next.ready,.echo-next:not(.ready){\n color:#80bbc8!important;\n opacity:.65!important;\n animation:logicSlowBlink 3s ease-in-out infinite!important;\n}\n@keyframes logicSlowBlink{0%,100%{filter:opacity(.35)}50%{filter:opacity(.9)}}\n\n/* v11: closed and open Stage 01 wall sprites share the SAME physical rectangle. */\n.room #floorLayer,.room #wallLayer{\n position:absolute!important;left:0!important;top:0!important;right:auto!important;bottom:auto!important;\n width:100%!important;height:100%!important;min-width:100%!important;min-height:100%!important;\n transform:none!important;object-fit:fill!important;transform-origin:center center!important;\n image-rendering:pixelated!important;\n}\n.room #wallLayer{clip-path:none!important}\n.game #interactionHint{bottom:calc(5% + 135px)!important;z-index:30!important}\n' + '</style></head>', 1)
+html = html.replace("</head>", '<style id="logic-timeout-actions">#pauseOverlay.timeout-mode .pause-row:first-child{display:none!important}</style></head>', 1)
 html = html.replace("</head>", '<style id="logic-v14-wall-sync">\n/* Preloaded full-canvas closed/open wall sprites. Keep precisely the same render box. */\n.room #wallLayer,.room #wallOpenLayer {\n position:absolute!important;left:0!important;top:0!important;right:auto!important;bottom:auto!important;\n width:100%!important;height:100%!important;min-width:100%!important;min-height:100%!important;\n margin:0!important;padding:0!important;max-width:none!important;max-height:none!important;\n transform:none!important;transform-origin:center center!important;object-fit:fill!important;\n image-rendering:pixelated!important;filter:none!important;clip-path:none!important;\n z-index:4!important;pointer-events:none!important;\n}\n.room.show-upper-player #wallLayer,.room.show-upper-player #wallOpenLayer{z-index:2!important}\n</style>' + "</head>", 1)
 html = html.replace("</head>", '\n<style id="logic-v14-shared-prompt">\n/* Identical typography and ready state to the tutorial ECHO prompt. */\n.echo-bar {box-sizing:border-box!important;padding-bottom:29px!important;min-height:88px!important}\n.echo-bar #echoText {display:block!important;margin:0!important;padding:0 0 8px!important;max-width:100%!important;white-space:normal!important;overflow-wrap:anywhere!important}\n.echo-bar #echoNext.echo-next {\n position:absolute!important;right:14px!important;bottom:7px!important;\n font:9px/1.4 NeoDungGeunMo,monospace!important;letter-spacing:normal!important;\n pointer-events:none!important;color:#6c8791!important;opacity:1!important;\n animation:none!important;text-shadow:none!important;\n}\n.echo-bar #echoNext.echo-next.ready {color:#f5ffff!important;animation:tutorialEchoBlink .8s steps(2,end) infinite!important}\n@keyframes tutorialEchoBlink {50%{opacity:.35}}\n</style>\n' + "</head>", 1)
 # 실제 표시 위치와 충돌 판정의 픽셀 이동값을 일치시킵니다.
