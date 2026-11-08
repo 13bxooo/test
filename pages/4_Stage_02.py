@@ -551,14 +551,29 @@ html = r"""<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name
 #echoFinale .ending-error-code{font-size:12px;line-height:1.6;color:#fb526e}
 #echoFinale .ending-error-sub{font-size:10px;color:#9eb8c6;line-height:1.6}
 #echoFinale .ending-error-ok{display:block;margin:2px auto 10px;text-align:center;border:1px solid #5ba3b6;width:76px;padding:4px 8px;background:#0f2631;color:#f0ffff;font-size:11px}
-/* 카메라 전원 차단과 SIGNAL LOST */
-#echoFinale .ending-signal{position:absolute;inset:0;z-index:90;background:#000;display:none;align-items:center;justify-content:center;flex-direction:column}
+/* 진입 컷신과 같은 CRT 카메라 종료 방식. 새로운 전원 차단 애니메이션을 만들지 않습니다. */
+#echoFinale.powering-down .ending-room,
+#echoFinale.powering-down .ending-errors{
+ transform-origin:50% 50%;pointer-events:none;
+ animation:cameraPowerCollapse .78s cubic-bezier(.6,0,.75,1) both!important;
+}
+#echoFinale.powering-down::after{
+ content:"";pointer-events:none;position:absolute;z-index:85;top:50%;left:50%;
+ width:min(950px,92vw);height:3px;transform:translate(-50%,-50%) scaleX(0);
+ background:#d8ffff;box-shadow:0 0 7px #caffff,0 0 24px #00daff;
+ animation:cameraPowerLine .78s steps(12,end) forwards;
+}
+/* SIGNAL LOST는 STAGE 00 진입창과 동일한 테두리·모서리·크기 클래스를 재사용합니다. */
+#echoFinale .ending-signal{position:absolute;inset:0;z-index:90;background:#000;display:none;align-items:center;justify-content:center}
 #echoFinale .ending-signal.visible{display:flex}
-#echoFinale .ending-power-line{position:absolute;left:0;right:0;top:50%;height:100vh;background:#e1ffff;box-shadow:0 0 18px #a7f8ff;transform-origin:center;animation:endingPowerCut .8s steps(14,end) forwards}
-@keyframes endingPowerCut{0%{transform:scaleY(1);opacity:.55}55%{transform:scaleY(.012);opacity:1}82%{transform:scaleX(.1) scaleY(.003);opacity:.9}100%{transform:scaleX(0) scaleY(0);opacity:0}}
-#echoFinale .ending-signal-text{font-size:clamp(24px,5vw,46px);letter-spacing:.23em;color:#eef7f9;text-shadow:0 0 9px #5ec8db;opacity:0}
+#echoFinale .ending-signal-card{width:min(350px,78vw);min-height:145px}
+#echoFinale .ending-signal-text{font-size:clamp(25px,4vw,36px);line-height:1.6;letter-spacing:2px;color:#f5fbff;text-shadow:0 0 5px #fff,0 0 14px #57dfff;opacity:0}
 #echoFinale .ending-signal-text.visible{opacity:1;animation:endingSignalBlink 1.8s steps(1,end) infinite}
 @keyframes endingSignalBlink{0%,100%{opacity:1}18%{opacity:.38}24%{opacity:1}77%{opacity:.72}}
+@media(prefers-reduced-motion:reduce){
+ #echoFinale.powering-down .ending-room,#echoFinale.powering-down .ending-errors{animation:none!important;opacity:0!important}
+ #echoFinale.powering-down::after{animation:none!important;opacity:0!important}
+}
 @media(max-width:640px){#echoFinale .ending-viewer{width:96vw}#echoFinale .ending-error{width:clamp(160px,42vw,240px)}#echoFinale .ending-error-content{padding:7px 8px;gap:8px}#echoFinale .ending-error-sub{font-size:8px}}
 </style>
 
@@ -570,7 +585,7 @@ html = r"""<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name
   <div id="endingBlank" class="ending-black"></div>
   <div id="endingGlitch" class="ending-glitch" aria-hidden="true"></div>
   <div id="endingErrors" class="ending-errors" aria-hidden="true"></div>
-  <div id="endingSignal" class="ending-signal"><div class="ending-power-line"></div><div id="endingSignalText" class="ending-signal-text">SIGNAL LOST</div></div>
+  <div id="endingSignal" class="ending-signal"><div class="stage-transition-card ending-signal-card"><div id="endingSignalText" class="stage-transition-stage ending-signal-text">SIGNAL LOST</div></div></div>
 </div><script>(()=>{
 const $=id=>document.getElementById(id),player=$('player'),keys=new Set();
 const saveKey='project_logic_stage02_progress_v1',handoffKey='project_logic_stage02_handoff_v1';
@@ -840,18 +855,19 @@ function endingErrorSound(index){
   const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio)return;
   glitchAudioCtx=glitchAudioCtx||new Audio();glitchAudioCtx.resume();
   const ctx=glitchAudioCtx,now=ctx.currentTime;
-  for(const [i,frequency] of [0,1].map(i=>[i,880-index*48-i*210])){
+  for(const [i,frequency] of [0,1].map(i=>[i,920-(index%13)*34-i*160])){
    const o=ctx.createOscillator(),g=ctx.createGain();o.type='square';o.frequency.setValueAtTime(frequency,now+i*.07);
-   g.gain.setValueAtTime(.0001,now+i*.07);g.gain.exponentialRampToValueAtTime(.035,now+i*.07+.012);g.gain.exponentialRampToValueAtTime(.0001,now+i*.07+.11);
+   g.gain.setValueAtTime(.0001,now+i*.07);g.gain.exponentialRampToValueAtTime(.020,now+i*.07+.012);g.gain.exponentialRampToValueAtTime(.0001,now+i*.07+.11);
    o.connect(g).connect(ctx.destination);o.start(now+i*.07);o.stop(now+i*.07+.12);
   }
  }catch(e){}
 }
 function createEndingError(index){
- // 두 방향으로 대각선을 따라 쏟아지는 14개의 시스템 오류 창.
- const positions=[[14,16],[25,24],[36,32],[47,40],[58,48],[69,56],[80,64],
-                  [88,74],[18,73],[28,63],[39,53],[50,43],[61,33],[72,23]];
- const [x,y]=positions[index%positions.length];const err=document.createElement('div');err.className='ending-error';
+ // 양쪽 대각선을 따라 36개의 오류창이 촘촘히 쌓입니다.
+ const step=Math.floor(index/2)%18;
+ const x=12+step*4.4+(index%2?2:0);
+ const y=index%2?(79-step*3.6):(18+step*3.6);
+ const err=document.createElement('div');err.className='ending-error';
  err.style.setProperty('--x',x+'%');err.style.setProperty('--y',y+'%');err.style.zIndex=String(2+index);
  err.innerHTML='<div class="ending-error-bar"><span>SYSTEM FAILURE // 0'+(index+1)+'</span><span class="ending-error-x">×</span></div>'+
  '<div class="ending-error-content"><span class="ending-error-icon">×</span><div><div class="ending-error-code">ERROR CODE // E-'+String(401+index)+'</div><div class="ending-error-sub">CRITICAL PROCESS TERMINATED</div></div></div><div class="ending-error-ok">OK</div>';
@@ -890,10 +906,17 @@ async function startEndingSequence(){
  endingGlitch(true);playGlitchSound(.8,true);
  await endingWait(430);$('endingRoomImage').src='__ECHO_ERROR__';
  await endingWait(370);endGlitch();
- // 마지막 오류 창이 나타난 다음 지체하지 않고 SIGNAL LOST로 넘어갑니다.
- for(let i=0;i<14;i++){createEndingError(i);await endingWait(100)}
- const lost=$('endingSignal');lost.classList.add('visible');playCameraPowerOffSound();
- await endingWait(810);$('endingSignalText').classList.add('visible');
+ // 36개를 38ms 간격으로 빠르게 출력하고, 마지막 창 직후 진입 컷신과 같은 카메라 종료를 실행합니다.
+ for(let i=0;i<36;i++){
+  createEndingError(i);
+  if(i<35)await endingWait(38);
+ }
+ // 기존 Stage 02 진입 때와 동일한 효과음과 CRT 수축 애니메이션을 재사용합니다.
+ playCameraPowerOffSound();
+ screen.classList.add('powering-down');
+ await endingWait(800);
+ const lost=$('endingSignal');lost.classList.add('visible');
+ $('endingSignalText').classList.add('visible');
  await endingWait(1800);
  returnToFreshTitle();
 }
