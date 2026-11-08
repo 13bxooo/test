@@ -610,9 +610,28 @@ let wallAlpha=null;
 const collisionCtx=collisionCanvas.getContext('2d',{willReadFrequently:true});
 function buildWallCollision(){try{collisionCtx.clearRect(0,0,1200,900);collisionCtx.drawImage($('wallLayer'),0,0,1200,900);wallAlpha=collisionCtx.getImageData(0,0,1200,900).data}catch(e){wallAlpha=null}}
 if($('wallLayer').complete)buildWallCollision();else $('wallLayer').addEventListener('load',buildWallCollision,{once:true});
+// 오브제 이미지를 기준으로 실제 충돌 영역을 설정합니다. 그림자는 충돌하지 않습니다.
+const physicalProps=['core','diagnostic','maintenance','document','circuit','warning','wall_panel'];
+function blockedByProp(nx,ny){
+ const roomRect=$('room').getBoundingClientRect();
+ if(roomRect.width<=0||roomRect.height<=0)return false;
+ const cx=roomRect.left+nx/100*roomRect.width;
+ const cy=roomRect.top+ny/100*roomRect.height;
+ const rx=(player.offsetWidth||22)*.34,ry=(player.offsetHeight||28)*.22;
+ for(const id of physicalProps){
+  const el=$('stage02-prop-'+id);if(!el)continue;
+  const r=el.getBoundingClientRect();if(r.width<=0||r.height<=0)continue;
+  // 가장자리 투명 픽셀은 제외하고 본체 주변만 막습니다.
+  const left=r.left+r.width*.085,right=r.right-r.width*.085;
+  const top=r.top+r.height*.08,bottom=r.bottom-r.height*.07;
+  if(cx+rx>left&&cx-rx<right&&cy+ry>top&&cy-ry<bottom)return true;
+ }
+ return false;
+}
 function valid(nx,ny){
  const px=Math.round(nx*12),py=Math.round(ny*9);
  if(px<0||px>=1200||py<0||py>=900)return false;
+ if(blockedByProp(nx,ny))return false;
  if(!wallAlpha)return true;
  // 캐릭터 발 위치 기준으로 벽 이미지의 불투명한 픽셀만 충돌 처리.
  for(const [dx,dy] of [[-9,-9],[9,-9],[-9,9],[9,9],[0,0]]){
@@ -829,8 +848,10 @@ function endingErrorSound(index){
  }catch(e){}
 }
 function createEndingError(index){
- const positions=[[21,19],[33,29],[45,39],[57,49],[68,59],[79,69]];
- const [x,y]=positions[index];const err=document.createElement('div');err.className='ending-error';
+ // 두 방향으로 대각선을 따라 쏟아지는 14개의 시스템 오류 창.
+ const positions=[[14,16],[25,24],[36,32],[47,40],[58,48],[69,56],[80,64],
+                  [88,74],[18,73],[28,63],[39,53],[50,43],[61,33],[72,23]];
+ const [x,y]=positions[index%positions.length];const err=document.createElement('div');err.className='ending-error';
  err.style.setProperty('--x',x+'%');err.style.setProperty('--y',y+'%');err.style.zIndex=String(2+index);
  err.innerHTML='<div class="ending-error-bar"><span>SYSTEM FAILURE // 0'+(index+1)+'</span><span class="ending-error-x">×</span></div>'+
  '<div class="ending-error-content"><span class="ending-error-icon">×</span><div><div class="ending-error-code">ERROR CODE // E-'+String(401+index)+'</div><div class="ending-error-sub">CRITICAL PROCESS TERMINATED</div></div></div><div class="ending-error-ok">OK</div>';
@@ -869,8 +890,8 @@ async function startEndingSequence(){
  endingGlitch(true);playGlitchSound(.8,true);
  await endingWait(430);$('endingRoomImage').src='__ECHO_ERROR__';
  await endingWait(370);endGlitch();
- for(let i=0;i<6;i++){createEndingError(i);await endingWait(145)}
- await endingWait(1350);
+ // 마지막 오류 창이 나타난 다음 지체하지 않고 SIGNAL LOST로 넘어갑니다.
+ for(let i=0;i<14;i++){createEndingError(i);await endingWait(100)}
  const lost=$('endingSignal');lost.classList.add('visible');playCameraPowerOffSound();
  await endingWait(810);$('endingSignalText').classList.add('visible');
  await endingWait(1800);
